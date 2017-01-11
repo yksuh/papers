@@ -1,0 +1,37 @@
+x = read.csv(file="dual1_PUT16.dat",head=TRUE,sep="\t")
+y = read.csv(file="dual2_PUT16.dat",head=TRUE,sep="\t")
+total <- c("ITER_PAIR", "CORR_VAL")
+max <- 1000
+for(i in 2:max)
+{
+	x1 <- subset(x, x$ITERNUM == i-1)
+	y1 <- subset(y, y$ITERNUM == i-1)
+	x2 <- subset(x, x$ITERNUM == i)
+	y2 <- subset(y, y$ITERNUM == i)
+	first <- rbind(x1, y1)
+	second <- rbind(x2, y2)
+	c <- cor(first$METIME, second$METIME)
+	total <- rbind(total, c(i, c))
+}
+nrow(total)
+write.table(total, "16_sec_ip_cor.dat", sep="\t", row.names=FALSE, col.names=FALSE) 
+	
+total <- c("ITER_PAIR", "CORR_VAL")
+x = read.csv(file="dual1_PUT16.dat",head=TRUE,sep="\t")
+y = read.csv(file="dual2_PUT16.dat",head=TRUE,sep="\t")
+x1 <- subset(x, x$ITERNUM == 1)
+y1 <- subset(y, y$ITERNUM == 1)
+x2 <- subset(x, x$ITERNUM == 2)
+y2 <- subset(y, y$ITERNUM == 2)
+first <- rbind(x1, y1)
+second <- rbind(x2, y2)
+c <- cor(first$METIME, second$METIME)
+
+x1 <- subset(x, x$ITERNUM == 2)
+y1 <- subset(y, y$ITERNUM == 2)
+x2 <- subset(x, x$ITERNUM == 3)
+y2 <- subset(y, y$ITERNUM == 3)
+first <- rbind(x1, y1)
+second <- rbind(x2, y2)
+c <- cor(first$METIME, second$METIME)
+c

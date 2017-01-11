@@ -1,0 +1,42 @@
+
+x = read.csv(file="1_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("1_sec_pt_all.eps")
+plot(x$PRTIME, xlim=c(0,1000), ylim=c(1100, 1300), pch=1, main='', xlab='# of executions', ylab='PT (msec)')
+dev.off()
+
+x = read.csv(file="2_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("2_sec_pt_all.eps")
+plot(x$PRTIME, xlim=c(0,1000), ylim=c(2200, 2500), pch=1, main='', xlab='# of executions', ylab='PT (msec)')
+dev.off()
+
+x = read.csv(file="4_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("4_sec_pt_all.eps")
+plot(x$PRTIME, xlim=c(0,1000), ylim=c(4500, 5000), pch=1, main='', xlab='# of executions', ylab='PT (msec)')
+dev.off()
+
+x = read.csv(file="8_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("8_sec_pt_all.eps")
+plot(x$PRTIME, xlim=c(0,1000), ylim=c(9000, 9100), pch=1, main='', xlab='# of executions', ylab='PT (msec)')
+dev.off()
+
+x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("16_sec_pt_all.eps")
+plot(x$PRTIME, xlim=c(0,1000), ylim=c(18050, 18300), pch=1, main='', xlab='# of executions', ylab='PT (msec)')
+dev.off()
+
+x = read.csv(file="32_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("32_sec_pt_all.eps")
+plot(x$PRTIME, xlim=c(0,1000), ylim=c(36000, 37200), pch=1, main='', xlab='# of executions', ylab='PT (msec)')
+dev.off()
+
+x = read.csv(file="64_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("64_sec_pt_all.eps")
+plot(x$PRTIME, xlim=c(0,1000), ylim=c(72000, 75500), pch=1, main='', xlab='# of executions', ylab='PT (msec)')
+dev.off()

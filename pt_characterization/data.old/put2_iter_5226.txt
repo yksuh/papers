@@ -1,0 +1,413 @@
+[Console output redirected to file:/home/yksuh/console_output]
+SELECT distinct exp_run_time, algrunid from AZDBLab_NewAlgRun2 order by exp_run_time, runstarttime, algrunid
+00001(	init,
+	btime  :1440346930,
+	etime  :9850954054,
+)
+00002(	kthreadd,
+	btime  :1440346930,
+	etime  :9850954055,
+)
+00003(	migration/0,
+	btime  :1440346930,
+	etime  :9850954047,
+)
+00004(	ksoftirqd/0,
+	btime  :1440346930,
+	etime  :9850954048,
+)
+00005(	migration/0,
+	btime  :1440346930,
+	etime  :9850954049,
+)
+00006(	watchdog/0,
+	btime  :1440346930,
+	etime  :9850954050,
+)
+00007(	events/0,
+	btime  :1440346930,
+	etime  :9850954051,
+)
+00008(	cgroup,
+	btime  :1440346930,
+	etime  :9850954052,
+)
+00009(	khelper,
+	btime  :1440346930,
+	etime  :9850954053,
+)
+00010(	netns,
+	btime  :1440346930,
+	etime  :9850954050,
+)
+00011(	async/mgr,
+	btime  :1440346930,
+	etime  :9850954051,
+)
+00012(	pm,
+	btime  :1440346930,
+	etime  :9850954052,
+)
+00013(	sync_supers,
+	btime  :1440346930,
+	etime  :9850954041,
+)
+00014(	bdi-default,
+	btime  :1440346930,
+	etime  :9850954042,
+)
+00015(	kintegrityd/0,
+	btime  :1440346930,
+	etime  :9850954043,
+)
+00016(	kblockd/0,
+	btime  :1440346930,
+	etime  :9850954045,
+)
+00017(	kacpid,
+	btime  :1440346930,
+	etime  :9850954046,
+)
+00018(	kacpi_notify,
+	btime  :1440346930,
+	etime  :9850954047,
+)
+00019(	kacpi_hotplug,
+	btime  :1440346930,
+	etime  :9850954048,
+)
+00020(	ata/0,
+	btime  :1440346930,
+	etime  :9850954023,
+)
+00021(	ata_aux,
+	btime  :1440346930,
+	etime  :9850954023,
+)
+00022(	ksuspend_usbd,
+	btime  :1440346930,
+	etime  :9850954024,
+)
+00023(	khubd,
+	btime  :1440346930,
+	etime  :9850954025,
+)
+00024(	kseriod,
+	btime  :1440346930,
+	etime  :9850954026,
+)
+00025(	md/0,
+	btime  :1440346930,
+	etime  :9850954027,
+)
+00026(	md_misc/0,
+	btime  :1440346930,
+	etime  :9850954029,
+)
+00027(	khungtaskd,
+	btime  :1440346931,
+	etime  :9850953733,
+)
+00028(	kswapd0,
+	btime  :1440346931,
+	etime  :9850953734,
+)
+00029(	ksmd,
+	btime  :1440346931,
+	etime  :9850953734,
+)
+00030(	khugepaged,
+	btime  :1440346931,
+	etime  :9850953735,
+)
+00031(	aio/0,
+	btime  :1440346931,
+	etime  :9850953736,
+)
+00032(	crypto/0,
+	btime  :1440346931,
+	etime  :9850953737,
+)
+00037(	kthrotld/0,
+	btime  :1440346931,
+	etime  :9850953738,
+)
+00038(	pciehpd,
+	btime  :1440346931,
+	etime  :9850953738,
+)
+00040(	kpsmoused,
+	btime  :1440346931,
+	etime  :9850953704,
+)
+00041(	usbhid_resumer,
+	btime  :1440346931,
+	etime  :9850953705,
+)
+00072(	kstriped,
+	btime  :1440346931,
+	etime  :9850953683,
+)
+00165(	ttm_swap,
+	btime  :1440346931,
+	etime  :9850953443,
+)
+00166(	kslowd000,
+	btime  :1440346931,
+	etime  :9850953443,
+)
+00167(	kslowd001,
+	btime  :1440346931,
+	etime  :9850953444,
+)
+00343(	scsi_eh_0,
+	btime  :1440346932,
+	etime  :9850952772,
+)
+00344(	scsi_eh_1,
+	btime  :1440346932,
+	etime  :9850952774,
+)
+00345(	scsi_eh_2,
+	btime  :1440346932,
+	etime  :9850952775,
+)
+00347(	scsi_eh_3,
+	btime  :1440346932,
+	etime  :9850952776,
+)
+00474(	md0_raid1,
+	btime  :1440346934,
+	etime  :9850951644,
+	sTime  :2312022704 to 2312023704 = 1000,
+	sTimeS :2312022704 to 2312023704 = 1000,
+)
+00488(	jbd2/md0-8,
+	btime  :1440346936,
+	etime  :9850949597,
+)
+00489(	ext4-dio-unwrit,
+	btime  :1440346936,
+	etime  :9850949598,
+)
+00508(	flush-9:0,
+	btime  :1440346936,
+	etime  :9850949080,
+)
+00574(	udevd,
+	btime  :1440346938,
+	etime  :9850947280,
+)
+00782(	hd-audio0,
+	btime  :1440346939,
+	etime  :9850946051,
+)
+01046(	kauditd,
+	btime  :1440346967,
+	etime  :9850918498,
+)
+01089(	infiniband/0,
+	btime  :1440346967,
+	etime  :9850918144,
+)
+01096(	ib_mcast,
+	btime  :1440346967,
+	etime  :9850918122,
+)
+01100(	ib_addr,
+	btime  :1440346967,
+	etime  :9850918076,
+)
+01104(	iw_cm_wq,
+	btime  :1440346967,
+	etime  :9850918073,
+)
+01108(	ib_cm/0,
+	btime  :1440346967,
+	etime  :9850918066,
+)
+01112(	rdma_cm,
+	btime  :1440346967,
+	etime  :9850918047,
+)
+01128(	ipoib,
+	btime  :1440346967,
+	etime  :9850918005,
+)
+01344(	portreserve,
+	btime  :1440346971,
+	etime  :9850914906,
+)
+01351(	rsyslogd,
+	btime  :1440346971,
+	etime  :9850914818,
+)
+01393(	rpcbind,
+	btime  :1440346971,
+	etime  :9850914569,
+)
+01411(	rpc.statd,
+	btime  :1440346971,
+	etime  :9850914502,
+)
+01440(	rpciod/0,
+	btime  :1440346971,
+	etime  :9850914398,
+)
+01445(	rpc.idmapd,
+	btime  :1440346973,
+	etime  :9850912307,
+)
+01867(	dbus-daemon,
+	btime  :1440346977,
+	etime  :9850908348,
+)
+01906(	cifsiod,
+	btime  :1440346979,
+	etime  :9850906565,
+)
+01915(	cifsd,
+	btime  :1440346979,
+	etime  :9850906422,
+)
+02017(	mcelog,
+	btime  :1440346982,
+	etime  :9850903978,
+)
+02057(	sshd,
+	btime  :1440346982,
+	etime  :9850903571,
+)
+02421(	abrt-dump-oops,
+	btime  :1440346988,
+	etime  :9850897275,
+)
+02452(	rhnsd,
+	btime  :1440346989,
+	etime  :9850896851,
+)
+02458(	rhsmcertd,
+	btime  :1440346989,
+	etime  :9850896829,
+)
+02500(	ypbind,
+	btime  :1440346989,
+	etime  :9850896590,
+)
+02516(	mingetty,
+	btime  :1440346989,
+	etime  :9850896516,
+)
+02518(	mingetty,
+	btime  :1440346989,
+	etime  :9850896515,
+)
+02520(	mingetty,
+	btime  :1440346989,
+	etime  :9850896514,
+)
+02522(	mingetty,
+	btime  :1440346989,
+	etime  :9850896513,
+)
+02524(	mingetty,
+	btime  :1440346989,
+	etime  :9850896512,
+)
+02526(	udevd,
+	btime  :1440346989,
+	etime  :9850896511,
+)
+02527(	udevd,
+	btime  :1440346989,
+	etime  :9850896513,
+)
+02528(	mingetty,
+	btime  :1440346989,
+	etime  :9850896510,
+)
+03959(	ntpd,
+	btime  :1444982360,
+	etime  :5215525056,
+)
+08299(	sudo,
+	btime  :1450185344,
+	etime  :12541758,
+)
+08302(	proc_monitor,
+	btime  :1450185348,
+	etime  :12537729,
+	uTime  :2114342000 to 2114534000 = 192000,
+	sTime  :48466000 to 48472000 = 6000,
+	uTimeS :2114342000 to 2114534000 = 192000,
+	sTimeS :48466000 to 48472000 = 6000,
+)
+08303(	sudo,
+	btime  :1450185353,
+	etime  :12532438,
+)
+08304(	unit.sh,
+	btime  :1450185356,
+	etime  :12529562,
+)
+08315(	sudo,
+	btime  :1450185356,
+	etime  :12529318,
+)
+08316(	java,
+	btime  :1450185356,
+	etime  :12529282,
+)
+08326(	incr_work,
+	btime  :1450185359,
+	etime  :12526906,
+	uTime  :1885608408 to 1887645408 = 2037000,
+	sTime  :257000 to 298000 = 41000,
+	r_chr  :7187 to 7188 = 1,
+	r_calls:5235 to 5236 = 1,
+	uTimeS :1885608408 to 1887645408 = 2037000,
+	sTimeS :257000 to 298000 = 41000,
+)
+15425(	sshd,
+	btime  :1450143750,
+	etime  :54135670,
+)
+15427(	sshd,
+	btime  :1450143750,
+	etime  :54135536,
+)
+15428(	bash,
+	btime  :1450143750,
+	etime  :54135512,
+)
+16246(	sshd,
+	btime  :1450144128,
+	etime  :53757833,
+)
+16248(	sshd,
+	btime  :1450144128,
+	etime  :53757698,
+)
+16249(	bash,
+	btime  :1450144128,
+	etime  :53757673,
+)
+24034(	rhn_check,
+	btime  :1450197880,
+	etime  :5484,
+	min_flt:8242 to 9041 = 799,
+	maj_flt:45 to 48 = 3,
+	uTime  :249000 to 623000 = 374000,
+	sTime  :61000 to 147000 = 86000,
+	r_chr  :5401931 to 76564001 = 71162070,
+	w_chr  :21858 to 26493 = 4635,
+	r_calls:1244 to 14156 = 12912,
+	w_calls:27 to 30 = 3,
+	r_bytes:8224768 to 86364160 = 78139392,
+	w_bytes:212992 to 225280 = 12288,
+	uTimeS :249000 to 623000 = 374000,
+	sTimeS :61000 to 147000 = 86000,
+)
+
+
+

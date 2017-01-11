@@ -1,0 +1,29 @@
+x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("16_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, plot=F)
+plot(h, freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 16-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+m = mean(h$density)
+v = var(h$density)
+xaxtl <- seq(floor(min(h$mids))-1,ceiling(max(h$mids))+1)
+axis(side=1, at=xaxtl, labels=xaxtl)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+xaxtl <- seq(floor(min(h$mids))-1,ceiling(max(h$mids))+1)
+axis(side=1, at=xaxtl, labels=xaxtl)
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+b <- as.double(b)
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+b <- as.double(b)
+yfit<-dbeta(x_normal,a,b)
+org_x = x_normal*((max(x$PRTIME)-min(x$PRTIME)))+min(x$PRTIME)
+lines(org_x, yfit, col="blue", lwd=2)
+dev.off()

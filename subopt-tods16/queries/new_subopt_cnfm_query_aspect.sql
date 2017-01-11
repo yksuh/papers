@@ -190,14 +190,4 @@ ALTER TABLE NSOCnfm_S4_New_Var ADD PRIMARY KEY (dbms, runid, querynum);
 -- select count(*) from NSOCnfm_S4_New_Var;
 -- select count(*) from NSOCnfm_S4_CTQatC;
 -- select distinct dbms, runid, querynum from NSOCnfm_S4_CTQatC minus select distinct dbms, runid, querynum from NSOCnfm_S4_New_Var
-SQL> select distinct dbms, runid, querynum from NSOCnfm_S4_CTQatC minus select distinct dbms, runid, querynum from NSOCnfm_S4_New_Var;
 
-DBMS
---------------------------------------------------------------------------------
-     RUNID   QUERYNUM
----------- ----------
-mysql
-       231	   87
-select dbms, runid, querynum, card, qeid from NSOCnfm_S0_AQE where runid = 231 and querynum = 87
-select dbms, runid, querynum, card, qeid from NSOCnfm_QED where runid = 231 and querynum = 87
-delete from NSOCnfm_S4_CTQatC where runid = 231 and querynum = 87 and card = 30900

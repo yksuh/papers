@@ -1,0 +1,520 @@
+
+####
+###extreme outliers
+
+on dual PUT2048 in Figure 33(b)
+
+iternum (at dual): 14, 56, 98
+
+SELECT avg(proc.utime+proc.stime) / 1000, median(proc.utime+proc.stime) / 1000
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and proc.processname = 'incr_work'
+and arr.algrunid = 11340
+
+=> mean: 2052306, 2052306
+
+SELECT arr.iternum, processname, sum(proc.utime+proc.stime)
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and arr.iternum IN (13, 55, 97)
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340
+group by arr.iternum, processname
+order by arr.iternum, sum(proc.utime+proc.stime) desc
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+	13 incr_work					    2052315000
+	13 rhsmcertd-worke					234000
+	13 proc_monitor 					200000
+	13 kslowd000						103000
+	13 kslowd001						102000
+	13 sshd 						 27000
+	13 md0_raid1						 26000
+	13 grep 						 16000
+	13 java 						  2000
+	13 jbd2/md0-8						  1000
+	55 incr_work					    2052341000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+	55 rhsmcertd-worke					232000
+	55 proc_monitor 					198000
+	55 kslowd000						103000
+	55 kslowd001						102000
+	55 sshd 						 26000
+	55 md0_raid1						 26000
+	55 grep 						  8000
+	55 kblockd/0						  2000
+	55 java 						  2000
+	55 jbd2/md0-8						  1000
+	97 incr_work					    2052337000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+	97 rhsmcertd-worke					233000
+	97 proc_monitor 					200000
+	97 kslowd001						103000
+	97 kslowd000						102000
+	97 sshd 						 33000
+	97 md0_raid1						 27000
+	97 grep 						 10000
+	97 java 						  2000
+	97 flush-9:0						  1000
+	97 kblockd/0						  1000
+
+####
+###extreme outliers
+
+on dual PUT1024 in Figure 29
+
+SELECT arr.iternum, processname, sum(proc.utime+proc.stime)
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and arr.iternum IN ( 79,151,663,834)
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 10680
+group by arr.iternum, processname
+order by arr.iternum, sum(proc.utime+proc.stime) desc
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+	79 incr_work					    1026467000
+	79 rhn_check					      31189000
+	79 proc_monitor 					196000
+	79 flush-9:0						130000
+	79 md0_raid1						112000
+	79 kslowd001						 54000
+	79 kslowd000						 53000
+	79 jbd2/md0-8						 12000
+	79 rhnsd						  7000
+	79 java 						  4000
+       151 incr_work					    1026417000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       151 rhn_check					      29294000
+       151 proc_monitor 					200000
+       151 flush-9:0						115000
+       151 md0_raid1						 86000
+       151 kslowd001						 53000
+       151 kslowd000						 52000
+       151 jbd2/md0-8						 12000
+       151 rhnsd						  6000
+       151 java 						  4000
+       663 incr_work					    1026450000
+       663 rhn_check					      31231000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       663 proc_monitor 					198000
+       663 flush-9:0						137000
+       663 md0_raid1						100000
+       663 kslowd001						 53000
+       663 kslowd000						 53000
+       663 jbd2/md0-8						 14000
+       663 rhnsd						  5000
+       663 java 						  4000
+       834 incr_work					    1026444000
+       834 rhn_check					      31784000
+       834 proc_monitor 					196000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       834 flush-9:0						134000
+       834 md0_raid1						 94000
+       834 kslowd000						 53000
+       834 kslowd001						 53000
+       834 jbd2/md0-8						 24000
+       834 rhnsd						  6000
+       834 java 						  4000
+
+40 rows selected.
+
+
+** second group ***
+
+=> 108, 138, 180, 208, 236, 264, 289, 317, 373
+
+SELECT arr.iternum, processname, sum(proc.utime+proc.stime)
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+--and arr.iternum IN ( 108, 138, 180, 208, 236, 264, 289, 317, 373)
+and arr.iternum IN ( 107,137, 179, 207, 235, 263, 288, 316, 372)
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 10680
+group by arr.iternum, processname
+order by arr.iternum, sum(proc.utime+proc.stime) desc
+
+==> 
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       107 incr_work					    1026174000
+       107 rhn_check						775000
+       107 proc_monitor 					196000
+       107 kslowd001						 52000
+       107 kslowd000						 52000
+       107 md0_raid1						 14000
+       107 rhnsd						  6000
+       107 java 						  3000
+       107 jbd2/md0-8						  2000
+       137 incr_work					    1026165000
+       137 rhn_check						771000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       137 proc_monitor 					198000
+       137 kslowd001						 52000
+       137 kslowd000						 51000
+       137 md0_raid1						 12000
+       137 rhnsd						  6000
+       137 java 						  3000
+       137 jbd2/md0-8						  1000
+       179 incr_work					    1026169000
+       179 rhn_check						761000
+       179 proc_monitor 					196000
+       179 kslowd000						 54000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       179 kslowd001						 51000
+       179 md0_raid1						 12000
+       179 rhnsd						  6000
+       179 java 						  3000
+       207 incr_work					    1026179000
+       207 rhn_check						770000
+       207 proc_monitor 					202000
+       207 kslowd000						 52000
+       207 kslowd001						 51000
+       207 md0_raid1						 15000
+       207 rhnsd						  5000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       207 java 						  3000
+       235 incr_work					    1026176000
+       235 rhn_check						763000
+       235 proc_monitor 					196000
+       235 kslowd001						 52000
+       235 kslowd000						 51000
+       235 md0_raid1						 12000
+       235 rhnsd						  6000
+       235 java 						  3000
+       235 cifsd						  1000
+       263 incr_work					    1026169000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       263 rhn_check						760000
+       263 proc_monitor 					198000
+       263 kslowd000						 51000
+       263 kslowd001						 51000
+       263 md0_raid1						 13000
+       263 rhnsd						  4000
+       263 java 						  3000
+       263 kblockd/0						  1000
+       263 jbd2/md0-8						  1000
+       288 incr_work					    1026172000
+       288 rhn_check						763000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       288 proc_monitor 					196000
+       288 kslowd000						 52000
+       288 kslowd001						 51000
+       288 md0_raid1						  8000
+       288 rhnsd						  6000
+       288 java 						  3000
+       288 jbd2/md0-8						  1000
+       316 incr_work					    1026171000
+       316 rhn_check						757000
+       316 proc_monitor 					198000
+       316 kslowd000						 51000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       316 kslowd001						 51000
+       316 md0_raid1						 10000
+       316 rhnsd						  7000
+       316 java 						  3000
+       372 incr_work					    1026171000
+       372 rhn_check						762000
+       372 proc_monitor 					198000
+       372 kslowd001						 52000
+       372 kslowd000						 52000
+       372 md0_raid1						 13000
+       372 rhnsd						  4000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       372 java 						  3000
+
+=====
+
+
+####
+###extreme outliers
+#dual PUT4096: 57, 250,
+#new dual PUT4096: 5, 26, 47, 68
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+	56 rhn_check					      30031000
+	56 incr_work						410180
+       249 rhn_check					      30111000
+       249 incr_work						410184
+
+SELECT arr.iternum, processname, sum(proc.utime+proc.stime)
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+--and arr.iternum IN ( 56, 249)
+and arr.iternum IN ( 4, 25, 46, 67)
+and (proc.utime+proc.stime) > 0
+--and arr.algrunid = 9720 
+and arr.algrunid = 11360 
+group by arr.iternum, processname
+order by arr.iternum, sum(proc.utime+proc.stime) desc
+
+SELECT arr.iternum, procid, processname, proc.utime+proc.stime as proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+--and arr.iternum IN ( 56, 249)
+and arr.iternum IN ( 4, 25, 46, 67)
+and (proc.utime+proc.stime) > 0
+--and arr.algrunid = 9720 
+and arr.algrunid = 11360 
+order by arr.iternum, proc.utime+proc.stime desc
+
+#dual PUT2048: 179, 354, 396
+#new dual PUT2048: 14, 56, 98
+######
+
+SELECT arr.iternum, processname, sum(proc.utime+proc.stime)
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+--and arr.iternum IN ( 179, 354, 396)
+and arr.iternum IN ( 177,178, 353, 395)
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 10700
+group by arr.iternum, processname
+order by arr.iternum, sum(proc.utime+proc.stime) desc
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       177 incr_work					    2052298000
+       177 proc_monitor 					200000
+       177 kslowd000						103000
+       177 kslowd001						102000
+       177 md0_raid1						 25000
+       177 java 						  3000
+       177 cifsd						  1000
+       177 kblockd/0						  1000
+---------- -------------------------------- --------------------------
+       178 incr_work					    2052566000
+       178 rhn_check					      29211000
+       178 proc_monitor 					199000
+       178 flush-9:0						112000
+       178 kslowd001						106000
+       178 md0_raid1						106000
+       178 kslowd000						104000
+       178 jbd2/md0-8						 20000
+       178 rhnsd						  6000
+       178 java 						  4000
+       178 cifsd						  1000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       353 incr_work					    2052603000
+       353 rhn_check					      31877000
+       353 proc_monitor 					198000
+       353 flush-9:0						146000
+       353 kslowd001						105000
+       353 kslowd000						104000
+       353 md0_raid1						 99000
+       353 jbd2/md0-8						 15000
+       353 rhnsd						  6000
+       353 java 						  3000
+       395 incr_work					    2052606000
+
+   ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+       395 rhn_check					      32436000
+       395 proc_monitor 					198000
+       395 flush-9:0						142000
+       395 md0_raid1						116000
+       395 kslowd000						105000
+       395 kslowd001						104000
+       395 jbd2/md0-8						 11000
+       395 rhnsd						  4000
+       395 java 						  3000
+       395 cifsd						  2000
+       395 kblockd/0						  1000
+
+SELECT arr.iternum, processname, sum(proc.utime+proc.stime)
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+--and arr.iternum IN (57, 250)
+and arr.iternum IN (56, 249)
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 9720
+group by arr.iternum, processname
+order by arr.iternum, sum(proc.utime+proc.stime) desc
+
+  ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+	56 rhn_check					      30031000
+	56 incr_work						410180
+       249 rhn_check					      30111000
+       249 incr_work						410184
+
+SELECT arr.iternum, processname, sum(proc.utime+proc.stime)
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+--and arr.iternum IN (14, 56, 98)
+and arr.iternum IN (13, 55, 97)
+--and arr.iternum IN (13, 55, 99,14, 56, 98)
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340
+group by arr.iternum, processname
+order by arr.iternum, sum(proc.utime+proc.stime) desc
+
+    ITERNUM PROCESSNAME			    SUM(PROC.UTIME+PROC.STIME)
+---------- -------------------------------- --------------------------
+	13 incr_work					    2052315000
+	13 rhsmcertd-worke					234000
+	13 proc_monitor 					200000
+	13 kslowd000						103000
+	13 kslowd001						102000
+	13 sshd 						 27000
+	13 md0_raid1						 26000
+	13 grep 						 16000
+	13 java 						  2000
+	13 jbd2/md0-8						  1000
+
+	55 incr_work					    2052341000
+	55 rhsmcertd-worke					232000
+	55 proc_monitor 					198000
+	55 kslowd000						103000
+	55 kslowd001						102000
+	55 sshd 						 26000
+	55 md0_raid1						 26000
+	55 grep 						  8000
+	55 kblockd/0						  2000
+	55 java 						  2000
+	55 jbd2/md0-8						  1000
+
+	97 incr_work					    2052337000
+	97 rhsmcertd-worke					233000
+	97 proc_monitor 					200000
+	97 kslowd001						103000
+	97 kslowd000						102000
+	97 sshd 						 33000
+	97 md0_raid1						 27000
+	97 grep 						 10000
+	97 java 						  2000
+	97 flush-9:0						  1000
+	97 kblockd/0						  1000
+
+	99 incr_work					    2052290000
+	99 proc_monitor 					200000
+	99 kslowd000						103000
+	99 kslowd001						102000
+	99 md0_raid1						 36000
+	99 java 						  3000
+	99 cifsd						  2000
+	99 kblockd/0						  1000
+
+
+
+SELECT arr.iternum, arr.runtime, processname, proc.utime+proc.stime
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+--and arr.iternum IN (4, 25, 46, 67)
+and arr.iternum IN (5, 26, 47, 68)
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11360
+
+---
+
+   ITERNUM    RUNTIME PROCESSNAME		       PROC.UTIME+PROC.STIME
+---------- ---------- -------------------------------- ---------------------
+	 4    4105297 sshd					       14000
+	 4    4105297 sshd						1000
+	 4    4105297 grep						4000
+	 4    4105297 grep						1000
+	 4    4105297 sshd					       11000
+	 4    4105297 sshd						2000
+	 4    4105297 grep						3000
+	 4    4105297 grep						1000
+	 4    4105297 rhsmcertd-worke				      115000
+	 4    4105297 rhsmcertd-worke				      115000
+	 4    4105297 flush-9:127					 100
+
+   ITERNUM    RUNTIME PROCESSNAME		       PROC.UTIME+PROC.STIME
+---------- ---------- -------------------------------- ---------------------
+	25    4105303 sshd					       13000
+	25    4105303 sshd						2000
+	25    4105303 grep						3000
+	25    4105303 grep						1000
+	25    4105303 sshd					       11000
+	25    4105303 sshd						1000
+	25    4105303 grep						3000
+	25    4105303 grep						1000
+	25    4105303 rhsmcertd-worke				      114000
+	25    4105303 rhsmcertd-worke				      115000
+	46    4105299 java						1000
+
+   ITERNUM    RUNTIME PROCESSNAME		       PROC.UTIME+PROC.STIME
+---------- ---------- -------------------------------- ---------------------
+	46    4105299 sshd					       11000
+	46    4105299 sshd						1000
+	46    4105299 grep						2000
+	46    4105299 grep						1000
+	46    4105299 sshd					       14000
+	46    4105299 grep						6000
+	46    4105299 grep						1000
+	46    4105299 rhsmcertd-worke				      115000
+	46    4105299 rhsmcertd-worke				      115000
+	67    4105304 java						1000
+	67    4105304 sshd					       12000
+
+   ITERNUM    RUNTIME PROCESSNAME		       PROC.UTIME+PROC.STIME
+---------- ---------- -------------------------------- ---------------------
+	67    4105304 sshd						3000
+	67    4105304 grep						6000
+	67    4105304 grep						1000
+	67    4105304 sshd					       11000
+	67    4105304 sshd						3000
+	67    4105304 grep						3000
+	67    4105304 grep						1000
+	67    4105304 rhsmcertd-worke				      116000
+	67    4105304 rhsmcertd-worke				      115000
+
+---
+
+   ITERNUM    RUNTIME PROCESSNAME		       PROC.UTIME+PROC.STIME
+---------- ---------- -------------------------------- ---------------------
+	 5    4104989 java						1000
+	26    4104999 flush-9:127					 100
+	47    4104996 flush-9:127					 100

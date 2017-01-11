@@ -256,3 +256,48 @@ NSOCnfm_S5_TRM							1
 
 21 rows selected.
 
+SELECT count(qeid)
+FROM NSOCnfm_S1_NQPV_PDE
+where dbms = 'mysql' 
+and experimentname = 'op-pk-30K-110q'
+
+COUNT(QEID)
+-----------
+	 20
+
+SELECT count(qeid)
+FROM NSOCnfm_S1_AQPV_PDE
+where dbms = 'mysql' 
+and experimentname = 'op-pk-30K-110q'
+
+COUNT(QEID)
+-----------
+	  0
+
+SELECT count(qeid)
+FROM NSOCnfm_S1_IOWTV_PDE
+where dbms = 'mysql' 
+and experimentname = 'op-pk-30K-110q'
+
+COUNT(QEID)
+-----------
+	 10
+
+SELECT experimentname, runId, count(qeid)
+FROM NSOCnfm_S1_QPTV_PDE
+where dbms = 'mysql' 
+and experimentname IN ('op-pk-30K-110q', 'op-30K-100q-8', 'op-30K-100q-10')
+group by experimentname, runid
+order by experimentname
+
+EXPERIMENTNAME
+--------------------------------------------------------------------------------
+COUNT(QEID)
+-----------
+op-30K-100q-8
+       2811
+
+op-pk-30K-110q
+       1761
+
+

@@ -1,0 +1,850 @@
+column PROCESSNAME format a15
+SELECT arr.algrunid,
+    proc.processname,
+    min((proc.utime+proc.stime)/1000) as min_proc_time,
+    max((proc.utime+proc.stime)/1000) as max_proc_time,
+    --avg((proc.utime+proc.stime)/1000) as avg_proc_time,
+    median((proc.utime+proc.stime)/1000) as med_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340
+having count(*) = 100
+group by arr.algrunid, proc.processname
+
+  ALGRUNID PROCESSNAME	  MIN_PROC_TIME MAX_PROC_TIME MED_PROC_TIME
+---------- -------------- ------------- ------------- -------------
+     11340 incr_work		2052290       2052341	    2052306
+     11340 kslowd000		    102 	  104		103
+     11340 kslowd001		    102 	  104		103
+     11340 md0_raid1		     16 	   37		 25
+     11340 proc_monitor 	    198 	  202		200
+
+SELECT arr.algrunid,
+	arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and proc.processname = 'incr_work' and (proc.utime+proc.stime)/1000 = 2052290
+and arr.algrunid = 11340
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340 and arr.iternum IN (99)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME    TOTAL_PROC_TIME
+---------- ---------- -------------- ---------------
+     11340	   99 incr_work 	     2052290
+     11340	   99 proc_monitor		 200
+     11340	   99 kslowd000 		 103
+     11340	   99 kslowd001 		 102
+     11340	   99 md0_raid1 		  36
+     11340	   99 cifsd			   2
+     11340	   99 java			   2
+     11340	   99 kblockd/0 		   1
+     11340	   99 java			   1
+
+SELECT arr.algrunid,
+	arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and proc.processname = 'incr_work' and (proc.utime+proc.stime)/1000 = 2052341
+and arr.algrunid = 11340
+
+  ALGRUNID    ITERNUM PROCESSNAME    TOTAL_PROC_TIME
+---------- ---------- -------------- ---------------
+     11340	   55 incr_work 	     2052341
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340 and arr.iternum IN (55)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME     TOTAL_PROC_TIME
+---------- ---------- --------------- ---------------
+     11340	   55 incr_work 	      2052341
+     11340	   55 proc_monitor		  198
+     11340	   55 rhsmcertd-worke		  116
+     11340	   55 rhsmcertd-worke		  116
+     11340	   55 kslowd000 		  103
+     11340	   55 kslowd001 		  102
+     11340	   55 md0_raid1 		   26
+     11340	   55 sshd			   13
+     11340	   55 sshd			   11
+     11340	   55 grep			    4
+     11340	   55 kblockd/0 		    2
+     11340	   55 java			    2
+     11340	   55 grep			    2
+     11340	   55 sshd			    2
+     11340	   55 jbd2/md0-8		    1
+     11340	   55 grep			    1
+     11340	   55 grep			    1
+
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340 and arr.iternum IN (13, 55, 97)
+order by iternum, proc.utime+proc.stime desc, procid
+
+  ALGRUNID    ITERNUM PROCESSNAME		       TOTAL_PROC_TIME
+---------- ---------- -------------------------------- ---------------
+     11340	   13 incr_work 			       2052315
+     11340	   13 proc_monitor				   200
+     11340	   13 rhsmcertd-worke				   117
+     11340	   13 rhsmcertd-worke				   117
+     11340	   13 kslowd000 				   103
+     11340	   13 kslowd001 				   102
+     11340	   13 md0_raid1 				    26
+     11340	   13 sshd					    13
+     11340	   13 sshd					    11
+     11340	   13 grep					     8
+     11340	   13 grep					     6
+     11340	   13 java					     2
+     11340	   13 sshd					     2
+     11340	   13 jbd2/md0-8				     1
+     11340	   13 sshd					     1
+     11340	   13 grep					     1
+     11340	   13 grep					     1
+
+     11340	   55 incr_work 			       2052341
+     11340	   55 proc_monitor				   198
+     11340	   55 rhsmcertd-worke				   116
+     11340	   55 rhsmcertd-worke				   116
+     11340	   55 kslowd000 				   103
+     11340	   55 kslowd001 				   102
+     11340	   55 md0_raid1 				    26
+     11340	   55 sshd					    13
+     11340	   55 sshd					    11
+     11340	   55 grep					     4
+     11340	   55 kblockd/0 				     2
+     11340	   55 java					     2
+     11340	   55 grep					     2
+     11340	   55 sshd					     2
+     11340	   55 jbd2/md0-8				     1
+     11340	   55 grep					     1
+     11340	   55 grep					     1
+
+     11340	   97 incr_work 			       2052337
+     11340	   97 proc_monitor				   200
+     11340	   97 rhsmcertd-worke				   117
+     11340	   97 rhsmcertd-worke				   116
+     11340	   97 kslowd001 				   103
+     11340	   97 kslowd000 				   102
+     11340	   97 md0_raid1 				    27
+     11340	   97 sshd					    15
+     11340	   97 sshd					    14
+     11340	   97 grep					     6
+     11340	   97 java					     2
+     11340	   97 sshd					     2
+     11340	   97 grep					     2
+     11340	   97 kblockd/0 				     1
+     11340	   97 sshd					     1
+     11340	   97 flush-9:0 				     1
+     11340	   97 grep					     1
+     11340	   97 sshd					     1
+     11340	   97 grep					     1
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    count(*) as num_appearances
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340 and arr.iternum IN (13, 55, 97)
+group by arr.algrunid, arr.iternum, proc.processname 
+order by arr.algrunid, arr.iternum, proc.processname;
+
+  ALGRUNID    ITERNUM PROCESSNAME		       NUM_APPEARANCES
+---------- ---------- -------------------------------- ---------------
+     11340	   13 grep					     4
+     11340	   13 incr_work 				     1
+     11340	   13 java					     1
+     11340	   13 jbd2/md0-8				     1
+     11340	   13 kslowd000 				     1
+     11340	   13 kslowd001 				     1
+     11340	   13 md0_raid1 				     1
+     11340	   13 proc_monitor				     1
+     11340	   13 rhsmcertd-worke				     2
+     11340	   13 sshd					     4
+
+     11340	   55 grep					     4
+     11340	   55 incr_work 				     1
+     11340	   55 java					     1
+     11340	   55 jbd2/md0-8				     1
+     11340	   55 kblockd/0 				     1
+     11340	   55 kslowd000 				     1
+     11340	   55 kslowd001 				     1
+     11340	   55 md0_raid1 				     1
+     11340	   55 proc_monitor				     1
+     11340	   55 rhsmcertd-worke				     2
+     11340	   55 sshd					     3
+
+     11340	   97 flush-9:0 				     1
+     11340	   97 grep					     4
+     11340	   97 incr_work 				     1
+     11340	   97 java					     1
+     11340	   97 kblockd/0 				     1
+     11340	   97 kslowd000 				     1
+     11340	   97 kslowd001 				     1
+     11340	   97 md0_raid1 				     1
+     11340	   97 proc_monitor				     1
+     11340	   97 rhsmcertd-worke				     2
+     11340	   97 sshd					     5
+
+SELECT arr.algrunid,
+    arr.iternum, 
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+--and arr.algrunid = 11340 and arr.iternum IN (7, 21, 28, 35, 42, 49, 63, 70, 77)
+and arr.algrunid = 11340 and arr.iternum IN (6, 20, 27, 34, 41, 48, 62, 69, 76)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME		       TOTAL_PROC_TIME
+---------- ---------- -------------------------------- ---------------
+     11340	    6 incr_work 			       2052306
+     11340	    6 proc_monitor				   200
+     11340	    6 rhsmcertd-worke				   116
+     11340	    6 kslowd000 				   103
+     11340	    6 kslowd001 				   103
+     11340	    6 md0_raid1 				    21
+     11340	    6 cifsd					     2
+     11340	    6 java					     2
+     11340	    6 java					     2
+ 
+     11340	   20 incr_work 			       2052310
+     11340	   20 proc_monitor				   202
+     11340	   20 rhsmcertd-worke				   117
+     11340	   20 kslowd001 				   104
+     11340	   20 kslowd000 				   102
+     11340	   20 md0_raid1 				    27
+     11340	   20 java					     2
+     11340	   20 jbd2/md0-8				     1
+     11340	   20 flush-9:0 				     1
+     11340	   20 java					     1
+
+     11340	   27 incr_work 			       2052309
+     11340	   27 proc_monitor				   200
+     11340	   27 rhsmcertd-worke				   117
+     11340	   27 kslowd000 				   103
+     11340	   27 kslowd001 				   102
+     11340	   27 md0_raid1 				    23
+     11340	   27 java					     2
+
+     11340	   34 incr_work 			       2052295
+     11340	   34 proc_monitor				   200
+     11340	   34 rhsmcertd-worke				   116
+     11340	   34 kslowd001 				   103
+     11340	   34 kslowd000 				   102
+     11340	   34 md0_raid1 				    21
+     11340	   34 cifsd					     5
+     11340	   34 java					     2
+     11340	   34 jbd2/md0-8				     1
+     11340	   34 flush-9:0 				     1
+
+     11340	   41 incr_work 			       2052311
+     11340	   41 proc_monitor				   200
+     11340	   41 rhsmcertd-worke				   116
+     11340	   41 kslowd000 				   103
+     11340	   41 kslowd001 				   103
+     11340	   41 md0_raid1 				    23
+     11340	   41 java					     2
+     11340	   41 cifsd					     1
+
+     11340	   48 incr_work 			       2052312
+     11340	   48 proc_monitor				   200
+     11340	   48 rhsmcertd-worke				   115
+     11340	   48 kslowd001 				   103
+     11340	   48 kslowd000 				   102
+     11340	   48 md0_raid1 				    25
+     11340	   48 flush-9:0 				     2
+     11340	   48 java					     2
+     11340	   48 java					     2
+     11340	   48 kblockd/0 				     1
+     11340	   48 cifsd					     1
+
+     11340	   62 incr_work 			       2052321
+     11340	   62 proc_monitor				   200
+     11340	   62 rhsmcertd-worke				   119
+     11340	   62 kslowd001 				   103
+     11340	   62 kslowd000 				   102
+     11340	   62 md0_raid1 				    22
+     11340	   62 cifsd					     2
+     11340	   62 java					     2
+     11340	   62 java					     2
+
+     11340	   69 incr_work 			       2052319
+     11340	   69 proc_monitor				   200
+     11340	   69 rhsmcertd-worke				   116
+     11340	   69 kslowd000 				   104
+     11340	   69 kslowd001 				   102
+     11340	   69 md0_raid1 				    27
+     11340	   69 cifsd					     2
+     11340	   69 java					     2
+     11340	   69 rhsmcertd 				     1
+     11340	   69 flush-9:0 				     1
+
+     11340	   76 incr_work 			       2052301
+     11340	   76 proc_monitor				   200
+     11340	   76 rhsmcertd-worke				   116
+     11340	   76 kslowd000 				   103
+     11340	   76 kslowd001 				   103
+     11340	   76 md0_raid1 				    32
+     11340	   76 java					     2
+     11340	   76 kblockd/0 				     1
+     11340	   76 cifsd					     1
+     11340	   76 rhsmcertd 				     1
+----
+
+SELECT proc.processname,
+    count(*) as num_appr
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 11340 and arr.iternum IN (6, 20, 27, 34, 41, 48, 62, 69, 76)
+having count(*) >= 9
+group by proc.processname
+
+PROCESSNAME			   NUM_APPR
+-------------------------------- ----------
+rhsmcertd-worke 			  9
+kslowd001				  9
+md0_raid1				  9
+java					 13
+kslowd000				  9
+incr_work				  9
+proc_monitor				  9
+
+-----
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+--- normal cases
+and arr.algrunid = 11340 and arr.iternum IN (7, 21, 28, 35, 42, 49, 63, 70, 77)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME    TOTAL_PROC_TIME
+---------- ---------- -------------- ---------------
+     11340	    7 incr_work 	     2052319
+     11340	    7 proc_monitor		 198
+     11340	    7 kslowd001 		 103
+     11340	    7 kslowd000 		 102
+     11340	    7 md0_raid1 		  23
+     11340	    7 sshd			  15
+     11340	    7 bash			   5
+     11340	    7 jbd2/md0-8		   3
+     11340	    7 cifsd			   2
+     11340	    7 java			   2
+     11340	    7 java			   1
+     11340	    7 sshd			   1
+     11340	    7 grep			   1
+
+     11340	   21 incr_work 	     2052300
+     11340	   21 proc_monitor		 200
+     11340	   21 kslowd000 		 103
+     11340	   21 kslowd001 		 103
+     11340	   21 md0_raid1 		  33
+     11340	   21 java			   2
+     11340	   21 kblockd/0 		   1
+
+     11340	   28 incr_work 	     2052311
+     11340	   28 proc_monitor		 202
+     11340	   28 kslowd000 		 103
+     11340	   28 kslowd001 		 103
+     11340	   28 md0_raid1 		  22
+     11340	   28 kblockd/0 		   2
+     11340	   28 java			   2
+     11340	   28 jbd2/md0-8		   1
+
+     11340	   35 incr_work 	     2052294
+     11340	   35 proc_monitor		 200
+     11340	   35 kslowd000 		 103
+     11340	   35 kslowd001 		 102
+     11340	   35 md0_raid1 		  34
+     11340	   35 jbd2/md0-8		   2
+     11340	   35 cifsd			   2
+     11340	   35 java			   2
+     11340	   35 java			   2
+     11340	   35 ntpd			   1
+
+     11340	   42 incr_work 	     2052300
+     11340	   42 proc_monitor		 200
+     11340	   42 kslowd001 		 103
+     11340	   42 kslowd000 		 102
+     11340	   42 md0_raid1 		  22
+     11340	   42 java			   2
+     11340	   42 kblockd/0 		   1
+     11340	   42 jbd2/md0-8		   1
+     11340	   42 flush-9:0 		   1
+ 
+    11340	   49 incr_work 	     2052315
+     11340	   49 proc_monitor		 200
+     11340	   49 kslowd000 		 104
+     11340	   49 kslowd001 		 102
+     11340	   49 md0_raid1 		  24
+     11340	   49 sshd			  10
+     11340	   49 bash			   3
+     11340	   49 java			   2
+     11340	   49 cifsd			   1
+     11340	   49 sshd			   1
+     11340	   49 grep			   1
+
+     11340	   63 incr_work 	     2052315
+     11340	   63 proc_monitor		 200
+     11340	   63 kslowd000 		 104
+     11340	   63 kslowd001 		 102
+     11340	   63 md0_raid1 		  30
+     11340	   63 java			   2
+
+     11340	   70 incr_work 	     2052299
+     11340	   70 proc_monitor		 200
+     11340	   70 kslowd001 		 103
+     11340	   70 kslowd000 		 102
+     11340	   70 md0_raid1 		  24
+     11340	   70 java			   2
+     11340	   70 kblockd/0 		   1
+     11340	   70 cifsd			   1
+     11340	   70 flush-9:0 		   1
+     11340	   70 java			   1
+
+     11340	   77 incr_work 	     2052299
+     11340	   77 proc_monitor		 200
+     11340	   77 kslowd000 		 103
+     11340	   77 kslowd001 		 102
+     11340	   77 md0_raid1 		  31
+     11340	   77 java			   2
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+--- normal cases
+and arr.algrunid = 11340 and arr.iternum IN (7, 91)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+---
+
+  ALGRUNID    ITERNUM PROCESSNAME		       TOTAL_PROC_TIME
+---------- ---------- -------------------------------- ---------------
+     11340	    7 incr_work 			       2052319
+     11340	    7 proc_monitor				   198
+     11340	    7 kslowd001 				   103
+     11340	    7 kslowd000 				   102
+     11340	    7 md0_raid1 				    23
+     11340	    7 sshd					    15
+     11340	    7 bash					     5
+     11340	    7 jbd2/md0-8				     3
+     11340	    7 cifsd					     2
+     11340	    7 java					     2
+     11340	    7 java					     1
+     11340	    7 sshd					     1
+     11340	    7 grep					     1
+
+     11340	   91 incr_work 			       2052317
+     11340	   91 proc_monitor				   200
+     11340	   91 kslowd000 				   103
+     11340	   91 kslowd001 				   102
+     11340	   91 md0_raid1 				    21
+     11340	   91 sshd					    17
+     11340	   91 bash					     3
+     11340	   91 java					     2
+     11340	   91 sshd					     2
+     11340	   91 java					     1
+     11340	   91 grep					     1
+     11340	   91 id					     1
+
+-----
+
+
+-----
+--- dual PUT4096
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+--- top layer
+and arr.algrunid = 11360 and arr.iternum IN (4, 25, 46, 67)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME		       TOTAL_PROC_TIME
+---------- ---------- -------------------------------- ---------------
+     11360	    4 rhsmcertd-worke				   115
+     11360	    4 rhsmcertd-worke				   115
+     11360	    4 sshd					    14
+     11360	    4 sshd					    11
+     11360	    4 grep					     4
+     11360	    4 grep					     3
+     11360	    4 sshd					     2
+     11360	    4 sshd					     1
+     11360	    4 grep					     1
+     11360	    4 grep					     1
+     11360	    4 flush-9:127				    .1
+
+     11360	   25 rhsmcertd-worke				   115
+     11360	   25 rhsmcertd-worke				   114
+     11360	   25 sshd					    13
+     11360	   25 sshd					    11
+     11360	   25 grep					     3
+     11360	   25 grep					     3
+     11360	   25 sshd					     2
+     11360	   25 grep					     1
+     11360	   25 sshd					     1
+     11360	   25 grep					     1
+
+     11360	   46 rhsmcertd-worke				   115
+     11360	   46 rhsmcertd-worke				   115
+     11360	   46 sshd					    14
+     11360	   46 sshd					    11
+     11360	   46 grep					     6
+     11360	   46 grep					     2
+     11360	   46 java					     1
+     11360	   46 sshd					     1
+     11360	   46 grep					     1
+     11360	   46 grep					     1
+
+     11360	   67 rhsmcertd-worke				   116
+     11360	   67 rhsmcertd-worke				   115
+     11360	   67 sshd					    12
+     11360	   67 sshd					    11
+     11360	   67 grep					     6
+     11360	   67 sshd					     3
+     11360	   67 sshd					     3
+     11360	   67 grep					     3
+     11360	   67 java					     1
+     11360	   67 grep					     1
+     11360	   67 grep					     1
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+--- second layer
+and arr.algrunid = 11360 and arr.iternum IN (32, 39, 54, 61, 75, 81, 88, 92, 99)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME		       TOTAL_PROC_TIME
+---------- ---------- -------------------------------- ---------------
+     11360	   32 rhsmcertd-worke				   116
+
+     11360	   39 rhsmcertd-worke				   114
+     11360	   39 flush-9:127				    .1
+
+     11360	   61 flush-9:127				    .1
+
+     11360	   81 rhsmcertd-worke				   116
+
+     11360	   88 rhsmcertd-worke				   118
+     11360	   88 sshd					    13
+     11360	   88 sshd					    13
+     11360	   88 grep					     7
+     11360	   88 grep					     6
+     11360	   88 sshd					     2
+     11360	   88 sshd					     2
+     11360	   88 grep					     1
+     11360	   88 grep					     1
+
+     11360	   92 rhsmcertd-worke				   117
+
+     11360	   99 rhsmcertd-worke				   115
+
+----
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+--- second layer
+and arr.algrunid = 11360 and arr.iternum IN (1, 8, 15, 22, 29, 36, 43, 50, 57, 64, 71, 78, 85, 89, 96)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME		       TOTAL_PROC_TIME
+---------- ---------- -------------------------------- ---------------
+     11360	    1 rhsmcertd-worke				   116
+     11360	    1 sshd					     8
+     11360	    1 sshd					     1
+     11360	    1 flush-9:127				    .1
+
+     11360	    8 rhsmcertd-worke				   116
+
+     11360	   15 rhsmcertd-worke				   118
+     11360	   15 flush-9:127				    .1
+
+     11360	   22 rhsmcertd-worke				   115
+     11360	   22 sshd					     7
+     11360	   22 sshd					     1
+
+     11360	   29 rhsmcertd-worke				   115
+     11360	   29 java					     1
+
+     11360	   36 rhsmcertd-worke				   115
+     11360	   36 java					     1
+     11360	   36 flush-9:127				    .1
+
+     11360	   43 rhsmcertd-worke				   115
+     11360	   43 sshd					     7
+     11360	   43 sshd					     1
+
+     11360	   50 rhsmcertd-worke				   117
+     11360	   50 flush-9:127				    .1
+
+     11360	   57 rhsmcertd-worke				   116
+     11360	   57 java					     1
+
+     11360	   64 rhsmcertd-worke				   116
+     11360	   64 sshd					     8
+     11360	   64 java					     1
+
+     11360	   71 rhsmcertd-worke				   115
+     11360	   71 flush-9:127				    .1
+
+     11360	   78 rhsmcertd-worke				   115
+
+     11360	   85 rhsmcertd-worke				   116
+     11360	   85 sshd					     9
+     11360	   85 sshd					     1
+
+     11360	   85 flush-9:127				    .1
+
+     11360	   89 rhsmcertd-worke				   118
+     11360	   89 java					     2
+
+     11360	   96 rhsmcertd-worke				   116
+
+-------
+--- EMPv7
+
+column PROCESSNAME format a15
+SELECT arr.algrunid,
+    proc.processname,
+    min((proc.utime+proc.stime)/1000) as min_proc_time,
+    max((proc.utime+proc.stime)/1000) as max_proc_time,
+    --avg((proc.utime+proc.stime)/1000) as avg_proc_time,
+    median((proc.utime+proc.stime)/1000) as med_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 16620
+having count(*) = 40
+group by arr.algrunid, proc.processname
+
+  ALGRUNID PROCESSNAME	   MIN_PROC_TIME MAX_PROC_TIME MED_PROC_TIME
+---------- --------------- ------------- ------------- -------------
+     16620 events/0		       1	     8		   4
+     16620 flush-9:0		       1	    12		   6
+     16620 incr_work		16421954      16422131	  16422031.5
+     16620 kslowd000		  125249	126679	    126135.5
+     16620 kslowd001		  125525	126664	    126073.5
+     16620 md0_raid1		      34	    60		46.5
+     16620 jbd2/md0-8		      10	    30		20.5
+     16620 proc_monitor 	     198	   202		 200
+
+---- 
+--- remove all runs containing any process 
+--- belonging to proc(max_pt) - proc(min_pt)
+--- gather more runs until a minimum of samples is collected
+SELECT distinct 
+       arr.algrunid,
+       arr.iternum
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and proc.processname IN ('sshd', 'grep') 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 16620
+order by iternum
+--and arr.iternum IN (1, 10, 34, 16)
+;
+
+  ALGRUNID    ITERNUM
+---------- ----------
+     16620	    1
+     16620	    6
+     16620	    7
+     16620	   11
+     16620	   12
+     16620	   16
+     16620	   17
+     16620	   22
+     16620	   27
+     16620	   32
+     16620	   33
+
+  ALGRUNID    ITERNUM
+---------- ----------
+     16620	   37
+     16620	   38
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 16620 and arr.iternum IN (30)
+order by iternum, proc.utime+proc.stime desc, procid;
+
+  ALGRUNID    ITERNUM PROCESSNAME     TOTAL_PROC_TIME
+---------- ---------- --------------- ---------------
+     16620	   19 incr_work 	     16422095
+     16620	   19 kslowd001 	       125976
+     16620	   19 kslowd000 	       125249
+     16620	   19 proc_monitor		  198
+     16620	   19 md0_raid1 		   49
+     16620	   19 jbd2/md0-8		   16
+     16620	   19 flush-9:0 		    8
+     16620	   19 events/0			    2
+     16620	   19 kblockd/0 		    2
+     16620	   19 java			    2
+
+     16620	   20 incr_work 	     16421960
+     16620	   20 kslowd001 	       126470
+     16620	   20 kslowd000 	       126460
+     16620	   20 proc_monitor		  200
+     16620	   20 md0_raid1 		   47
+     16620	   20 jbd2/md0-8		   29
+     16620	   20 flush-9:0 		    6
+     16620	   20 kblockd/0 		    4
+     16620	   20 events/0			    2
+     16620	   20 java			    2
+     16620	   20 bdi-default		    1
+     16620	   20 java			    1
+
+     16620	   30 incr_work 	     16421983
+     16620	   30 kslowd000 	       126679
+     16620	   30 kslowd001 	       126282
+     16620	   30 proc_monitor		  200
+     16620	   30 md0_raid1 		   46
+     16620	   30 jbd2/md0-8		   18
+     16620	   30 flush-9:0 		    6
+     16620	   30 events/0			    3
+     16620	   30 kblockd/0 		    3
+     16620	   30 java			    2
+     16620	   30 java			    1
+
+select distinct t0.algrunid,
+		t0.iternum 
+from 
+	(SELECT arr.algrunid,
+	    arr.iternum,
+	    proc.processname,
+	    (proc.utime+proc.stime)/1000 as total_proc_time
+	FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+	WHERE arr.algrunid = proc.algrunid
+	and arr.datanum = proc.DATANUM
+	and arr.iternum = proc.iternum 
+	and (proc.utime+proc.stime) > 0
+	and proc.processname IN ('kslowd000', 'kslowd001')
+	and arr.algrunid = 16620
+	--order by iternum, proc.utime+proc.stime desc, procid
+	) t0,
+	(SELECT arr.algrunid,
+	    proc.processname,
+	    --min((proc.utime+proc.stime)/1000) as min_proc_time,
+	    --max((proc.utime+proc.stime)/1000) as max_proc_time,
+	    avg((proc.utime+proc.stime)/1000) as avg_proc_time,
+	    median((proc.utime+proc.stime)/1000) as med_proc_time,
+	    stddev((proc.utime+proc.stime)/1000) as std_proc_time
+	FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+	WHERE arr.algrunid = proc.algrunid
+	and arr.datanum = proc.DATANUM
+	and arr.iternum = proc.iternum 
+	and (proc.utime+proc.stime) > 0
+	and proc.processname IN ('kslowd000', 'kslowd001')
+	and arr.algrunid = 16620
+	having count(*) = 40
+	group by arr.algrunid, proc.processname) t1
+WHERE t0.algrunid = t1.algrunid
+and t0.processname = t1.processname 
+--and ((t0.total_proc_time > t1.avg_proc_time+2*t1.std_proc_time) or (t0.total_proc_time < t1.avg_proc_time+2*t1.std_proc_time))
+and t0.total_proc_time <= t1.med_proc_time
+order by iternum
+;
+
+------
+
+SELECT arr.algrunid,
+    arr.iternum,
+    proc.processname,
+    (proc.utime+proc.stime)/1000 as total_proc_time
+FROM AZDBLab_NewAlgRunResult2 arr, AZDBLab_ProcInfo2 proc
+WHERE arr.algrunid = proc.algrunid
+and arr.datanum = proc.DATANUM
+and arr.iternum = proc.iternum 
+and (proc.utime+proc.stime) > 0
+and arr.algrunid = 8900 and arr.iternum IN (1, 10, 34, 16)
+order by iternum, procid, proc.utime+proc.stime;
+

@@ -1,0 +1,8 @@
+x = read.csv(file="1_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("1_sec_pt_hist.eps")
+h = hist(x$PRTIME, right=F, breaks=max(x$PRTIME)-min(x$PRTIME)+1, plot=F)
+plot(h, ylim=c(0,600), freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 1-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(floor(min(h$mids)),ceiling(max(h$mids)))
+axis(side=1, at=xaxtl, labels=xaxtl)
+dev.off()

@@ -1,0 +1,105 @@
+x = read.csv(file="1_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="2_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="4_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+
+x = read.csv(file="8_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="32_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="64_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+
+x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="256_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="1024_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="2048_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="4096_sec.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="8192_sec1.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+
+x = read.csv(file="8192_sec2.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+x = read.csv(file="16384_sec1.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)
+
+
+x = read.csv(file="16384_sec2.dat",head=TRUE,sep="\t")
+x_up = mean(x$PRTIME) + 5*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 5*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+cor(x$TDIFF, x$PRTIME)

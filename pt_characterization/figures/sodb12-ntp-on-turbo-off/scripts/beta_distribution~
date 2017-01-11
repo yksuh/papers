@@ -1,0 +1,460 @@
+setEPS()
+postscript("16_sec_pt_beta.eps")
+
+x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
+h = hist(x$PRTIME, right=F, plot=F)
+### perform normalization of x #####
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+x_normal = sort(x_normal)
+
+### get histogram on normalized x #####
+h_normal = hist(x_normal, breaks=length(h$breaks),right=F, plot=F)
+### get mean/variance of normalized x #####
+m = mean(x_normal)
+v = var(x_normal)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+### get parameters a, b from beta distribution on normalized x #####
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+b <- as.double(b)
+
+### get new x-axis values by beta distribution of normalized x #####
+y_beta<-dbeta(x_normal,a,b)
+
+### fit x_val and y_val #####
+plot(h, freq=TRUE, ylim=c(0,400),xaxt='n', col="green", main='PT frequency on the 16-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(floor(min(h$mids))-2,ceiling(max(h$mids))+1)
+axis(side=1, at=xaxtl, labels=xaxtl)
+x_val = sort(x$PRTIME)
+y_val = min(h$counts) + ((y_beta)/(max(y_beta)-min(y_beta))) * (max(h$counts)-min(h$counts))
+lines(x_val,y_val, col="blue", lwd=2)
+dev.off()
+setEPS()
+
+
+x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("16_sec_pt_beta.eps")
+h = hist(x$PRTIME, breaks=10,right=F, plot=F)
+### perform normalization of x #####
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+### get histogram on normalized x #####
+h_normal = hist(x_normal, breaks=length(h$breaks),right=F, plot=F)
+plot(h, freq=TRUE, ylim=c(0,400),xaxt='n', col="green", main='PT frequency on the 16-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(floor(min(h$mids))-2,ceiling(max(h$mids))+1)
+axis(side=1, at=xaxtl, labels=xaxtl)
+### get mean/variance of normalized x #####
+m = mean(x_normal)
+v = var(x_normal)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+### get parameters a, b from beta distribution on normalized x #####
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+b <- as.double(b)
+### get new x-axis values by beta distribution of normalized x #####
+x_beta<-dbeta(x_normal,a,b)
+### get another histogram on the new x-axis values #####
+h_beta = hist(x_beta, breaks=length(h$breaks),right=F, plot=F)
+### denormalize to the raw x-axis values from the x-axis values by beta distribution #####
+x_val = min(x$PRTIME) + ((h_beta$mids)/(max(h_beta$breaks)-min(h_beta$breaks))) * (max(x$PRTIME)-min(x$PRTIME))
+### get frequency data of the histogram on the new x-axis values #####
+y_val = h_beta$counts
+### fit x_val and y_val #####
+lines(x_val,y_val, col="blue", lwd=2)
+dev.off()
+
+
+
+
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+h = hist(x_normal, right=F, plot=F)
+plot(h, freq=TRUE, ylim=c(0,300),xaxt='n', col="green", main='PT frequency on the 16-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+m = mean(x_normal)
+v = var(x_normal)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+b <- as.double(b)
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, breaks=length(h$breaks),right=F, plot=F)
+lines(x$PRTIME, yfit, col="blue", lwd=2)
+dev.off()
+
+h = hist(x$PRTIME, right=F, plot=F)
+plot(h, freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 16-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+b <- as.double(b)
+yfit<-dbeta(x_normal,a,b)
+yfit<-yfit*1000
+xfit<-(x_normal*(max(x$PRTIME)-min(x$PRTIME)))+min(x$PRTIME)
+lines(, yfit, col="blue", lwd=2)
+dev.off()
+
+
+
+
+
+x = read.csv(file="64_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("64_sec_pt_beta.eps")
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+h = hist(x_normal, right=F, plot=F)
+plot(h, freq=TRUE, ylim=c(0,300),xaxt='n', col="green", main='PT frequency on the 64-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+m = mean(x_normal)
+v = var(x_normal)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x_normal),max(x_normal),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+lines(x_normal, yfit, col="blue", lwd=2)
+xaxtl <- seq(min(x_normal),max(x_normal))
+axis(side=1, at=xaxtl, labels=xaxtl)
+dev.off()
+
+
+
+
+
+
+x = read.csv(file="1_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("1_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=max(x$PRTIME)-min(x$PRTIME)+1, plot=F)
+plot(h, ylim=c(0,500), freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 1-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(floor(min(h$mids))-2,ceiling(max(h$mids))+1)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="2_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("2_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=max(x$PRTIME)-min(x$PRTIME)+1, plot=F)
+plot(h, ylim=c(0,800), freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 2-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(floor(min(h$mids))-10,ceiling(max(h$mids))+10)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="4_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("4_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=main, plot=F)
+plot(h, ylim=c(0,1000), freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 4-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(floor(min(h$mids)),ceiling(max(h$mids)))
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="8_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("8_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
+plot(h, ylim=c(0,1000), freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 8-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(min(x$PRTIME)-3,max(x$PRTIME)+4)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+
+x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("16_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
+plot(h, ylim=c(0,800), freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 16-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(min(x$PRTIME)-3,max(x$PRTIME)+4)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="32_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("32_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
+plot(h, ylim=c(0,400), freq=TRUE,  xaxt='n', col="green", main='PT frequency on the 32-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(min(x$PRTIME)-3,max(x$PRTIME)+4)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="64_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("64_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, plot=F)
+plot(h, freq=TRUE, ylim=c(0,1000),xaxt='n', col="green", main='PT frequency on the 64-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(min(x$PRTIME)-3,max(x$PRTIME)+4)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("128_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, plot=F)
+plot(h, freq=TRUE, ylim=c(0,250),xaxt='n', col="green", main='PT frequency on the 128-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(min(x$PRTIME)-3,max(x$PRTIME)+4)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="256_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("256_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=max(x$PRTIME)-min(x$PRTIME),plot=F)
+plot(h, freq=TRUE, ylim=c(0,300),xaxt='n', col="green", main='PT frequency on the 256-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(min(x$PRTIME)-5,max(x$PRTIME)+5)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME),max(x$PRTIME),length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("512_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=ceiling((max(x$PRTIME)-min(x$PRTIME))/4),plot=F)
+plot(h, freq=TRUE, ylim=c(0,200),xaxt='n', col="green", main='PT frequency on the 512-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+nb = ceiling((max(h$mids)-min(h$mids))/20)
+xaxtl <- seq(min(x$PRTIME)-10,max(x$PRTIME)+10, by=nb)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME)-30,max(x$PRTIME)+30,length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+
+
+x = read.csv(file="2048_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("2048_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, breaks=ceiling((max(x$PRTIME)-min(x$PRTIME))/4),plot=F)
+plot(h, freq=TRUE, ylim=c(0,300),xaxt='n', col="green", main='PT frequency on the 2048-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+nb = ceiling((ceiling(max(h$mids))-floor(min(h$mids)))/20)
+xaxtl <- seq(floor(min(h$mids)-10),ceiling(max(h$mids)+10), by=nb)
+axis(side=1, at=xaxtl, labels=xaxtl)
+m = mean(h$density)
+v = var(h$density)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+a
+b <- as.double(b)
+b
+yfit<-dbeta(x_normal,a,b)
+h2 = hist(yfit, right=F, plot=F)
+xfit<-seq(min(x$PRTIME)-10,max(x$PRTIME)+10,length=length(h2$counts)) 
+lines(xfit, h2$counts, col="blue", lwd=2)
+dev.off()
+
+
+
+

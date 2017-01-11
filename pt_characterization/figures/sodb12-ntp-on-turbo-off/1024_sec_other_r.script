@@ -1,0 +1,5 @@
+x = read.csv(file="other_proc_1024_task.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("other_proc_1024_task_all.eps")
+plot(x$OTHER_TOTAL_SECS, xlim=c(0,300), pch=19, main='Other Total Time on the 1024-second task', xlab='# of executions', ylab='Other Total Time (msec)')
+

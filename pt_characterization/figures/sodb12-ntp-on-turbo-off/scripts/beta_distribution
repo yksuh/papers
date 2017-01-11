@@ -1,0 +1,36 @@
+x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("16_sec_pt_beta.eps")
+h = hist(x$PRTIME, right=F, plot=F)
+### perform normalization of x #####
+x_normal = (x$PRTIME-min(x$PRTIME))/(max(x$PRTIME)-min(x$PRTIME))
+x_normal = sort(x_normal)
+
+### get histogram on normalized x #####
+h_normal = hist(x_normal, breaks=length(h$breaks),right=F, plot=F)
+### get mean/variance of normalized x #####
+m = mean(x_normal)
+v = var(x_normal)
+estBetaParams <- function(mu, var) {
+  alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+  beta <- alpha * (1 / mu - 1)
+  return(params = list(alpha = alpha, beta = beta))
+}
+### get parameters a, b from beta distribution on normalized x #####
+r <- estBetaParams(m,v)
+a <- r[1]; b <- r[2]
+a <- as.double(a)
+b <- as.double(b)
+
+### get new x-axis values by beta distribution of normalized x #####
+y_beta<-dbeta(x_normal,a,b)
+
+### fit x_val and y_val #####
+plot(h, freq=TRUE, ylim=c(0,400),xaxt='n', col="green", main='PT frequency on the 16-second task', xlab='PT (ms)', ylab=expression('Frequency'))
+xaxtl <- seq(floor(min(h$mids))-2,ceiling(max(h$mids))+1)
+axis(side=1, at=xaxtl, labels=xaxtl)
+x_val = sort(x$PRTIME)
+y_val = min(h$counts) + ((y_beta)/(max(y_beta)-min(y_beta))) * (max(h$counts)-min(h$counts))
+lines(x_val,y_val, col="blue", lwd=2)
+dev.off()
+setEPS()
