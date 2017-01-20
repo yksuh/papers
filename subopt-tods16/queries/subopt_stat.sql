@@ -1,3 +1,41 @@
+CREATE TABLE Cnfm_Analysis_SuboptDefn AS
+SELECT qc1.experimentid, qc1.experimentname, qc1.dbms, qc1.runid, qc1.queryNum,
+  qc1.card as HighCard, qc1.med_calc_qt AS MedianHighCard,
+  qc1.std_calc_qt AS SDHighCard, qc2.med_calc_qt AS MedianLowCard, qc2.std_calc_qt AS SDLowCard,
+  qc2.card as LowCard, qc1.planid AS PlHighCard, qc2.planid PlLowCard,
+  CASE WHEN (qc2.med_calc_qt-(0.5*qc2.std_calc_qt))-(qc1.med_calc_qt+(0.5*qc1.std_calc_qt))< 0 THEN 0 WHEN (qc2.med_calc_qt-(0.5*qc2.std_calc_qt))-(qc1.med_calc_qt+(0.5*qc1.std_calc_qt))>= 0
+   AND (qc2.med_calc_qt-(1.0*qc2.std_calc_qt))-(qc1.med_calc_qt+(1.0*qc1.std_calc_qt))< 0 THEN 1 WHEN (qc2.med_calc_qt-(1.0*qc2.std_calc_qt))-(qc1.med_calc_qt+(1.0*qc1.std_calc_qt))>= 0
+   AND (qc2.med_calc_qt-(1.5*qc2.std_calc_qt))-(qc1.med_calc_qt+(1.5*qc1.std_calc_qt))< 0 THEN 2 ELSE 3 END AS Subopt_SD
+  , 100*(qc2.med_calc_qt-qc1.med_calc_qt)/qc1.med_calc_qt AS Subopt_rel
+FROM NSOCnfm_S4_CTQatC qc1, NSOCnfm_S4_CTQatC qc2
+WHERE qc1.experimentid=qc1.experimentid
+AND qc1.runid=qc2.runid
+AND qc1.querynum=qc2.querynum
+and ((qc1.dbms='mysql' and qc1.card=qc2.card+300)
+OR (qc1.dbms!='mysql' and qc1.card=qc2.card+10000))
+and qc1.planid<>qc2.planid;
+
+
+
+
+
+select count(*)
+from 
+(select experimentid, dbms, runid, queryNum, max(Subopt_rel) as max_sor 
+from Cnfm_Analysis_SuboptDefn 
+group by experimentid, dbms, runid, queryNum
+having max(Subopt_rel)>0)
+
+select count(*)
+from 
+(select experimentid, dbms, runid, queryNum, max(Subopt_rel) as max_sor 
+from Cnfm_Analysis_SuboptDefn 
+group by experimentid, dbms, runid, queryNum
+having max(Subopt_rel)<0)
+
+WITH subopt1 AS (select experimentid, dbms, runid, queryNum, max(Subopt_rel) as max_sor from Cnfm_Analysis_SuboptDefn group by experimentid, dbms, runid, queryNum
+having max(Subopt_rel)>0) SELECT CASE WHEN max_sor>=72000 THEN 'GT= 72000%'  WHEN max_sor>=71000 THEN 'GT= 71000%' WHEN max_sor>=40000 THEN 'GT= 40000%' WHEN max_sor>=30000 THEN 'GT= 30000%' WHEN max_sor>=20000 THEN 'GT= 20000%' WHEN max_sor>=10000 THEN 'GT= 10000%' WHEN max_sor>=5000 THEN 'GT= 5000%' WHEN max_sor>=2500 THEN 'GT= 2500%' WHEN max_sor>=1000 THEN 'GT= 1000%' WHEN max_sor>=500 THEN 'GT= 500%' WHEN max_sor>=250 THEN 'GT= 250%' WHEN max_sor>=100 THEN 'GT= 100%' WHEN max_sor>=70 THEN 'GT= 70%' WHEN max_sor>=60 THEN 'GT= 60%' WHEN max_sor>=50 THEN 'GT= 50%' WHEN max_sor>=40 THEN 'GT= 40%' WHEN max_sor>=30 THEN 'GT= 30%' WHEN max_sor>=20 THEN 'GT= 20%' WHEN max_sor>=10 THEN 'GT= 10%' ELSE 'GT 0' END AS SuboptRanges, COUNT(*) FROM subopt1 a GROUP BY CASE WHEN max_sor>=72000 THEN 'GT= 72000%'  WHEN max_sor>=71000 THEN 'GT= 71000%' WHEN max_sor>=40000 THEN 'GT= 40000%' WHEN max_sor>=30000 THEN 'GT= 30000%' WHEN max_sor>=20000 THEN 'GT= 20000%' WHEN max_sor>=10000 THEN 'GT= 10000%' WHEN max_sor>=5000 THEN 'GT= 5000%' WHEN max_sor>=2500 THEN 'GT= 2500%' WHEN max_sor>=1000 THEN 'GT= 1000%' WHEN max_sor>=500 THEN 'GT= 500%' WHEN max_sor>=250 THEN 'GT= 250%' WHEN max_sor>=100 THEN 'GT= 100%' WHEN max_sor>=70 THEN 'GT= 70%' WHEN max_sor>=60 THEN 'GT= 60%' WHEN max_sor>=50 THEN 'GT= 50%' WHEN max_sor>=40 THEN 'GT= 40%' WHEN max_sor>=30 THEN 'GT= 30%' WHEN max_sor>=20 THEN 'GT= 20%' WHEN max_sor>=10 THEN 'GT= 10%' ELSE 'GT 0' END ORDER BY SuboptRanges;
+
 
 SQL> select sum(stepResultSize) from NSOCnfm_RowCount where stepname ='NSOCnfm_SPQatC';
 
@@ -165,7 +203,7 @@ select count(t0.querynum) as numSubOptQs
 from (select distinct dbms, runid, querynum, coalesce(count(highcard),0) as numQatCs
 from Cnfm_Analysis_SuboptDefn 
 group by dbms, runid, querynum) t0 
-where numQatCs = 1
+where numQatCs = 2
 
 NUMSUBOPTQS
 -----------
@@ -180,6 +218,16 @@ group by dbms, runid, querynum) t0
 NUMQSPOSCP
 ----------
       5625
+
+select count(t0.querynum) as numSubOptQs
+from (select distinct dbms, runid, querynum, count(highcard) as cards
+      from Cnfm_Analysis_SuboptDefn 
+      group by dbms, runid, querynum) t0 
+where cards = 1
+
+NUMSUBOPTQS
+-----------
+       2338
 
 select count(t0.querynum) as numQsPosCP
 from (select distinct dbms, runid, querynum 
