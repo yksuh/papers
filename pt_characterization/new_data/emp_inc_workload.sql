@@ -22,8 +22,8 @@ CREATE TABLE EMP_INC_RUN_PROC_INFO AS
 	-- 1 sec, 2 secs, 4 secs, 8 secs, 16 secs, 32 secs, 64 secs
 	and (arr.algrunid IN (5292, 5332, 5372, 5412, 5452, 5492, 5532)
 	-- 128 secs, 256 secs, 512 secs, 1024 secs, 2048 secs, 4096 secs, 8192 secs, 16384 secs
-	--or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8119, 8880, 8900))
-	or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8960, 8880, 8900))
+	or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8119, 8880, 8900))
+	--or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8960, 8880, 8900))
 	--and arr.iternum <= 300 -- first 300 
 	--group by arr.algrunid, ar.exp_run_time, arr.iternum, arr.runtime, proc.processname
 	order by iternum, pt desc;
