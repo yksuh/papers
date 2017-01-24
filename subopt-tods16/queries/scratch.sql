@@ -1,3 +1,6 @@
+select sum(queries) from (select runid, count(distinct querynum) as queries from (select runid, querynum from Cnfm_Analysis_SuboptDefn where Subopt_SD = 3) group by runid)
+
+
 column expName format a20 
 column dbms format a10 
 SELECT expName, dbms, runid, count(*) as nqueries -- queries 
