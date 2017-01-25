@@ -1,0 +1,270 @@
+28c28
+< \title{SEDONA: A Novel Protocol for Identifying Infrequent, Long-Running Daemons on a Linux System}
+---
+> \title{SEDONA: A Novel Timing Scheme for Identifying an Infrequent, Long-Running Daemons on a Linux System}
+53,57c53
+< It is challenging to accurately measure the execution-time of a given
+< program due to many extraneous factors. To enable better timing results
+< restrained, we present a novel protocol that identifies infrequent,
+< long-running daemons to enable effective elimination of executions
+< exhibiting these daemons.
+---
+> In general, it is very challenging to measure the execution-time of a given program accurately and precisely because of many extraneous factors. To obtain better timing results with such factors restrained, we present a novel timing scheme via identification of infrequent, long-running daemons and selective elimination of executions with so-identified daemons.
+61c57
+< Infrequent Long-running Daemon, Execution-Time Measurement
+---
+> Infrequent, Long-running Daemon, Elimination, Execution-Time, Measurement
+67,68c63,64
+< Measuring program execution time is a much-used
+< technique for performance evaluation in computer science. 
+---
+> Measuring program execution-time is one of the most popular 
+> techniques for performance evaluation in computer science. 
+72c68
+< which indeed suggests the need for a better timing protocol.
+---
+> which indeed suggests soliciting a nicer timing scheme.
+74c70
+< Consider a simple compute-bound program, termed {\em PUT} (program-under-test), 
+---
+> Let's consider a simple compute-bound program, termed {\em PUT} (program-under-test), 
+76,78c72,76
+< This program runs a nested for-loop with a specified task length ($tl$) (in seconds). 
+< The $tl$ value is translated to the corresponding 
+< number of iterations for which that for-loop is performed. 
+---
+> This program runs a nested for-loop designed to be finished in a specified task length ($tl$) (in sec). 
+> In the inner loop an integer variable ($j$) gets incremented by one. 
+> %That $tl$ value is translated to the corresponding 
+> %number of iterations for which that for-loop is performed. 
+> %The addition operation is 
+99c97
+< 	\subfigure[Initial Elapsed Time Measurement]{
+---
+> 	\subfigure[A Histogram of Original Measurements]{
+103c101
+< 	\subfigure[Program Time After Identified Daemon Removal]{
+---
+> 	\subfigure[A Histogram of Our Measurements]{
+112,113c110,111
+< We used 128~seconds as the task length ran the PUT program (designated as PUT128) 
+< 800~times. Fig.~\ref{fig:meas_comp} shows two histograms of the timing results on the PUT128.
+---
+> We passed 128~seconds as task length to and ran the PUT program (called PUT128) 
+> 800~times. Fig.~\ref{fig:meas_comp} shows two histograms of timing results on the PUT128.
+124,128c122,126
+< significantly reduces such variability.
+< The gist of the scheme is to (i)~focus on
+< {\em process time} (PT) rather than on elapsed time (ET) and 
+< (ii)~remove some executions that involve
+< {\em infrequent, \hbox{long-running} daemon processes}, which impact
+---
+> successfully handles such variability with useful treatments. 
+> The gist of the scheme is to i) employ 
+> {\em process time} (PT) rather than elapsed time (ET) and 
+> ii) remove some executions including 
+> {\em infrequent, \hbox{long-running} daemon processes} impacting 
+130c128
+< %(Typically, one tick is equivalent to 1/100 secs, or 1 {\tt HZ}.) 
+---
+> (Typically, one tick is equivalent to 1/100 secs, or 1 {\tt HZ}.) 
+133c131
+< PT can be calculated as the sum of ticks (where one tick is equal to 10 msec)
+---
+> PT can be calculated as the sum of ticks 
+136c134
+< This use of PT and selective elimination 
+---
+> The successful use of PT and selective elimination 
+138c136
+< measurement quality---in both standard deviation and relative error---
+---
+> measurement quality---standard deviation and relative error---
+143c141,142
+< McGeoch introduced
+---
+> There are several academic works concerning measuring program time. 
+> McGeoch introduces
+146c145
+< presented two timing schemes of using clock-cycle and interval counters. 
+---
+> presents two timing schemes of using clock-cycle and interval counters. 
+153c152
+< timing and the influence of daemons that may significantly disturb the timing.
+---
+> timing and the influence of co-existing daemons that may significantly disturb the timing.
+161c160
+< Commercial software tools measure execution time~\cite{VTune,TimeSys,WindView}. 
+---
+> There are some commercial software tools for measuring execution time~\cite{VTune,TimeSys,WindView}. 
+165c164
+< We previously developed a timing protocol called TTP (Tucson Timing Protocol)
+---
+> We have developed a timing protocol, called TTP (Tucson Timing Protocol), 
+181c180
+< \item We provide empirical evidence that 
+---
+> \item We provide empirical evidences that 
+183c182,183
+< can be seriously affected by extant system daemons.
+---
+> can be seriously hurt by extant system daemons 
+> without a proper care.
+185,186c185,186
+< \item We propose a novel timing protocol that
+< identifies infrequent, long-running daemons that impact the timing results for that program. 
+---
+> \item We propose a novel timing scheme 
+> to identify an infrequent, long-running daemons impacting the timing results for that program. 
+189c189
+< \item We evaluate the performance of the protocol with rigorous experiments, 
+---
+> \item We evaluate the performance of the method by rigorous experiments, 
+195c195
+< \item The experimental results show a demonstrate for the effectiveness of our scheme\shorten{SEDONA: 
+---
+> \item The experimental results show a strong support for the effectiveness of our scheme\shorten{SEDONA: 
+202,203c202
+< \noindent
+< The rest of this letter is organized as follows. 
+---
+> The rest of this letter is organized in the following. 
+205,206c204,206
+< In the following section, we evaluate the performance of 
+< the scheme using real workloads.
+---
+> In turn, we evaluate the performance of 
+> the scheme using real workloads. Finally, we 
+> conclude this letter.
+231c231
+< \STATE Step 1. Set up the timing environment.
+---
+> \STATE Step 1. Set up a timing environment.
+233,234c233
+< \STATE Step 3. Consider each pair of elapsed time measurements to be a
+< dual-PUT measurement 
+---
+> \STATE Step 3. Consider each pair of elapsed time measurements to be a dual-PUT measurement, 
+245,246c244,245
+< \STATE Step 10. Discard an execution including a daemon of which process
+< time is greater than the respective cutoff time.
+---
+> \STATE Step 10. Discard an execution including a daemon of which process time is greater than 
+> the respective cutoff time.
+254c253
+< %We now elaborate the SEDONA scheme with an example, to explain and justify each step.
+---
+> We now elaborate the above SEDONA scheme with an example, to explain and justify each step.
+260c259
+< As motivated by our prior work~\cite{Currim}, 
+---
+> As illustrated in our prior work~\cite{Currim}, 
+263c262
+< iii) switching off particular CPU features\cite{intel15,intelSpeed15} if any (Step 1). 
+---
+> iii) switching off CPU features\cite{intel15,intelSpeed15} if any (Step 1). 
+270,271c269,270
+< We use 128 seconds because that is long enough to perhaps experience an infrequent daemon. 
+< We run it 800 times to capture infrequent daemons that perhaps run every few hours or even 
+---
+> Why PUT128? Because it is long enough to perhaps experience an infrequent daemon. 
+> Why 800? To capture infrequent daemons perhaps running every few hours or even 
+283c282
+< the rest of the samples clustered in the bottom row. 
+---
+> th rest of the samples clustered in the bottom row. 
+290c289
+< those of {\em pairs of successive samples}.\shorten{So samples 1 and 2 
+---
+> those of pairs of successive samples.\shorten{So samples 1 and 2 
+295c294
+< There are two quite obvious outliers\shorten{, corresponding to sample \# 75 and \# 634,} with ETs of 163,913 msec (rightmost) and 161,785 msec (uppermost), respectively. 
+---
+> There are two quite obvious outliers\shorten{, corresponding to sample \# 75 and \# 634,} with ETs of 163,913 msec (rightmost), and 161,785 msec (uppermost), respectively. 
+389,392c388,391
+< minimum time in the \hbox{$L$-samples} (Step 7). 
+< This computation provides a rough, initial distinction of a ``long-running''
+< daemon, namely, the valley between the maximum PT from the central cluster 
+< and the minimum PT from the $L$-samples, to differentiate ``short-running'' 
+---
+> minimum time in the $L$-samples (Step 7). 
+> This computation provides a rough, initial distinction of a ``long-running'' daemon. 
+> Namely, the valley between the maximum PT from the central cluster 
+> and the minimum PT from the $L$-samples differentiated ``short-running'' 
+394c393
+< For those daemons (i.e. {\tt grep}) never appearing in the central cluster,
+---
+> For those daemons (i.e. {\tt grep}) never appearing in the central cluster 
+398c397
+< PUT16384 (4.5 hours per sample versus 2 minutes), to see 
+---
+> PUT16384 instead (4.5 hours per sample versus 2 minutes), to see 
+465c464
+< over the corresponding cutoff. We thus end up dropping just fifteen of the 800
+---
+> over the corresponding cutoff. We thus end up removing the fifteen of the 800
+470c469
+< and by about two orders of magnitude for PUT16384.
+---
+> and by about two orders of magnitude for PUT16384, too.
+520a520,521
+> We now evaluate the \hbox{performance} of the SEDONA.
+> 
+524,526c525,526
+< We now evaluate the \hbox{performance} of the SEDONA protocol.
+< Our experiments were conducted on a machine
+< described in Table~\ref{tab:machine_config}. 
+---
+> Our experiments were conducted on a machine with 
+> the specification described in Table~\ref{tab:machine_config}. 
+556,557c556,557
+< Table~\ref{tab:spec_real} shows that
+< the SEDONA protocol (which uses PT) significantly outperformed the original 
+---
+> As exhibited in Table~\ref{tab:spec_real}, overall 
+> the SEDONA (using PT) significantly outperformed the original 
+560,561c560
+< None of the benchmarks revealed a bigger standard deviation from the SEDONA
+< protocol as compared to that of ORG.
+---
+> None of the benchmarks revealed a bigger standard deviation of our scheme compared to that of the ORG.
+563,568c562,567
+< Our protocol quite effectively filtered out infrequent daemon executions 
+< in these real-world workloads. 
+< Furthermore, the relative error of SEDONA was equal to or 
+< lower than that of ORG for slightly under an half (specifically, 12) of the benchmarks.
+< %For instance, we observed about a 10x margin between the two schemes for the 
+< %{\tt 434} workload.
+---
+> Our timing approach filtering out infrequent daemon executions 
+> was very effective for these real-world workloads. 
+> Furthermore, the relative error of the SEDONA was equal to or 
+> lower than that of the ORG for slightly under an half (specifically, 12) of the benchmarks. 
+> For instance, we observed about a 10x margin between the two schemes for the 
+> {\tt 434} workload.
+570c569
+< SEDONA also scaled well for the SPEC workloads, 
+---
+> The SEDONA scheme also scaled well for the SPEC workloads, 
+572c571
+< For the short benchmarks 
+---
+> For some lightweight benchmarks 
+574c573
+< {\tt 434}, {\tt 445}, and {\tt 999}: those taking under 100 sec), 
+---
+> {\tt 434}, {\tt 445}, and {\tt 999})  (taking under 100 sec), 
+577,578c576,577
+< for the medium-length benchmarks (e.g., {\tt 447}, {\tt 456}, {\tt 470}, and {\tt 473}).
+< For the long-running benchmarks (e.g., {\tt 436} and {\tt 454}, both$>$ 900 sec), 
+---
+> for the medium-weight ones (e.g., {\tt 447}, {\tt 456}, {\tt 470}, and {\tt 473}) (100 $\sim$ 400 sec). 
+> For the heavyweight ones (e.g., {\tt 436} and {\tt 454}) ($>$ 900 sec), 
+677c676
+< We }presented a novel execution-time measurement scheme called {\em SEDONA}\shorten{, 
+---
+> We }presented a novel execution-time measurement scheme, called {\em SEDONA}\shorten{, 
+681c680
+< Our scheme is more precise and accurate than the traditional method\shorten{
+---
+> Our scheme was more precise and accurate than the traditional method\shorten{
