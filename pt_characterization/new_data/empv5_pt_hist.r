@@ -2,11 +2,14 @@ x = read.csv(file="1_sec.dat",head=TRUE,sep="\t")
 setEPS()
 postscript("1_sec_pt_hist_v5.eps")
 binsize=1
-xmax <- max(x$PRTIME)
-xmin <- min(x$PRTIME)
-nbins <- ceiling((xmax-xmin) / binsize)
+x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+nbins <- ceiling((max(x$PRTIME)-min(x$PRTIME)) / binsize)
 h = hist(x$PRTIME, right=F, breaks=nbins,plot=F)
-plot(h, ylim=c(0,500), xaxt='n',freq=TRUE,xlim=c(xmin-1,xmax+1),col="green", main='PT frequency on INC1', 
+xmin <-min(x$PRTIME)
+xmax <-max(x$PRTIME)
+plot(h, ylim=c(0,1000), xaxt='n',freq=TRUE,xlim=c(xmin-1,xmax+1),col="green", main='PT frequency on INC1', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), xlab='PT (ms)', ylab=expression('Frequency'))
 xaxtl <- seq(xmin-1,xmax+1,by=binsize)
 axis(side=1, at=xaxtl, labels=xaxtl)
@@ -152,11 +155,6 @@ xaxtl <- seq(xmin,xmax,by=5)
 axis(side=1, at=xaxtl, labels=xaxtl)
 dev.off()
 
-1024	     27
-	1024	     88
-	1024	    252
-	1024	    276
-
 x = read.csv(file="1024_sec.dat",head=TRUE,sep="\t")
 setEPS()
 postscript("1024_sec_pt_hist_v5.eps")
@@ -181,7 +179,7 @@ dev.off()
 
 x = read.csv(file="2048_sec.dat",head=TRUE,sep="\t")
 setEPS()
-postscript("2048_sec_pt_hist_V5.eps")
+postscript("2048_sec_pt_hist_v5.eps")
 x <- subset(x, x$ITERNUM <= 300)
 x <- subset(x, x$ITERNUM != 117)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
