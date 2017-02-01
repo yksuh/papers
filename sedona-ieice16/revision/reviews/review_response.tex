@@ -1,0 +1,156 @@
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{algorithmic}
+\usepackage{alltt}
+\usepackage{array}
+\usepackage[cmex10]{amsmath}
+\usepackage{amssymb}
+%\usepackage[caption=false]{caption}
+\usepackage[dvipsnames]{color}
+%\usepackage{colortbl}
+%\usepackage{enumitem}
+%\usepackage{eqparbox}
+%\usepackage{fixltx2e}
+%\usepackage{float}
+%\usepackage{floatflt}
+%\usepackage{mdwmath}
+%\usepackage{mdwtab}
+%\usepackage{multirow}
+\usepackage{stfloats}
+%\usepackage[font=footnotesize]{subfig}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+%\usepackage[tight,normalsize,sf,SF]{subfigure}
+%\usepackage{subfigure} 
+\usepackage{times}
+\usepackage{url}
+\usepackage{verbatim} 
+\usepackage{wrapfig}
+\usepackage{xspace}
+\usepackage{color}
+
+\definecolor{grey}{RGB}{200,200,200}
+\newcommand{\hilite}[1]{\colorbox{yellow}{#1}}
+\newcommand{\hiliting}[1]{\colorbox{grey}{#1}}
+\long\def\todo#1{\hilite{{\bf TODO:} {\em #1}}}
+
+\setlength{\oddsidemargin}{0in}
+\setlength{\textwidth}{6.5in}
+
+
+% new commands: from file -- to permit re-use
+%\input{newcommands.tex}
+
+%Hyphenation problems
+\hyphenation{name-space}
+\hyphenation{schema-location}
+\hyphenation{xml-lint}
+\hyphenation{time-stamp}
+\hyphenation{time-stamps}
+\hyphenation{time-stamped}
+
+
+\urlstyle{rm}
+\graphicspath{{./figures/}}
+
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+%\newcommand{\rev}[1]{\textcolor{blue}{#1}}
+%\newcommand{\quo}[1]{\textcolor{gray}{#1}}
+%\newcommand{\rev}[1]{\vspace{3mm} \noindent {\em {\color{blue}{#1}}}}
+
+
+\newenvironment{myindentpar}[1]%
+{\begin{list}{}
+         {\vspace{10pt}
+					\setlength{\leftmargin}{#1}}
+          \item[]
+}
+{\end{list}}
+\newcommand{\rev}[1]{\begin{myindentpar}{.25in} {\em {\color{blue}{#1}}}\end{myindentpar}}
+
+\newenvironment{myindentparQ}[1]%
+{\begin{list}{}
+         {\setlength{\leftmargin}{#1}}
+          \item[]
+}
+{\end{list}}
+\newcommand{\quo}[1]{\begin{myindentparQ}{.25in} {{\color{gray}{#1}}}\end{myindentparQ}}
+
+\begin{document}
+
+\title{Author's Reply}
+\author{}
+\maketitle
+
+\section*{Overview}\label{sec:overview}
+I appreciate these quite thorough reviews. I appreciate the feedback and suggestions.
+
+\newcounter{RP}
+
+\clearpage
+\section*{Reviewer}\label{sec:rev1}
+
+% 1
+\rev{
+$<<$ Reviewer's comments to the author(s) $>>$
+
+The SEDONA is based on the probability that any daemons run during the
+measurement. And cutoff time is based on the actual measurement time.
+The proposed approach is interesting, but I cannot understand why the
+author employs such statistics and heuristic way, and how efficient the
+proposed approach will work. Please refer to my comments, and consider
+to revise the manuscript and re-submit .
+}
+
+I understand your concern. I respond to individually below. 
+Please also note that your (excellent) comments are incorporated into the revision. 
+
+\rev{
+Comments: 
+(1) In the last of the manuscript, the author describes ``Our plan is to
+integrate SEDONA into the query timing protocol [8]." If the research
+goal is the combination of the SEDONA and the query timing protocol,
+the proposed approach may be suitable. However, the goal is not
+clearly described in the manuscript. The readers will recognize the
+SEDONA is a generic protocol. If the research goal is the combination
+of this work and the prior work, the author should mention so.
+}
+
+I understand that the goal of this paper is not well articulated. 
+Yes, SEDONA is a generic protocol, which can be applied to any arbitrary Linux system 
+when it comes to reducing variability of the execution time of a program of interest. 
+I now state the actual goal, marked in blue, in the introduction section. 
+
+Note also that the mention of my plan in the future work 
+is just one aspect of the extension of the SEDONA protocol. 
+I claim that the combination is not the ultimate research goal of this paper. 
+To avoid confusion, I removed that sentence. 
+
+\rev{
+(2) If the proposed approach is for a generic purpose, there is a strong
+doubt about usability. The improvement of the SEDONA is little. And the
+extent of the each benchmark’s improvement described in Table 3
+varies widely. Thus, the experimental results does not confirm whether
+the SEDONA is widely practical or is useful. The description to clarify
+the SEDONA’s characteristics is needed.
+} 
+
+\rev{ 
+(3) The improvement of the SEDONA is little. And the extent of the each
+benchmark’s improvement described in Table 3 varies widely. Thus, the
+experimental results does not confirm whether the SEDONA is widely
+practical or is useful.
+}
+
+This review is the same as (2). Please refer to our response of (2) for this comment.
+
+\rev{ 
+(4) Since the explanation of ``dual-PUT'' is not enough, I can not well
+understand the algorithm shown in Fig. 3. Similarly, what is “1st
+Half’s ET (ms)” attached at Fig. 4(b), 4(c), 4(d) ? I understood only that
+the label is related with “dual-PUT”. These words are important in the
+manuscript. So, please keep in mind to write understandably.
+}
+
+\end{document}

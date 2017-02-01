@@ -1,0 +1,88 @@
+\newcommand{\ie}{\textit{i.e.},\xspace}
+\newcommand{\eg}{\textit{e.g.},\xspace}
+\newcommand{\cf}{\textit{cf.},\xspace}
+\newcommand{\etc}{\textit{etc}.\@\xspace}
+\newcommand{\vs}{\textit{vs}}
+%\newcommand{\tVal}{{\sc $\tau$Validator}}
+\newcommand{\tVal}{{\sc $\tau$XMLLint}}
+\newcommand{\tX}{$\tau$XSchema}
+\def\tB{\mbox{$\tau$Bench}}
+\newcommand{\TODO}[1]{[TODO: #1]} 
+\newcommand{\DONE}[1]{[DONE: #1]} 
+\newcommand{\note}[1]{\colorbox{yellow}{\emph{#1}}}
+\newcommand{\stevecomment}[1]{}
+\newcommand{\tab}{\hspace{5mm}}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Commands taken from Steve's Thesis %%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\tool}[1]{{\sc #1}}
+%\newcommand{\ex}[1]{ \hbox{\tt\small<#1>}} 
+%\newcommand{\att}[1]{ \hbox{\tt\small#1}} 
+\newcommand{\ele}[1]{\hbox{\tt <#1>}} 
+\newcommand{\att}[1]{\hbox{\tt #1}} 
+\newcommand{\attval}[1]{{\tt "#1"}} 
+\newcommand{\tXml}{{\sc $\tau$XMLLint}}
+\newcommand{\xmllint}{{\sc XMLLint}}
+\newcommand{\squash}{{\sc Squash}}
+\newcommand{\unsquash}{{\sc UnSquash}}
+\newcommand{\resquash}{{\sc ReSquash}}
+\newcommand{\validator}{{\em Temporal Constraint Validator Module}}
+\newcommand{\schemamapper}{{\sc SchemaMapper}}
+\newcommand{\putFile}[1]{\lstset{caption={\tt #1},label=listing:#1} \lstinputlisting{examples/#1}}
+\newcommand{\putFileNL}[1]{\lstset{caption={\tt #1},label=listing:#1,numbers=none} \lstinputlisting{examples/#1} \lstset{label=,numbers=left}}
+\newcommand{\putFileNLCompany}[1]{\lstset{language=CompanyXML} \lstset{caption={\tt #1},label=listing:#1,numbers=none} \lstinputlisting{examples/#1} \lstset{label=,numbers=left}\lstset{language=SteveXML} }
+\newcommand{\putFileRep}[1]{\lstset{caption={\tt #1},label=listing:#1} \lstinputlisting{examples/exampleRep/#1}}
+\newcommand{\putFileRepCapNL}[2]{\lstset{caption=#2,label=listing:#1,numbers=none} \lstinputlisting{examples/#1} \lstset{label=,numbers=left}}
+\newcommand{\putFileRepCap}[2]{\lstset{caption=#2,label=listing:#1} \lstinputlisting{examples/exampleRep/#1} \lstset{label=}}
+
+\newcommand{\needcite}{\colorbox{yellow}{\textbf{[?]}}}
+
+% Counters for enumerate - makes bold letters (eg, (a)) and bold first few words.
+\newcommand{\litem}[1]{\item{\bfseries #1}}
+\newcounter{enumi_saved}
+\newcommand{\startlist}{\begin{enumerate}[label=\textbf{(\alph{*})}]  \setcounter{enumi}{\value{enumi_saved}}}
+\newcommand{\listdone}{\setcounter{enumi_saved}{\value{enumi}}\end{enumerate}}
+
+% Counters for enumerate - makes bold letters (eg, (a)) and bold first few words.
+\newcounter{denumi_saved}
+\newcommand{\startlistD}{\begin{enumerate}[label=\textbf{(\arabic{*})}]\setcounter{enumi}{\value{denumi_saved}}}
+\newcommand{\listdoneD}{\setcounter{denumi_saved}{\value{enumi}}\end{enumerate}}
+
+% Smaller lists (bullets)
+\newcommand{\squishlist}{
+   \begin{list}{$\bullet$}
+    { \setlength{\itemsep}{0pt}      \setlength{\parsep}{1pt}
+      \setlength{\topsep}{1pt}       \setlength{\partopsep}{0pt}
+      \setlength{\leftmargin}{2.8em} \setlength{\labelwidth}{1em}
+      \setlength{\labelsep}{0.5em} } }
+      
+% Smaller lists (dash)
+\newcommand{\squishdash}{
+   \begin{list}{-}
+    { \setlength{\itemsep}{0pt}      \setlength{\parsep}{1pt}
+      \setlength{\topsep}{1pt}       \setlength{\partopsep}{0pt}
+      \setlength{\leftmargin}{2.8em} \setlength{\labelwidth}{1em}
+      \setlength{\labelsep}{0.5em} } }
+\newcommand{\squishend}{
+    \end{list}  }
+
+% Smaller lists (numbers)
+\newcommand{\numsquishlist}{
+   \begin{list}{$\bullet$}
+    { \setlength{\itemsep}{0pt}      \setlength{\parsep}{1pt}
+      \setlength{\topsep}{1pt}       \setlength{\partopsep}{0pt}
+      \setlength{\leftmargin}{2.8em} \setlength{\labelwidth}{1em}
+      \setlength{\labelsep}{0.5em} } }
+
+\newcommand{\numsquishend}{
+    \end{list}  }
+
+
+%Hyphenation problems
+\hyphenation{name-space}
+\hyphenation{schema-location}
+\hyphenation{xml-lint}
+\hyphenation{time-stamp}
+\hyphenation{time-stamps}
