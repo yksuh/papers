@@ -42,12 +42,17 @@ mean(x$METIME)
 y <- subset(x, x$METIME < 160000) 
 max(y$METIME)
 #x <- subset(x, x$ITERNUM != 90 & x$ITERNUM != 202) 
-sd(x$METIME)/mean(x$METIME)
+re <- sd(x$METIME)/mean(x$METIME)
 setEPS()
 postscript("128_sec_et_old.eps")
 plot(x$METIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax), 
 	pch=1, main='', 
-	xlab='Iteration', ylab='Elapsed Time (msec)')
+	xlab='Repetition', ylab='Elapsed Time (msec)')
+options(scipen = 999)
+legend(380, 171500, c(as.expression(paste("# of total samples = ",nrow(x))), 
+		    as.expression(paste("standard deviation = ",round(sd(x$METIME),1),"msec")), 
+		    as.expression(paste("relative error = ",round(re,5)))
+))
 dev.off()
 
 x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
@@ -111,17 +116,30 @@ x$ITERNUM != 634 & x$ITERNUM != 663 & x$ITERNUM != 746 & x$ITERNUM != 775
 #     12661 grep 		  451	       1
 #     12652 grep 		  451	       1
 #     12658 bash 		  451	       1
-#)
+#
+)
 min(x$PRTIME)
-old_xmin <- 128240
+old_xmin <- 120000
 max(x$PRTIME)
-old_xmax <- 128260
+old_xmax <- 170000
 mean(x$PRTIME)
 min(x$PRTIME)
 max(x$PRTIME)
 mean(x$PRTIME)
 sd(x$PRTIME)## 2.6
-sd(x$PRTIME)/mean(x$PRTIME)### 2.061408e-05
+re <- sd(x$PRTIME)/mean(x$PRTIME)### 2.061408e-05
+postscript("128_sec_pt_new.eps")
+plot(x$PRTIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax), 
+	pch=1, main='', 
+	xlab='Repetition', ylab='Process Time (msec)'
+)
+options(scipen = 999)
+legend(380, 171500, c(as.expression(paste("# of retained samples = ",nrow(x))), 
+		    as.expression(paste("standard deviation = ",round(sd(x$PRTIME),1),"msec")), 
+		    as.expression(paste("relative error = ",round(re,5)))
+))
+dev.off()
+
 setEPS()
 postscript("128_sec_pt_new_hist.eps")
 binsize=2
