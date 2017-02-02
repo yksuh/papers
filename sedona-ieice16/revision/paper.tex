@@ -106,31 +106,58 @@ to reach the specified task length.}
 \end{figure}
 
 We used 128~seconds as the task length and ran the PUT program (termed PUT128) 
-800~times. Fig.~\ref{fig:meas_comp} shows two histograms of the timing results on PUT128.
-Most of the 800 executions measured in elapsed time, 
-via  {\tt System.currentTimeMillis()} in Java, are gathered in the tallest bar 
-of \hbox{128,000--129,000 msec,} with just a few executions outside of that bar, as can be seen in Fig.~\ref{fig:hist_before_et}. 
-But these outliers significantly impact the overall measurement quality: 
-a standard deviation of 1,700 msec and a relative error of 0.03. 
-\shorten{This result suggests adequately eliminating these outliers 
+800~times. 
+%Fig.~\ref{fig:meas_comp} shows two histograms of the timing results on PUT128.
+{\color{blue}Fig.~\ref{fig:meas_comp} shows two plots of the timing results on PUT128.
+%Most of the 800 repetitions measured in elapsed time, 
+%via  {\tt System.currentTimeMillis()} in Java, are gathered in the tallest bar 
+%of \hbox{128,000--129,000 msec,} with just a few executions outside of that bar, 
+%as can be seen in Fig.~\ref{fig:hist_before_et}. 
+Most of the 800 repetitions measured in elapsed time, 
+via  {\tt System.currentTimeMillis()} in Java, form the central band 
+of \hbox{128,000--129,000 ms,} as can be seen in Fig.~\ref{fig:hist_before_et}. 
+There also exist over a dozen of repetitions above that band, called outliers.
+But these outliers {\em critically} impact the overall measurement quality: 
+a standard deviation of 1,730 ms and a relative error of 0.01.
+This result suggests adequately eliminating these outliers 
 while retaining most of the measured executions.}
 
-In contrast, our scheme, which we propose shortly, 
-significantly reduces such variability.
-The gist of the scheme is to (i)~focus on
-{\em process time} (PT) rather than on elapsed time (ET) and 
-(ii)~remove some executions that involve
-{\em infrequent, \hbox{long-running} daemon processes}, which impact
-the process time of the process. 
+{\color{blue}
+Our protocol, which we propose shortly, on the contrary, 
+effectively identifies and removes those outliers. 
+In effect, the protocol considerably reduces such variability.
+The protocol identified and removed fifteen repetitions 
+that had {\em infrequent, \hbox{long-running} daemon processes}, 
+impacting the execution time of PUT128. 
+In addition, the protocol utilized {\em process time} (PT) (of PUT128) 
+rather than elapsed time (ET). 
 Using PT is preferred, in that it considers 
 the time taken for only a process of interest.
 PT can be calculated as the sum of ticks (where one tick is equal to 10 msec)
 in user and system mode, available via {\tt taskstats} C struct, 
 provided by the Linux NetLink facility~\cite{Netlink}.
-This use of PT and selective elimination 
-was able to improve 
-measurement quality---in both standard deviation and relative error---up to by 
-three orders of magnitude for PUT128, as illustrated in Fig.~\ref{fig:hist_after_pt}. 
+As a result, none of the retained timing results was outside of 
+the central band in Fig.~\ref{fig:hist_after_pt}, and thus 
+the measurement quality---in both standard deviation and relative error---was 
+improved up to by three orders of magnitude for PUT128, 
+as shown in Fig.~\ref{fig:hist_after_pt}.
+}
+
+%The key idea to the protocol is to (i)~utilize
+%{\em process time} (PT) rather than on elapsed time (ET) and 
+%(ii)~throw out some executions that involve
+%{\em infrequent, \hbox{long-running} daemon processes}, which impact
+%the process time of the process. 
+%Using PT is preferred, in that it considers 
+%the time taken for only a process of interest.
+%PT can be calculated as the sum of ticks (where one tick is equal to 10 msec)
+%in user and system mode, available via {\tt taskstats} C struct, 
+%provided by the Linux NetLink facility~\cite{Netlink}.
+%This use of PT and selective elimination 
+%was able to improve 
+%measurement quality---in both standard deviation and relative error---up to by 
+%three orders of magnitude for PUT128, as illustrated in Fig.~\ref{fig:hist_after_pt}. 
+%}
 
 %\vspace{0.05in}
 {\bf Related Work.} 
