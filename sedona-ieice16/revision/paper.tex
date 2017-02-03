@@ -73,9 +73,9 @@ Measuring program execution time is a much-used
 technique for performance evaluation in computer science. 
 Despite the importance of accurate and precise execution-time measurement, 
 how to achieve {\em better} timing has not been well addressed. 
-{\color{blue} Surprisingly, there is considerable variability in the measured time.
+Surprisingly, there is considerable variability in the measured time.
 %which indeed suggests the need for a better timing protocol.
-The goal of this paper is to propose
+{\color{red} The goal of this paper is to propose
 a better timing protocol that can significantly reduce such variability 
 and thus enable better timing results without a doubt of their validity.}
 
@@ -123,25 +123,48 @@ This result suggests adequately eliminating these outliers
 while retaining most of the measured executions.}
 
 {\color{blue}
-Our protocol, which we propose shortly, on the contrary, 
-effectively identifies and removes those outliers. 
-In effect, the protocol considerably reduces such variability.
-The protocol identified and removed fifteen repetitions 
-that had {\em infrequent, \hbox{long-running} daemon processes}, 
-impacting the execution time of PUT128. 
-In addition, the protocol utilized {\em process time} (PT) (of PUT128) 
-rather than elapsed time (ET). 
-Using PT is preferred, in that it considers 
-the time taken for only a process of interest.
-PT can be calculated as the sum of ticks (where one tick is equal to 10 msec)
-in user and system mode, available via {\tt taskstats} C struct, 
-provided by the Linux NetLink facility~\cite{Netlink}.
-As a result, none of the retained timing results was outside of 
-the central band in Fig.~\ref{fig:hist_after_pt}, and thus 
-the measurement quality---in both standard deviation and relative error---was 
-improved up to by three orders of magnitude for PUT128, 
-as shown in Fig.~\ref{fig:hist_after_pt}.
+Our protocol, which we characterize shortly, on the contrary, 
+exactly identified and removed those outliers. 
+In effect, the protocol considerably reduced such variability, 
+as illustrated in Fig.~\ref{fig:hist_after_pt}. 
+Specifically, regarding standard deviation and relative error 
+the protocol presented a significant performance gain up to by 
+three orders of magnitude for the same PUT128 results.
 }
+
+{\color{red}
+{\bf Characteristics.} There are several distinctions of our protocol. 
+First, we utilize {\em process time} (PT) rather than on elapsed time (ET). 
+The use of PT is preferred, as it takes into account 
+the time taken for only a ``process'' (or program) of interest.
+PT is defined as the sum of ticks (where one tick is equal to 10 msec)
+in user and system mode. 
+These tick measures are obtainable via {\tt taskstats} C struct, 
+provided by the Linux NetLink facility~\cite{Netlink}. 
+Second, the protocol throws out some repetitions that involve
+{\em infrequent, \hbox{long-running} daemon processes}. 
+We observe that such daemon processes substantially impact 
+the execution time of the process.  
+By eliminating those repetitions, the protocol greatly improves
+the overall measurement quality, which would otherwise be biased by them.
+}
+%The protocol thus can considerably reduce such variability.
+%The protocol identified and removed fifteen repetitions 
+%that had {\em infrequent, \hbox{long-running} daemon processes}, 
+%impacting the execution time of PUT128. 
+%As a result, none of the retained timing results was outside of 
+%the central band in Fig.~\ref{fig:hist_after_pt}, and thus 
+%the measurement quality---in both standard deviation and relative error---was 
+%improved up to by three orders of magnitude for PUT128, 
+%as shown in Fig.~\ref{fig:hist_after_pt}.
+
+%In addition, the protocol utilized {\em process time} (PT) (of PUT128) 
+%rather than elapsed time (ET). 
+%Using PT is preferred, in that it considers 
+%the time taken for only a process of interest.
+%PT can be calculated as the sum of ticks (where one tick is equal to 10 msec)
+%in user and system mode, available via {\tt taskstats} C struct, 
+%provided by the Linux NetLink facility~\cite{Netlink}.
 
 %The key idea to the protocol is to (i)~utilize
 %{\em process time} (PT) rather than on elapsed time (ET) and 
