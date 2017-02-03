@@ -549,6 +549,38 @@ The results are \hbox{provided} in Table~\ref{tab:spec_real}.
 Note that in the table the results for {\tt 481} and {\tt 483} \hbox{benchmarks} 
 are omitted because of some runtime error and incurred I/O, respectively.
 
+{\color{blue}
+We compared the performance of ORG and \hbox{SEDONA} on 
+real programs such as insertion sort, termed SORT and 
+matrix multiplication (in column major), termed MM. 
+SEDONA overwhelmed ORG, as can be seen in Fig.~\ref{fig:synprog_test}. 
+As workload size increased, 
+the performance gap between SEDONA and ORG got increasingly widened, reaching up to by 6x.
+
+\begin{figure}[htp!]
+	\centering
+	\subfigure[SORT - Standard Deviation]{
+		\includegraphics[scale=0.31]{sort_std.eps}
+		\label{fig:sort_std}
+	}
+	\subfigure[SORT - Relative Error]{
+		\includegraphics[scale=0.31]{sort_re.eps}
+		\label{fig:sort_re}
+	}
+	\subfigure[MM - Standard Deviation]{
+		\includegraphics[scale=0.31]{matc_std.eps}
+		\label{fig:matc_std}
+	}
+	\subfigure[MM - Relative Error]{
+		\includegraphics[scale=0.31]{matc_re.eps}
+		\label{fig:matc_re}
+	}
+	\vspace{-.1in}
+	\caption{Performance Comparison on Real-world Programs~\label{fig:synprog_test}}
+\vspace{-.2in}
+\end{figure}
+}
+
 Table~\ref{tab:spec_real} shows that
 the SEDONA protocol (which uses PT) significantly outperformed the original 
 measurement technique (using ET), termed ORG, 
