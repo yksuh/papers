@@ -36,7 +36,7 @@
 \affiliate[labelA]{Supercomputing R\&{D} Center, KISTI, 245 Daehangno, Yuseong-gu, Daejeon, 34141, Republic of Korea}
 %\affiliate[labelB]{Department of Computer Science, University of Arizona, Tucson, AZ 85721, USA}
 }
-\received{2017}{2}{28}
+\received{2017}{2}{10}
 
 \definecolor{grey}{RGB}{200,200,200}
 \newcommand{\hilite}[1]{\colorbox{grey}{#1}}
@@ -51,11 +51,6 @@
 \maketitle
 
 \begin{summary}
-%It is challenging to accurately measure the execution-time of a given
-%program due to many extraneous factors. To enable better timing results\shorten{restrained},
-%we present a novel protocol that identifies infrequent, 
-%long-running daemons to enable effective elimination of executions 
-%exhibiting these daemons.
 {\color{blue}Measuring program execution time 
 a \hbox{much-used} technique for performance evaluation in computer science. 
 Without a proper care, however, timed results may vary a lot, 
@@ -84,10 +79,8 @@ and thus enable better timing results without a doubt of their validity.}
 Consider a simple compute-bound program, what we term {\em PUT} (program-under-test), 
 as shown in Fig.~\ref{alg:put}. 
 This program runs a nested for-loop with a specified task length ($tl$) (in seconds). 
-%The $tl$ value is translated to the corresponding 
-%number of {\color{blue}repetitions} for which that for-loop is performed. 
 {\color{blue}The $tl$ value is used to compute 
-the number of repetitions ($t$) for which that for-loop is performed 
+the number of iterations ($t$) for which that for-loop is performed 
 to reach the specified task length.}
 
 \vspace{-.2in}
@@ -112,23 +105,13 @@ We used 128~seconds as the task length and ran the PUT program (termed PUT128)
 a specification illustrated in Table~\ref{tab:machine_config}, 
 in a controlled environment 
 with (i)~many non-critical daemon processes deactivated, (ii)~the 
-network timing protocol daemon enabled, and (iii)~a kernel up-to-date.} 
+network timing protocol daemon enabled, and (iii)~an up-to-date kernel.} 
  
-%Fig.~\ref{fig:meas_comp} shows two histograms of the timing results on PUT128.
 {\color{blue}Fig.~\ref{fig:meas_comp} shows two plots of the timing results on PUT128.
-%Most of the 800 repetitions measured in elapsed time, 
-%via  {\tt System.currentTimeMillis()} in Java, are gathered in the tallest bar 
-%of \hbox{128,000--129,000 msec,} with just a few executions outside of that bar, 
-%as can be seen in Fig.~\ref{fig:hist_before_et}. 
-Most of the 800 repetitions measured in elapsed time, 
+Most of the 800 executions measured in elapsed time, 
 via  {\tt System.currentTimeMillis()} in Java, form the central band 
 of \hbox{128,000--129,000 ms,} as can be seen in Fig.~\ref{fig:hist_before_et}. 
-Although the environment restrained some identified timing factors, 
-there exist over a dozen of repetitions above that band, called outliers. 
-Indeed, these outliers {\em critically} impact the overall measurement quality: 
-a standard deviation of 1,730 ms and a relative error of 0.01.
-This result suggests adequately eliminating these outliers 
-while retaining most of the measured executions.}
+Despite the well-controlled timing environment, there exist over a dozen of executions above that band, or {\em outliers}. Indeed, these outliers {\em critically} impact the overall measurement quality: a standard deviation of 1,730 ms and a relative error of 0.01. This result suggests adequately eliminating these outliers while retaining most of the executions.}
 
 {\color{blue}
 Our protocol, which we characterize shortly, on the contrary, 
@@ -149,48 +132,14 @@ PT is defined as the sum of ticks (where one tick is equal to 10 msec)
 in user and system mode. 
 These tick measures are obtainable via {\tt taskstats} C struct, 
 provided by the Linux NetLink facility~\cite{Netlink}. 
-Second, the protocol throws out some repetitions that involve
+Second, the protocol throws out some executions that involve
 {\em infrequent, \hbox{long-running} daemon processes}. 
 We observe that such daemon processes substantially impact 
 the execution time of the process.  
-By eliminating those repetitions, the protocol greatly improves
+By eliminating those executions, the protocol greatly improves
 the overall measurement quality, which would otherwise be biased by them.
 }
-%The protocol thus can considerably reduce such variability.
-%The protocol identified and removed fifteen repetitions 
-%that had {\em infrequent, \hbox{long-running} daemon processes}, 
-%impacting the execution time of PUT128. 
-%As a result, none of the retained timing results was outside of 
-%the central band in Fig.~\ref{fig:hist_after_pt}, and thus 
-%the measurement quality---in both standard deviation and relative error---was 
-%improved up to by three orders of magnitude for PUT128, 
-%as shown in Fig.~\ref{fig:hist_after_pt}.
 
-%In addition, the protocol utilized {\em process time} (PT) (of PUT128) 
-%rather than elapsed time (ET). 
-%Using PT is preferred, in that it considers 
-%the time taken for only a process of interest.
-%PT can be calculated as the sum of ticks (where one tick is equal to 10 msec)
-%in user and system mode, available via {\tt taskstats} C struct, 
-%provided by the Linux NetLink facility~\cite{Netlink}.
-
-%The key idea to the protocol is to (i)~utilize
-%{\em process time} (PT) rather than on elapsed time (ET) and 
-%(ii)~throw out some executions that involve
-%{\em infrequent, \hbox{long-running} daemon processes}, which impact
-%the process time of the process. 
-%Using PT is preferred, in that it considers 
-%the time taken for only a process of interest.
-%PT can be calculated as the sum of ticks (where one tick is equal to 10 msec)
-%in user and system mode, available via {\tt taskstats} C struct, 
-%provided by the Linux NetLink facility~\cite{Netlink}.
-%This use of PT and selective elimination 
-%was able to improve 
-%measurement quality---in both standard deviation and relative error---up to by 
-%three orders of magnitude for PUT128, as illustrated in Fig.~\ref{fig:hist_after_pt}. 
-%}
-
-%\vspace{0.05in}
 {\bf Related Work.} 
 McGeoch introduced
 two basic methods of measuring program time: elapsed time and CPU time~\cite{Mcgeoch12}. 
@@ -203,36 +152,17 @@ in a simulation framework via dynamic sampling of trace snippets during program 
 None of these prior works, however, takes into account the variability in 
 timing and the influence of daemons that may significantly disturb the timing.
 
-%\begin{figure}[t]
-%	\centering
-%	\subfigure[Initial Elapsed Time Measurement]{
-%		%\includegraphics[width=0.31\textwidth]{128_sec_et_old_hist.eps}
-%		\includegraphics[width=0.31\textwidth]{128_sec_et_old.eps}
-%		\label{fig:hist_before_et}
-%	}
-%	\subfigure[Program Time After Our Protocol]{
-%		%\includegraphics[width=0.31\textwidth]{128_sec_pt_new_hist.eps}
-%		\includegraphics[width=0.31\textwidth]{128_sec_pt_new.eps}
-%		\label{fig:hist_after_pt}
-%	}
-%	\caption{An Example of Measurement Results on a \linebreak \hbox{Compute-bound} 
-%	Program-Under-Test~\label{fig:meas_comp}}
-%	\vspace{-.18in}
-%\end{figure} 
-
 \begin{figure}[t]
 	\centering
-	\subfigure[Initial Elapsed Time Measurement]{
-		%\includegraphics[width=0.31\textwidth]{128_sec_et_old_hist.eps}
+	\subfigure[{\color{blue}Initial Elapsed Time Measurement}]{
 		\includegraphics[width=0.224\textwidth]{128_sec_et_old.eps}
 		\label{fig:hist_before_et}
 	}
-	\subfigure[Program Time After Our Protocol]{
-		%\includegraphics[width=0.31\textwidth]{128_sec_pt_new_hist.eps}
+	\subfigure[{\color{blue}Program Time After Our Protocol}]{
 		\includegraphics[width=0.224\textwidth]{128_sec_pt_new.eps}
 		\label{fig:hist_after_pt}
 	}
-	\caption{An Example of Measurement Results on a \linebreak \hbox{Compute-bound} 
+	\caption{{\color{blue}An Example of Measurement Results on a \linebreak \hbox{Compute-bound}} 
 	Program-Under-Test~\label{fig:meas_comp}}
 	\vspace{-.18in}
 \end{figure} 
@@ -241,33 +171,21 @@ Commercial software tools measure execution time~\cite{VTune,TimeSys,WindView}.
 Since the tools' source code is not disclosed, there is no way of figuring out 
 whether they can prevent such a daemon from timing. 
 
-We previously developed a timing protocol called TTP (Tucson Timing Protocol)
-for programs exhibiting I/O, in particular, query execution time in \hbox{DBMSes}~\cite{Currim}.
-Our study identified a variety of Linux measures 
-(e.g., user ticks, system ticks, IOWait ticks, etc.) 
-relevant to timing a single query and then 
-presented a structural causal model 
-of explicating the variance of query time. 
-Based on this model, we proposed the protocol for calculating the query time. 
-Our scheme we propose in this manuscript 
-is applicable to the TTP protocol, to further improve the query time calculation.
-
-%\vspace{0.05in}
+\vspace{0.05in}
 {\bf Contribution.} 
 Our contributions are following.
-%\vspace{-0.12in}
+\vspace{-0.05in}
 \begin{itemize}
 
 \item We show empirical evidence that 
-measuring program time 
+measuring execution time 
 can be seriously affected by daemons.
 
 \item We propose a novel timing protocol that
 identifies infrequent, long-running daemons that impact the timing results for that program. 
 
-\item We evaluate the performance of the protocol with rigorous experiments, 
-starting from a simple program in pure-computation mode {\color{blue}through 
-some memory-intensive real-world programs} to a popular industrial benchmark suite.
+\item {\color{blue}We evaluate the performance of the protocol with rigorous experiments 
+using real-world programs.}
 
 \item The experimental results show a support for the effectiveness of our scheme\shorten{SEDONA: 
 early eliminating dirty executions infected with such a daemon 
@@ -278,28 +196,22 @@ and eventually contributing to enhancing the overall measurement-quality}.
 
 \noindent
 The rest of this letter is organized as follows. 
-Section~\ref{sec:prop_appach} elaborates on the proposed scheme. 
-In the following section, we evaluate the performance of 
-the scheme using real workloads.
+{\color{blue}We next elaborate on the proposed timing protocol. 
+In turn, we evaluate the performance of the scheme using real workloads. 
+Finally, we conclude this letter.}
 
 %\vspace\fill
 
 \section{Proposed Scheme}
 \label{sec:prop_appach}
 
-In this section we propose a novel execution-time measurement scheme, 
-called {\em SEDONA} (Selective Elimination through Detection of infrequent, lOng-ruNning dAemons). 
-Our scheme catches and eliminates executions including daemon processes that are infrequent and 
-long-running via a {\em cutoff} measure, and significantly improves measurement quality. 
-The SEDONA protocol consists of a total of ten steps, as described in Fig.~\ref{alg:find}. 
-%We first enumerate the steps to (a)~identify infrequent, 
-%long-running daemons, using a single run of many executions of PUT128, 
-%(b)~refine the list using a single run of many executions of PUT16384 (with a task length of 16K sec), 
-%and then (c)~use the data from those two runs to determine the cutoff for 
-%each \hbox{so-identified} daemon. 
-%We can then apply these cutoffs to remove outliers from subsequent runs of any 
-%arbitrary PUT and realistic workloads.
-%\vspace{-0.22in}
+In this section we propose a novel execution time measurement scheme, 
+called {\em SEDONA} (Selective Elimination through Detection of infrequent, lOng-ruNning dAemons). {\color{blue} Our scheme (1) utilizes PT (process time) to avoid absorbing timing noises from other co-running processes and (2) catches and eliminates executions including daemon processes that are infrequent and \hbox{long-running} via a {\em cutoff} measure. 
+%These two features contribute to significantly enhancing measurement quality.
+}
+
+Our SEDONA protocol consists of a total of ten steps, as described in Fig.~\ref{alg:find}. 
+{\color{blue}Note that this protocol can be applied to any arbitrary Linux system.}
 
 \begin{figure}[h]
 \begin{center}
@@ -324,19 +236,12 @@ consisting of a small number of executions (specifically, 40) of PUT16384.
 \caption{Summary of the SEDONA Timing Protocol\label{alg:find}}
 \vspace{-0.25in}
 \end{figure}
-%
 
-%We now elaborate the SEDONA scheme with an example, to explain and justify each step.
-%\vspace{-0.8in}
-
-%\subsection{A Running Example} 
-%\vspace{-0.05in}
 {\bf A Running Example.} 
 As motivated by our prior work~\cite{Currim}, 
 we configure a timing environment by i) stopping non-critical daemons, 
 ii) activating the Network Timing Protocol daemon, and 
 iii) switching off particular CPU features\cite{intel15,intelSpeed15} if any (Step 1). 
-%(Our machine's specification will be given in Tab~\ref{tab:machine_config}).
 
 We then run a program-under-test (called PUT) of 
 Fig.~\ref{alg:put} with a task length of 128~sec, 
@@ -349,7 +254,7 @@ Note that we collect all daemon processes as well as the PUT and their measures
 through the Netlink interface from the kernel before and after each 
 timing.
 
-Fig.~\ref{fig:reg_put128} plots all the 800 elapsed times of the run of PUT128.
+Fig.~\ref{fig:reg_put128} plots all the 800 elapsed times (ETs) of the run of PUT128.
 %We see three rows in the plot: a solid row of many samples, perhaps
 %six or more samples that are just above that solid row, and two
 %samples that are way above the solid row. 
@@ -358,16 +263,29 @@ the top and middle rows represent over a dozen of outliers far from
 the rest of the samples clustered in the bottom row. 
 We'll now drill down into these outliers to 
 show how to reliably eliminate the indirect influence of 
-some ``infrequent, long-running daemons'' on the process time (PT) 
-of the PUT.
+some ``infrequent, long-running daemons'' on PT (\hbox{process} time) of the PUT.
 
-To identify such daemons, we use a novel scatter plot: 
-those of {\em pairs of successive samples}.\shorten{So samples 1 and 2 
-form the first pair, samples 3 and 4 form the second pair.} 
+To identify such daemons, we use a novel \hbox{scatter} plot: 
+those of {\em pairs of successive samples}{\color{blue}. 
+So \hbox{samples}~\#{1} and~\#{2} form the first pair, 
+samples~\#{3} and~\#{4} form the second pair.
+Such a pair is termed ``\hbox{{\it dual-PUT}}.'' 
+A sample of \hbox{dual-PUT256}, for instance, 
+consists of two consecutive (odd and even) 
+samples of PUT128: 
+sample~\#{1} of dual-PUT256 is equivalent 
+to samples~\#{1} and \#{2} of PUT128.}
+
 Fig.~\ref{fig:raw_put128} presents such a scatter plot 
-of 400 samples of a \hbox{dual-PUT256} constructed 
+of 400 samples of a run of \hbox{dual-PUT256} constructed 
 from a run of the 800 PUT128 samples (Step~3). 
-There are two quite obvious outliers\shorten{, corresponding to sample \# 75 and \# 634,} with ETs of 163,913 msec (rightmost) and 161,785 msec (uppermost), respectively. 
+{\color{blue} The $xy$-plane corresponds to the dual-PUT samples; 
+for example, \hbox{sample}~\#{2} of a run of dual-PUT256 
+is plotted as a point with samples \#{3} and~\#{4} of a run of PUT128 
+on the respective $x$ and $y$ axes. In that sense 
+the $x$ ($y$) axis is named as ``Odd (Even) Sample's ET.''}
+There are two quite obvious outliers with ETs 
+of 163,913 ms (rightmost) and 161,785 ms (uppermost), respectively.
 
 \begin{figure}[ht]
 	\centering
@@ -376,27 +294,23 @@ There are two quite obvious outliers\shorten{, corresponding to sample \# 75 and
 		\includegraphics[width=0.224\textwidth]{put128_empv4_new.eps}
 		\label{fig:reg_put128}
 	}
-	\subfigure[Dual-PUT256 Measurements]{
+	\subfigure[Dual-PUT256 Samples]{
 		%\includegraphics[width=0.223\textwidth]{dual_et_put256_empv4.eps}
-		\includegraphics[width=0.224\textwidth]{dual_et_put256_empv4_new.eps}
+		\includegraphics[width=0.224\textwidth]{dual_et_put256_empv4.eps}
 		\label{fig:raw_put128}
 	}
-	\vspace{0.1in}    
+	%\vspace{-0.1in}    
 	\subfigure[Zooming in on the $L$-shape]{
 		\includegraphics[width=0.224\textwidth]{zooming_in_dual_et_put256_empv4.eps}
 		\label{fig:dual_put256_liters}
 	}
-%	\subfigure[Further Zooming in on the $L$-Shape]{
-%		\includegraphics[scale=0.39]{further_zooming_in_dual_et_put256_empv4.eps}
-%		\label{fig:fzoom_in_dual_et_put256}
-%	}
 	\subfigure[The Central Cluster]{
 		\includegraphics[width=0.224\textwidth]{dual_et_clump_put256_empv4.eps}
 		\label{fig:dual_et_put256_cluster}
         }
     \caption{Successive Scatter plots of a PUT128 with 800 samples 
     (equivalent to a Dual-PUT256 with 400 samples) in Steps~2---4~\label{fig:put128_plot}} 
-    \vspace{-0.2in}     
+    \vspace{-0.3in}     
 \end{figure} 
 
 We informally term this phenomenon of a scatter plot of a dual-PUT run an
@@ -410,7 +324,7 @@ Figure~\ref{fig:dual_put256_liters} zooms into the lower left region,
 focusing on the
 tight cluster of samples.  Interestingly, this plot continues to exhibit an
 $L$-shape, with perhaps a dozen or more $L$-samples in the left and bottom arms of
-the ``$L$,'' and again no samples in the upper right portion of the
+the ``$L$'', and again no samples in the upper right portion of the
 scatter plot.
 
 We continue zooming until we get to Figure~\ref{fig:dual_et_put256_cluster},
@@ -791,17 +705,17 @@ than the conventional timing method.
 % protocol~\cite{Currim} to further improve the protocol by 
 % early identifying such a daemon and eliminating samples contaminated by that daemon.
 
-\section{Conclusion and Future Work}
+\section{Conclusion}
 \label{sec:conclusion}
 \vspace{-0.07in}
 We \shorten{provided an empirical evidence of 
 how significantly measurement quality could be hurt by 
 the presence of infrequent, long-running daemon processes. 
-We }presented a novel execution-time measurement scheme called {\em SEDONA}\shorten{, 
+We }proposed a novel timing protocol called {\em SEDONA}\shorten{, 
 employing process time and identifying an infrequent, long-running daemon}, 
-which is more precise and \hbox{accurate} than the traditional method\shorten{
+which is more precise and \hbox{accurate} than the traditional method relying on elapsed time\shorten{
 as shown in the experiments}.
-Our plan is to integrate SEDONA into the query timing protocol~\cite{Currim}.
+%Our plan is to integrate SEDONA into the query timing protocol~\cite{Currim}.
 %Our evaluation using real benchmarks demonstrated the strong effectiveness of 
 %the scheme in improving the measurement performance.
 %Our scheme is more precise and accurate than the traditional method\shorten{

@@ -1,36 +1,3 @@
-x = read.csv(file="all_spec_before.dat",head=TRUE,sep="\t")
-y = read.csv(file="all_spec_after.dat",head=TRUE,sep="\t")
-specCpu.std <- cbind(ORG_ET_std=(x$STD_ET),FIND_ET_std=(y$STD_PT))
-specCpu.std <- round(specCpu.std,1)
-setEPS()
-postscript("spec_std.eps")
-b<-barplot(t(specCpu.std[1:31,]), log="y", yaxt="n", main="", beside=TRUE, 
-names.arg=c("400","401","403","410","416","429","433","434","435","436","437",
-	    "444","445","447","450","453","454","456","458","459","462","464",
-	    "465","470","471","473","481","482","483","998","999"), 
-	las=2,xlab="SPEC CPU2006",ylab="Standard deviation in log scale (msec)", ylim=c(0.1,8192), col=c("tan2","blue"))
-#legend(x=85.1,y=8000, c("ORG: ET", "FIND: PT"),cex=.8, col=c("tan2","blue"),pch=c(22,0,0))
-legend(x=9,y=8000, c("ORG-ET", "FIND-PT"),cex=.8, col=c("tan2","blue"),pch=c(22,0,0))
-ticks <- seq(-1, 16, by=1)
-axis(2, at=c(-1,1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192,16384))
-dev.off()
-
-x = read.csv(file="all_spec_before.dat",head=TRUE,sep="\t")
-y = read.csv(file="all_spec_after.dat",head=TRUE,sep="\t")
-specCpu.std <- cbind(ORG_ET_re=(x$RE_ET),FIND_ET_re=(y$RE_PT))
-#specCpu.std <- round(specCpu.std,1)
-setEPS()
-postscript("spec_re.eps")
-b <- barplot(t(specCpu.std[1:31,]), log="y", yaxt="n", main="", beside=TRUE, 
-names.arg=c("400","401","403","410","416","429","433","434","435","436","437","444", "445","447","450","453","454","456","458","459","462","464","465","470","471","473","481","482","483","998","999"), 
-las=2,xlab="SPEC CPU2006",ylab="Relative error in log scale (msec)", ylim=c(0.000001,1), col=c("tan2","blue"))
-legend(x=3,y=0.5, c("ORG-ET", "FIND-PT"),cex=.8, col=c("tan2","blue"),pch=c(22,0,0))
-ticks <- seq(-6, 0, by=1)
-labels <- sapply(ticks, function(i) as.expression(bquote(10^ .(i))))
-axis(2, at=c(0.000001,0.00001,0.0001,0.001,0.01,0.1,1), labels=labels)
-dev.off()
-
-
 ### 128 sec 
 ### before protocol
 x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
@@ -47,7 +14,7 @@ setEPS()
 postscript("128_sec_et_old.eps")
 plot(x$METIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax), 
 	pch=1, main='', 
-	xlab='Repetition', ylab='Elapsed Time (msec)')
+	xlab='Iteration', ylab='Elapsed Time (msec)')
 options(scipen = 999)
 legend(380, 171500, c(as.expression(paste("# of total samples = ",nrow(x))), 
 		    as.expression(paste("standard deviation = ",round(sd(x$METIME),1),"msec")), 
@@ -131,7 +98,7 @@ re <- sd(x$PRTIME)/mean(x$PRTIME)### 2.061408e-05
 postscript("128_sec_pt_new.eps")
 plot(x$PRTIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax), 
 	pch=1, main='', 
-	xlab='Repetition', ylab='Process Time (msec)'
+	xlab='Iteration', ylab='Process Time (msec)'
 )
 options(scipen = 999)
 legend(380, 171500, c(as.expression(paste("# of retained samples = ",nrow(x))), 
@@ -196,157 +163,72 @@ xaxtl <- seq(old_xmin,old_xmax,by=binsize)
 axis(side=1, at=xaxtl, labels=xaxtl)
 dev.off()
 
-## 512 sec
-x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
+### Fig. 4(b)
+x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
+x.sub <- subset(x, x$ITERNUM <= 800)
+uol = mean(x.sub$PRTIME) + 2*sd(x.sub$PRTIME)
+dol = mean(x.sub$PRTIME) - 2*sd(x.sub$PRTIME)
+x.ol = subset(x, x.sub$PRTIME > uol | x.sub$PRTIME < dol)
+x.ref = subset(x, x.sub$PRTIME <= uol & x.sub$PRTIME >= dol)
+nrow(x)-nrow(x.ref)
+min(x.ref$PRTIME)
+max(x.ref$PRTIME)
+mean(x.ref$PRTIME)
+sd(x.ref$PRTIME)
+sd(x.ref$PRTIME)/mean(x.ref$PRTIME) 
 setEPS()
-postscript("512_sec_et_hist_old.eps")
-x <- subset(x, x$ITERNUM <= 300)
-binsize=500
-max(x$METIME) #533145 
-old_xmax <- 533500
-min(x$METIME) #512998
-old_xmin <- 512500
-nbins <- ceiling((old_xmax-old_xmin)) / binsize
-h = hist(x$METIME, right=F, breaks=nbins,plot=F)
-plot(h, ylim=c(0,300), xaxt='n',freq=TRUE,xlim=c(512500,533500),
-col="green", main='', sub=paste("(n=",nrow(x),", bin_size=",binsize,"msec)",sep=""), 
-xlab='Elapsed Time (msec)', ylab=expression('Frequency'))
-xaxtl <- seq(510000,540000,by=binsize)
-axis(side=1, at=xaxtl, labels=xaxtl)
+postscript("dual_et_put256_empv4.eps")
+min(x$METIME)#128247
+max(x$METIME)#128811
+x1 <- subset(x, x$ITERNUM %% 2 == 1)
+x2 <- subset(x, x$ITERNUM %% 2 == 0)
+x1$ITERNUM <- round(x1$ITERNUM/2)
+x2$ITERNUM <- x2$ITERNUM/2
+median(x1$METIME)#128250
+min_val <- 120000
+max_val <- 170000
+#plot(x1$METIME, x2$METIME, xlim=c(min_val, max_val), ylim=c(min_val, max_val), xlab='1st Half\'s ET (ms)', main='ETs of dual-PUT256 (simulated using PUT128 with 800 samples)', ylab='2nd Half\'s ET (ms)')
+plot(x1$METIME, x2$METIME, xlim=c(min_val, max_val), ylim=c(min_val, max_val), 
+xlab='Odd Sample\'s ET (ms)', main='', ylab='Even Sample\'s ET (ms)')
+#text(128251, 128811, label="rhn_check, rhnsd captured", pos = 4)#85
+#text(128250, 128634, label="rhn_check, rhnsd captured", pos = 4)#89
 dev.off()
 
-x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
-min(x$METIME)
-old_xmin <- 510000
-max(x$METIME)
-old_xmax <- 540000
-setEPS()
-postscript("512_sec_et_old.eps")
-plot(x$METIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax), 
-	pch=1, main='', 
-	xlab='Iteration', ylab='Elapsed Time (msec)')
-dev.off()
-
-x <- subset(x, 
-x$ITERNUM != 16 & x$ITERNUM != 44 & x$ITERNUM != 72 & x$ITERNUM != 100 & x$ITERNUM != 128 & x$ITERNUM != 156 & 
-x$ITERNUM != 184 & x$ITERNUM != 212 & x$ITERNUM != 240 & x$ITERNUM != 268 & x$ITERNUM != 296 & x$ITERNUM != 297 
-) 
-
-
-
-x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
-min(x$METIME)
-old_xmin <- 510000
-max(x$METIME)
-old_xmax <- 540000
-setEPS()
-postscript("512_sec_pt_old.eps")
-plot(x$PRTIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax), 
-	pch=1, main='', 
-	xlab='Iterations', ylab='Process Time (msec)')
-dev.off()
-
-x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
-setEPS()
-postscript("512_sec_pt_hist.eps")
-x <- subset(x, x$ITERNUM <= 300)
-binsize=5
-nbins <- ceiling((max(x$PRTIME)-min(x$PRTIME)) / binsize)
-h = hist(x$PRTIME, right=F, breaks=nbins,plot=F)
-plot(h, ylim=c(0,200), xaxt='n',freq=TRUE,xlim=c(min(x$PRTIME)-15,max(x$PRTIME)+28),col="blue", main='', 
-sub=paste("(n=",nrow(x),", bin_size=",binsize,"msec)",sep=""), xlab='Process Time (msec)', ylab=expression('Frequency'))
-xaxtl <- seq(min(x$PRTIME)-15,max(x$PRTIME)+28,by=15)
-axis(side=1, at=xaxtl, labels=xaxtl)
-dev.off()
-
-
-x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
-x <- subset(x, x$ITERNUM <= 300)
+### Fig. 4(c)
+x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
+x <- subset(x, x$ITERNUM != 75 & x$ITERNUM != 634)
 min(x$METIME)
 max(x$METIME)
-mean(x$METIME)
-round(sd(x$METIME),1)
-sd(x$METIME)/mean(x$METIME)
-x <- subset(x, 
-x$ITERNUM != 16 & x$ITERNUM != 44 & x$ITERNUM != 72 & x$ITERNUM != 100 & x$ITERNUM != 128 & x$ITERNUM != 156 & 
-x$ITERNUM != 184 & x$ITERNUM != 212 & x$ITERNUM != 240 & x$ITERNUM != 268 & x$ITERNUM != 296 & x$ITERNUM != 297 
-) 
-x.sub <- subset(x, x$ITERNUM <= 300)
-uol = mean(x.sub$METIME) + 2*sd(x.sub$METIME)
-dol = mean(x.sub$METIME) - 2*sd(x.sub$METIME)
-x.ref = subset(x.sub, x.sub$METIME <= uol & x.sub$METIME >= dol)
-nrow(x.sub)
-nrow(x.ref)
-min(x.ref$METIME)
-max(x.ref$METIME)
-mean(x.ref$METIME)
-round(sd(x.ref$METIME),1)
-sd(x.ref$METIME)/mean(x.ref$METIME)
-
-## 1024 sec
-x = read.csv(file="1024_sec.dat",head=TRUE,sep="\t")
-min(x$METIME)
-max(x$METIME)
-mean(x$METIME)
-round(sd(x$METIME),1)
-sd(x$METIME)/mean(x$METIME)
-#x <- subset(x, 
-#x$ITERNUM != 13 & x$ITERNUM != 27 & x$ITERNUM != 41 & x$ITERNUM != 55 & x$ITERNUM != 69 & 
-#x$ITERNUM != 83 & x$ITERNUM != 88 & x$ITERNUM != 97 & x$ITERNUM != 111 & x$ITERNUM != 125 & 
-#x$ITERNUM != 135 & x$ITERNUM != 149 & x$ITERNUM != 163 & x$ITERNUM != 177 & x$ITERNUM != 191 & 
-#x$ITERNUM != 205 & x$ITERNUM != 219 & x$ITERNUM != 233 & x$ITERNUM != 247 & x$ITERNUM != 252 &
-#x$ITERNUM != 261 & x$ITERNUM != 276 & x$ITERNUM != 290 & x$ITERNUM != 298
-#)
-x <- subset(x, 
-x$ITERNUM != 27 & x$ITERNUM != 88 & x$ITERNUM != 252 & x$ITERNUM != 276)  
-x.sub <- subset(x, x$ITERNUM <= 300)
-uol = mean(x.sub$METIME) + 2*sd(x.sub$METIME)
-dol = mean(x.sub$METIME) - 2*sd(x.sub$METIME)
-x.ref = subset(x.sub, x.sub$METIME <= uol & x.sub$METIME >= dol)
-nrow(x.sub)
-nrow(x.ref)
-min(x.ref$METIME)
-max(x.ref$METIME)
-mean(x.ref$METIME)
-round(sd(x.ref$METIME),1)
-sd(x.ref$METIME)/mean(x.ref$METIME)
-
-x = read.csv(file="1024_sec.dat",head=TRUE,sep="\t")
+min_val <- 128200
+max_val <- 129500
 setEPS()
-postscript("1024_sec_pt_hist.eps")
-x <- subset(x, x$ITERNUM <= 300)
-binsize=5
-nbins <- ceiling((max(x$PRTIME)-min(x$PRTIME)) / binsize)
-h = hist(x$PRTIME, right=F, breaks=nbins,plot=F)
-xmin <-min(x$PRTIME)-16
-xmax <-max(x$PRTIME)+19
-plot(h, ylim=c(0,140), xaxt='n',freq=TRUE,xlim=c(xmin,xmax),col="green", main='PT frequency on PUT1024', 
-sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), xlab='PT (ms)', ylab=expression('Frequency'))
-xaxtl <- seq(xmin,xmax,by=20)
-axis(side=1, at=xaxtl, labels=xaxtl)
+postscript("zooming_in_dual_et_put256_empv4.eps")
+x1 <- subset(x, x$ITERNUM %% 2 == 1)
+x2 <- subset(x, x$ITERNUM %% 2 == 0)
+x1$ITERNUM <- round(x1$ITERNUM/2)
+x2$ITERNUM <- x2$ITERNUM/2;
+plot(x1$METIME, x2$METIME, 
+ xlim=c(min_val, max_val), 
+ ylim=c(min_val, max_val), 
+xlab='Odd Sample\'s ET (ms)', main='', ylab='Even Sample\'s ET (ms)')
 dev.off()
 
-
-######## find vs. raw #####
-x = read.csv(file="all_spec_before.dat",head=TRUE,sep="\t", row.names=NULL)
-
-
-plot(h, ylim=c(0,140), xaxt='n',freq=TRUE,xlim=c(xmin,xmax),col="green", main='PT frequency on PUT1024', 
-sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), xlab='PT (ms)', ylab=expression('Frequency'))
-
-b <- barplot(t(specCpu.std[1:31,]), log="y", yaxt="n", main="", beside=TRUE, 
-names.arg=c("400","401","403","410","416","429","433","434","435","436","437","444", "445","447","450","453","454","456","458","459","462","464","465","470","471","473","481","482","483","998","999"), 
-las=2,xlab="SPEC CPU2006",ylab="Standard deviation in log scale (msec)", ylim=c(0.1,100000), col=c("tan2","blue"))
-legend(x=1,y=35000, c("ET", "PT"),cex=.8, col=c("tan2","blue"),pch=c(22,0,0))
-
-
-b <- barplot(t(specCpu.std[1:31,]), log="y", yaxt="n", main="", beside=TRUE, 
-names.arg=c("400","401","403","410","416","429","433","434","435","436","437","444", "445","447","450","453","454","456","458","459","462","464","465","470","471","473","481","482","483","998","999"), 
-las=2,xlab="SPEC CPU2006",ylab="Standard deviation in log scale (msec)", ylim=c(0.1,100000), col=c("tan2","blue"))
-legend(x=1,y=35000, c("ET", "PT"),cex=.8, col=c("tan2","blue"),pch=c(22,0,0))
-#ticks <- seq(-1, 16, by=1)
-#labels <- sapply(ticks, function(i) as.expression(bquote(2^ .(i))))
-#axis(2, at=c(-1, 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536), labels=labels)
-axis(2, at=c(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536))
+## Fig. 4 (d)
+x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
+x <- subset(x, x$ITERNUM != 75 & x$ITERNUM != 634)
+min(x$METIME)
+median(x$METIME)
+max(x$METIME)
+min_val <- 128240
+max_val <- 128260
+setEPS()
+postscript("dual_et_clump_put256_empv4.eps")
+x1 <- subset(x, x$ITERNUM %% 2 == 1)
+x2 <- subset(x, x$ITERNUM %% 2 == 0)
+x1$ITERNUM <- round(x1$ITERNUM/2)
+x2$ITERNUM <- x2$ITERNUM/2;
+plot(x1$METIME, x2$METIME, 
+ xlim=c(min_val, max_val), 
+ ylim=c(min_val, max_val), 
+xlab='Odd Sample\'s ET (ms)', main='', ylab='Even Sample\'s ET (ms)')
 dev.off()
-

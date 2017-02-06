@@ -103,7 +103,14 @@ proposed approach will work. Please refer to my comments, and consider
 to revise the manuscript and re-submit .
 }
 
-Your concerns are well understood. I respond to individually below. 
+Your concerns are well understood. I found such statistics and heuristic approaches 
+very useful to catch what system daemons are infrequent, long-running. 
+Also, the approaches make our protocol generic, in that 
+such statistics and heuristics can be computed and 
+applied on any Linux system. The experimental results show that 
+our protocol is more efficient than the traditional method relying on elapsed time. 
+
+I now respond to individually below.
 %Your comments are incorporated into the revision. 
 
 \rev{
@@ -117,13 +124,17 @@ SEDONA is a generic protocol. If the research goal is the combination
 of this work and the prior work, the author should mention so.
 }
 
-The described plan (in the previous paper) is one possibility in the future, 
-but that is not stated as this paper's research goal. 
-Our goal of this paper is to propose a {\em generic, better} timing protocol 
-against the conventional approach of utilizing elapsed time. 
-The goal is successfully achieved by significantly reducing variability of 
-the execution time of a program of interest in our experiments. 
+I understand your confusion. The previously described plan was suggested as one of the possibilities in the future work. But that is not the research goal of this paper. 
+As you already recognized, the goal of this paper is to propose a {\em generic, better} timing protocol against the conventional approach of utilizing elapsed time, 
+to enable better timing results. This goal is successfully achieved 
+by significantly reducing variability in timing as demonstrated in our various experiments.
+%The goal is successfully achieved by significantly reducing variability of 
+%the execution time of a program of interest in our experiments. 
 I now clearly state this goal, marked in red, at the last sentence in Section~1. 
+
+To avoid confusion, I removed the last mention. Also, the first paragraph on page~2, 
+which used to provide an explanation of a possible combination of the query timing protocol 
+with SEDONA, was removed.
 
 %Note also that the mention of my plan in the future work 
 %is just one aspect of the extension of the SEDONA protocol. 
@@ -159,15 +170,13 @@ as well as for a medium-length or a short-length one.
 Such scalability was still observed in our new experiment, 
 which I describe shortly, as shown in Fig.~5.
 
-Note also that the ET results by the ORG method were based 
-on the settings taking care of several identified timing factors, such as
-(i)~deactivating non-critical daemons, 
-(ii)~switching on the network timing protocol daemon, and 
-(iii)~kernel upgrade. 
-(The description of these settings is marked in red in the paragraph below Fig.~1.) 
-In the well-controlled measurement environment, our protocol further 
-reduced the variability of execution time against the ORG method
-in such various benchmarks, which actually demonstrated its general purpose and wide usability. 
+Note also that the ET results by the ORG method were also based 
+on the settings taking care of several identified timing factors as
+described in the third paragraph in Section~2.
+Under such a well-configured timing environment, our protocol further 
+reduced the variability of execution time compared to the ORG method
+in such various benchmarks, 
+which actually demonstrated its general purpose and wide usability. 
 
 Lastly, the results from a new experiment provide 
 another strongly evidence that our protocol is widely practical and useful. 
@@ -189,21 +198,27 @@ practical or is useful.
 This review is basically the same as (2). Please refer to our response of (2) for this comment. 
 One note. You may feel that the extent of the improvement varies widely, 
 because the SPEC CPU2006 includes a set of very different compute-bound benchmarks. 
-But even if so, we found that all the benchmarks in the suite benefited from our timing protocol, and in addition, 
-for some workloads, our protocol significantly reduced their variability up to by 10x.  
+But even if so, we found that all the benchmarks in the suite benefited from our timing protocol, 
+and in addition, for some workloads, our protocol significantly reduced their variability up to by 10x.  
 
 
 \rev{ 
 (4) Since the explanation of ``dual-PUT'' is not enough, I can not well
-understand the algorithm shown in Fig. 3. 
-}
-
-More descriptions of the term ``dual-PUT'' is provided in Section~2. 
-\rev{
-Similarly, what is “1st
+understand the algorithm shown in Fig. 3. Similarly, what is “1st
 Half’s ET (ms)” attached at Fig. 4(b), 4(c), 4(d) ? I understood only that
 the label is related with “dual-PUT”. These words are important in the
 manuscript. So, please keep in mind to write understandably.
 }
+
+Your point is well taken. 
+The term of ``dual-PUT'' represents 
+a pair of two consecutive samples of a run of a (regular) PUT. 
+(The length of that regular PUT is virtually doubled as dual-PUT.) More descriptions of the term ``dual-PUT'' are provided with an easy example 
+in the second paragraph in the right column on page~2. 
+In addition, the 1st half indicates the first element of the pair 
+whereas the 2nd half represents the second element of the same pair. 
+The label of ``1st Half's ET (ms)'' is renamed as ``Odd Samples' ET(ms),'' 
+for better clarification. Please refer to the following (third) paragraph. 
+
 
 \end{document}

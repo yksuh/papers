@@ -336,7 +336,7 @@
  \@tempcnta \hold@vol\relax
  \advance \@tempcnta 1917\relax
  \ifnum \@tempcnta=1917\relax
-  200x%
+  2017%
  \else
   \the\@tempcnta
  \fi
@@ -1985,7 +1985,7 @@
   JULY\or AUGUST\or SEPTEMBER\or OCTOBER\or NOVEMBER\or DECEMBER\fi
   \ 
   \ifnum \@tempcnta=1917\relax
-   200x%
+   2017%
   \else
    \the\@tempcnta
   \fi
