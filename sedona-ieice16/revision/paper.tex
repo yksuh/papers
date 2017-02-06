@@ -1,4 +1,6 @@
 \documentclass[letter]{ieice}
+\usepackage{balance}
+\usepackage{flushend}
 \usepackage[ruled,linesnumbered]{algorithm2e}
 \usepackage{amssymb,amsthm,amsmath}
 \usepackage{balance}
@@ -106,7 +108,12 @@ to reach the specified task length.}
 \end{figure}
 
 We used 128~seconds as the task length and ran the PUT program (termed PUT128) 
-800~times. 
+800~times. {\color{red}Note that PUT128 was run on a machine, with 
+a specification illustrated in Table~\ref{tab:machine_config}, 
+in a controlled environment 
+with (i)~many non-critical daemon processes deactivated, (ii)~the 
+network timing protocol daemon enabled, and (iii)~a kernel up-to-date.} 
+ 
 %Fig.~\ref{fig:meas_comp} shows two histograms of the timing results on PUT128.
 {\color{blue}Fig.~\ref{fig:meas_comp} shows two plots of the timing results on PUT128.
 %Most of the 800 repetitions measured in elapsed time, 
@@ -116,8 +123,9 @@ We used 128~seconds as the task length and ran the PUT program (termed PUT128)
 Most of the 800 repetitions measured in elapsed time, 
 via  {\tt System.currentTimeMillis()} in Java, form the central band 
 of \hbox{128,000--129,000 ms,} as can be seen in Fig.~\ref{fig:hist_before_et}. 
-There also exist over a dozen of repetitions above that band, called outliers.
-But these outliers {\em critically} impact the overall measurement quality: 
+Although the environment restrained some identified timing factors, 
+there exist over a dozen of repetitions above that band, called outliers. 
+Indeed, these outliers {\em critically} impact the overall measurement quality: 
 a standard deviation of 1,730 ms and a relative error of 0.01.
 This result suggests adequately eliminating these outliers 
 while retaining most of the measured executions.}
@@ -247,7 +255,7 @@ is applicable to the TTP protocol, to further improve the query time calculation
 %\vspace{0.05in}
 {\bf Contribution.} 
 Our contributions are following.
-\vspace{-0.12in}
+%\vspace{-0.12in}
 \begin{itemize}
 
 \item We show empirical evidence that 
@@ -258,8 +266,8 @@ can be seriously affected by daemons.
 identifies infrequent, long-running daemons that impact the timing results for that program. 
 
 \item We evaluate the performance of the protocol with rigorous experiments, 
-starting from a simple program in pure-computation mode 
-to a popular industrial benchmark suite.
+starting from a simple program in pure-computation mode {\color{blue}through 
+some memory-intensive real-world programs} to a popular industrial benchmark suite.
 
 \item The experimental results show a support for the effectiveness of our scheme\shorten{SEDONA: 
 early eliminating dirty executions infected with such a daemon 
@@ -361,7 +369,7 @@ of 400 samples of a \hbox{dual-PUT256} constructed
 from a run of the 800 PUT128 samples (Step~3). 
 There are two quite obvious outliers\shorten{, corresponding to sample \# 75 and \# 634,} with ETs of 163,913 msec (rightmost) and 161,785 msec (uppermost), respectively. 
 
-\begin{figure}[t]
+\begin{figure}[ht]
 	\centering
 	\subfigure[PUT128 with 800 Samples]{
 		%\includegraphics[width=0.223\textwidth]{put128_empv4.eps}
@@ -388,7 +396,7 @@ There are two quite obvious outliers\shorten{, corresponding to sample \# 75 and
         }
     \caption{Successive Scatter plots of a PUT128 with 800 samples 
     (equivalent to a Dual-PUT256 with 400 samples) in Steps~2---4~\label{fig:put128_plot}} 
-    \vspace{-0.16in}     
+    \vspace{-0.2in}     
 \end{figure} 
 
 We informally term this phenomenon of a scatter plot of a dual-PUT run an
@@ -498,7 +506,7 @@ We also include daemons that (a)~were identified as infrequent and
 We then take the {\em maximum} of the two cutoffs for the final cutoff PT 
 (the last column of Tab.~\ref{tab:final_infrequent_cutoff}). 
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
 {\scriptsize
 \begin{tabular}{|p{1.2cm}|c|c|p{1cm}|p{1.45cm}|} \hline
@@ -526,7 +534,7 @@ We then take the {\em maximum} of the two cutoffs for the final cutoff PT
 }
 \caption{Collected Infrequent, Long-running Daemons and Their Final Cutoff
   Process Time \hbox{(Step~9)}\label{tab:final_infrequent_cutoff}}
-  \vspace{-0.4in}
+  \vspace{-0.2in}
 \end{table}
 
 Based on Tab.~\ref{tab:final_infrequent_cutoff}, 
@@ -540,7 +548,7 @@ and by about two \hbox{orders} of magnitude for PUT16384.
 %(5661.7 vs. 229.8) 0.0003448491 vs. 8.4$\times$10$^{-6}$
 %(40.4 vs. 26.7) 2.463122e-06 vs. 1.626005e-06
 
-\vspace\fill
+%\vspace\fill
 
 \section{Evaluation}
 \label{sec:eval}
@@ -579,29 +587,6 @@ matrix multiplication (in column major), termed MM.
 SEDONA overwhelmed ORG, as can be seen in Fig.~\ref{fig:synprog_test}. 
 As workload size increased, 
 the performance gap between SEDONA and ORG got increasingly widened, reaching up to by 6x.
-
-\begin{figure}[htp!]
-	\centering
-	\subfigure[SORT - Standard Deviation]{
-		\includegraphics[scale=0.31]{sort_std.eps}
-		\label{fig:sort_std}
-	}
-	\subfigure[SORT - Relative Error]{
-		\includegraphics[scale=0.31]{sort_re.eps}
-		\label{fig:sort_re}
-	}
-	\subfigure[MM - Standard Deviation]{
-		\includegraphics[scale=0.31]{matc_std.eps}
-		\label{fig:matc_std}
-	}
-	\subfigure[MM - Relative Error]{
-		\includegraphics[scale=0.31]{matc_re.eps}
-		\label{fig:matc_re}
-	}
-	\vspace{-.1in}
-	\caption{Performance Comparison on Real-world Programs~\label{fig:synprog_test}}
-\vspace{-.2in}
-\end{figure}
 }
 
 Table~\ref{tab:spec_real} shows that
@@ -616,6 +601,29 @@ Furthermore, the relative error of SEDONA was
 lower than that of ORG for all the benchmarks. 
 For instance, about a 10x \hbox{margin} between the two was yielded for 
 {\tt 434.zeusmp}.
+
+\begin{figure}[t]
+	\centering
+	\subfigure[{\color{blue}SORT - Standard Deviation}]{
+		\includegraphics[scale=0.31]{sort_std.eps}
+		\label{fig:sort_std}
+	}
+	\subfigure[{\color{blue}SORT - Relative Error}]{
+		\includegraphics[scale=0.31]{sort_re.eps}
+		\label{fig:sort_re}
+	}
+	\subfigure[{\color{blue}MM - Standard Deviation}]{
+		\includegraphics[scale=0.31]{matc_std.eps}
+		\label{fig:matc_std}
+	}
+	\subfigure[{\color{blue}MM - Relative Error}]{
+		\includegraphics[scale=0.31]{matc_re.eps}
+		\label{fig:matc_re}
+	}
+	\vspace{-.1in}
+	\caption{{\color{blue}Performance Comparison on Real-world Programs~\label{fig:synprog_test}}}
+\vspace{-.2in}
+\end{figure}
 
 SEDONA also scaled well for the SPEC workloads, 
 with regard to growth of relative error as the execution time lengthened.
@@ -654,7 +662,7 @@ precision, and scalability in measuring the execution time of real \hbox{compute
 than the conventional timing method.
 
 \vspace{-0.1in}
-\begin{table}[h]
+\begin{table}[t]
 \centering
 {
 \scriptsize
@@ -708,9 +716,9 @@ than the conventional timing method.
 \end{tabular}
 }
 \caption{Performance Evaluation on the SPEC Benchmarks\label{tab:spec_real}}
-\vspace{-0.33in}
+\vspace{-0.25in}
 \end{table}
-\vspace{0.5in}
+%\vspace{0.5in}
 
 %\vspace{-0.1in}
 %\begin{table}[h]
@@ -807,6 +815,8 @@ Our plan is to integrate SEDONA into the query timing protocol~\cite{Currim}.
 %\section*{Acknowledgments} 
 %The author give many thanks to Rick Snodgrass, Rob Meier, and John Kececioglu 
 %for their sincere supports.
+
+\balance
 
 \vspace{-0.03in}
 {\tiny 
