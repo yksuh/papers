@@ -396,11 +396,10 @@ and {\tt ntpd}. That said, the central cluster also contains other
   {\tt rhsmcertd-worke}, and {\tt sshd}. 
   But these daemons were categorized in the \hbox{dual-PUT256} analysis as {\em
   infrequent}, several having \hbox{periodicities} estimated at four or twenty hours.
-When the PUT had a ``short'' 
+When {\color{blue}PUT128} had a ``short'' 
 program time (in this case, two minutes), daemons with a periodicity of
-hours are \hbox{infrequent}. But with a PUT with a ``long'' program time (in this
-case, 4.5 hours), some of those daemons are now frequent, and appear in the 
-central cluster.
+hours are \hbox{infrequent}. But with {\color{blue}PUT16384} 
+with a ``long'' program time (in this case, 4.5 hours), some of those daemons are now frequent, and appear in the central cluster.
 
 In Step~9 we compute 
 the cutoff for each of those infrequent, long-running daemons so
