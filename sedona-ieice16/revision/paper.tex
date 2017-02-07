@@ -103,10 +103,12 @@ to reach the specified task length.}
 We used 128~seconds as the task length and ran the PUT program (termed PUT128) 
 800~times. {\color{red}Note that PUT128 was run on a machine, with 
 a specification illustrated in Table~\ref{tab:machine_config}, 
-in a controlled environment 
-with (i)~many non-critical daemon processes deactivated, (ii)~the 
-network timing protocol daemon enabled, and (iii)~an up-to-date kernel.} 
- 
+in the same timing environment as used in our prior work~\cite{Currim}, 
+with i)~non-critical daemons deactivated, 
+ii)~the Network Timing Protocol daemon switched on,  
+iii)~particular CPU features\cite{intel15,intelSpeed15} turned off, and 
+and iv)~an up-to-date kernel installed.} 
+
 {\color{blue}Fig.~\ref{fig:meas_comp} shows two plots of the timing results on PUT128.
 Most of the 800 executions measured in elapsed time, 
 via  {\tt System.currentTimeMillis()} in Java, form the central band 
@@ -149,8 +151,8 @@ They proposed a measurement protocol, called {\em minimum-of-k},
 that for observed elapsed ticks the minimum is chosen as the most accurate one. 
 Odom et al.'s work~\cite{Odom05} focused on timing long-running programs 
 in a simulation framework via dynamic sampling of trace snippets during program execution. 
-None of these prior works, however, takes into account the variability in 
-timing and the influence of daemons that may significantly disturb the timing.
+But none of these prior works considers the variability in 
+timing and the impact of daemons that may disturb the timing a lot.
 
 \begin{figure}[t]
 	\centering
@@ -238,10 +240,13 @@ consisting of a small number of executions (specifically, 40) of PUT16384.
 \end{figure}
 
 {\bf A Running Example.} 
-As motivated by our prior work~\cite{Currim}, 
-we configure a timing environment by i) stopping non-critical daemons, 
-ii) activating the Network Timing Protocol daemon, and 
-iii) switching off particular CPU features\cite{intel15,intelSpeed15} if any (Step 1). 
+%As motivated by our prior work~\cite{Currim}, 
+%we configure a timing environment by i) stopping non-critical daemons, 
+%ii) activating the Network Timing Protocol daemon, and 
+%iii) switching off particular CPU features\cite{intel15,intelSpeed15} if any (Step 1). 
+{\color{blue}
+First, we set up the same measurement environment as described earlier in Section~\ref{sec:intro}, 
+to eliminate known timing factors in advance (Step~1).}
 
 We then run a program-under-test (called PUT) of 
 Fig.~\ref{alg:put} with a task length of 128~sec, 
