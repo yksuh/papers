@@ -84,7 +84,7 @@
 \maketitle
 
 \section*{Overview}\label{sec:overview}
-I appreciate these quite thorough reviews. I appreciate the feedback and suggestions.
+I appreciate these quite thorough reviews and suggestions.
 
 \newcounter{RP}
 
@@ -103,20 +103,16 @@ proposed approach will work. Please refer to my comments, and consider
 to revise the manuscript and re-submit .
 }
 
-Your concerns are well understood. 
-Indeed, our statistics and heuristics greatly help us 
-identify what daemons are infrequent, long-running on our system 
+I understand your concerns.
+Indeed, the used statistics and heuristics greatly helped me 
+identify what daemons were infrequent, long-running on our system 
 (as described in the fourth paragraph in the left column on page~3). 
 Applying such statistics and heuristics can be done to any Linux system, 
-which make our protocol generic. Furthermore, the experimental results show that 
-our protocol is more efficient than the traditional method relying on elapsed time. 
+which indeed makes our protocol generic. Furthermore, the experimental results show that 
+the proposed protocol is more efficient than the traditional method relying on elapsed time. 
 
-Note that my responses to your comments 
-are incorporated into the revision and marked in {\color{red}red}. 
-There are some new and modified contents in the revision, 
-which are marked in {\color{blue}blue} for better distinction. 
 
-I now respond to individually below. 
+I now respond to individually below. Note that my responses to your comments are incorporated into the revision and marked in {\color{red}red}. There are also some new or modified contents in the revision, which are marked in {\color{blue}blue}.
 
 \rev{
 Comments: 
@@ -129,22 +125,14 @@ SEDONA is a generic protocol. If the research goal is the combination
 of this work and the prior work, the author should mention so.
 }
 
-I understand your confusion. The previously described plan was suggested as one of the possibilities in the future work. But that is not the research goal of this paper. 
-As you already recognized, the goal of this paper is to propose a {\em generic, better} timing protocol against the conventional approach of utilizing elapsed time, 
+I understand your confusion. The previously described plan was suggested as one of the possibilities in the future work. But that was not stated as the ultimate goal of this paper. 
+As you already recognized, my goal is to propose a {\em generic, better} timing protocol against the conventional approach of utilizing elapsed time, 
 to enable better timing results. This goal is successfully achieved 
-by significantly reducing variability in timing as demonstrated in our various experiments.
-%The goal is successfully achieved by significantly reducing variability of 
-%the execution time of a program of interest in our experiments. 
-I now clearly state this goal, marked in red, at the last sentence in Section~1. 
+by significantly reducing variability in timing as demonstrated in our various experiments. I now clearly state this goal, marked in red, in the last sentence in Section~1. 
 
 To avoid confusion, I removed the last mention. Also, the first paragraph on page~2, 
 which used to provide an explanation of a possible combination of the query timing protocol 
 with SEDONA, was removed.
-
-%Note also that the mention of my plan in the future work 
-%is just one aspect of the extension of the SEDONA protocol. 
-%I claim that the combination is not the ultimate research goal of this paper. 
-%To avoid confusion, I removed that sentence. 
 
 \rev{
 (2) If the proposed approach is for a generic purpose, there is a strong
@@ -155,10 +143,11 @@ the SEDONA is widely practical or is useful. The description to clarify
 the SEDONA’s characteristics is needed.
 } 
 
-Your concern is understood, but it is hard to agree with the comment that the improvement is little, for the following reasons.
+I understand this concern. But I do not agree with the comment that the improvement is little, for the following reasons.
 First, for a certain workload such as {\tt 434}, 
-our protocol reduced the variability was reduced up to by about 10x (from 75 ms to 7 ms), 
-which is *not* small. (Please refer to the last sentence 
+our protocol reduced the variability up to by about 10x 
+(from 75 ms to 7 ms), 
+which cannot be said to be small. (Please refer to the last sentence 
 in the first paragraph in the second column on page~4.)
 There were also some other workloads such as {\tt 410} and {\tt 445} 
 in which the improvement reached about 3x, respectively. 
@@ -169,29 +158,26 @@ by 1.5x as well.
 
 Second, our protocol scaled well over increasing execution time. 
 (Please refer to the second paragraph in the right column on page~4.)
-The relative error of our protocol was still smaller than that of the ORG method 
-for a long-running benchmark like {\tt 436} and {\tt 454} 
+The relative error of our protocol was lower than that of the traditional method 
+for a long-running benchmark such as {\tt 416}, {\tt 436}, and {\tt 454} 
 as well as for a medium-length or a short-length one. 
-Such scalability was still observed in our new experiment, 
-which I describe shortly, as shown in Fig.~5.
+A new experiment, 
+which I describe shortly, also revealed 
+such scalability of our protocol, as shown in Fig.~5.
 
-Note also that the ET results by the ORG method were also based 
-on the settings taking care of several identified timing factors as
-described in the third paragraph in Section~2.
-Under such a well-configured timing environment, our protocol further 
-reduced the variability of execution time compared to the ORG method
-in such various benchmarks, 
-which actually demonstrated its general purpose and wide usability. 
+(Note that the ET results by the conventional measurement were already 
+improved enough, as they were measured based 
+on the settings handling several identified timing factors mentioned in the third paragraph in Section~1. Under such a well-configured timing environment, our protocol could further reduce the variability of execution time in such various benchmarks. This actually demonstrates its general purpose and wide usability.)
 
-Lastly, the results from a new experiment provide 
-another strongly evidence that our protocol is widely practical and useful. 
+Lastly, the new experimental results provide 
+another strong evidence that our protocol is widely practical and useful. 
 In the new experiment we evaluated the performance of our protocol 
 on some real-world programs like insertion sort and matrix multiplication (in column major). 
-The experimental results showed that the performance gap between the original and our methods 
+The results showed that the performance gap between the original and our timing schemes  
 was increasingly widened, e.g., up to by 6x, as workload level increased. 
 
 Therefore, I strongly claim that these various experiments confirm 
-the wide acceptance and usability of SEDONA as an alternative to the ET-based measurement technique. 
+the wide acceptance and usability of SEDONA as an alternative to the ET-based conventional measurement technique. 
 
 \rev{ 
 (3) The improvement of the SEDONA is little. And the extent of the each
@@ -200,11 +186,7 @@ experimental results does not confirm whether the SEDONA is widely
 practical or is useful.
 }
 
-This review is basically the same as (2). Please refer to our response of (2) for this comment. 
-One note. You may feel that the extent of the improvement varies widely, 
-because the SPEC CPU2006 includes a set of very different compute-bound benchmarks. 
-But even if so, we found that all the benchmarks in the suite benefited from our timing protocol, 
-and in addition, for some workloads, our protocol significantly reduced their variability up to by 10x.  
+This review is basically the same as (2). Please refer to our response of (2) for this comment. One note, though. You may feel that the extent of the improvement varies widely. That is because the SPEC CPU2006 includes a set of very different compute-bound benchmarks. We also found that all the different benchmarks in the suite benefited from our timing protocol, and for a certain workload, our protocol significantly reduced their variability up to by 10x as mentioned earlier.
 
 
 \rev{ 
@@ -216,10 +198,11 @@ manuscript. So, please keep in mind to write understandably.
 }
 
 Your point is well taken. 
-The term of ``dual-PUT'' represents 
+More descriptions of the term ``\hbox{dual-PUT}'' are provided with a simple example in the second paragraph in the right column on page~2.  
+In brief, the term of ``dual-PUT'' represents 
 a pair of two consecutive samples of a run of a (regular) PUT. 
-(The task length of that regular PUT is virtually doubled, extended to the corresponding 
-dual-PUT.) More descriptions of the term ``\hbox{dual-PUT}'' are provided with a simple example in the second paragraph in the right column on page~2. 
+(The task length of that regular PUT is virtually doubled, extended to the corresponding dual-PUT.) 
+
 In addition, the 1st half indicates the first element of the pair 
 whereas the 2nd half the second element of the same pair. 
 The label of ``1st Half's ET (ms)'' is renamed as ``Odd Samples' ET(ms),'' 
