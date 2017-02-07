@@ -103,15 +103,20 @@ proposed approach will work. Please refer to my comments, and consider
 to revise the manuscript and re-submit .
 }
 
-Your concerns are well understood. I found such statistics and heuristic approaches 
-very useful to catch what system daemons are infrequent, long-running. 
-Also, the approaches make our protocol generic, in that 
-such statistics and heuristics can be computed and 
-applied on any Linux system. The experimental results show that 
+Your concerns are well understood. 
+Indeed, our statistics and heuristics greatly help us 
+identify what daemons are infrequent, long-running on our system 
+(as described in the fourth paragraph in the left column on page~3). 
+Applying such statistics and heuristics can be done to any Linux system, 
+which make our protocol generic. Furthermore, the experimental results show that 
 our protocol is more efficient than the traditional method relying on elapsed time. 
 
-I now respond to individually below.
-%Your comments are incorporated into the revision. 
+Note that my responses to your comments 
+are incorporated into the revision and marked in {\color{red}red}. 
+There are some new and modified contents in the revision, 
+which are marked in {\color{blue}blue} for better distinction. 
+
+I now respond to individually below. 
 
 \rev{
 Comments: 
@@ -213,12 +218,11 @@ manuscript. So, please keep in mind to write understandably.
 Your point is well taken. 
 The term of ``dual-PUT'' represents 
 a pair of two consecutive samples of a run of a (regular) PUT. 
-(The length of that regular PUT is virtually doubled as dual-PUT.) More descriptions of the term ``\hbox{dual-PUT}'' are provided with an easy example 
-in the second paragraph in the right column on page~2. 
+(The task length of that regular PUT is virtually doubled, extended to the corresponding 
+dual-PUT.) More descriptions of the term ``\hbox{dual-PUT}'' are provided with a simple example in the second paragraph in the right column on page~2. 
 In addition, the 1st half indicates the first element of the pair 
-whereas the 2nd half represents the second element of the same pair. 
+whereas the 2nd half the second element of the same pair. 
 The label of ``1st Half's ET (ms)'' is renamed as ``Odd Samples' ET(ms),'' 
-for better clarification. Please refer to the following (third) paragraph. 
-
+for better clarification. Please refer to the subsequent (third) paragraph. 
 
 \end{document}
