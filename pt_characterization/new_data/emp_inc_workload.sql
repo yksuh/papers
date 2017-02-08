@@ -22,7 +22,9 @@ CREATE TABLE EMP_INC_RUN_PROC_INFO AS
 	-- 1 sec, 2 secs, 4 secs, 8 secs, 16 secs, 32 secs, 64 secs
 	and (arr.algrunid IN (5292, 5332, 5372, 5412, 5452, 5492, 5532)
 	-- 128 secs, 256 secs, 512 secs, 1024 secs, 2048 secs, 4096 secs, 8192 secs, 16384 secs
-	or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8119, 8880, 8900))
+	--or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8119, 8880, 8900))
+	--or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8119, 8880, 8900))
+	or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8119, 8880, 8900,17200,17220,17180,17240))
 	--or arr.algrunid IN (6258, 6278, 6338, 6318, 6378, 8960, 8880, 8900))
 	--and arr.iternum <= 300 -- first 300 
 	--group by arr.algrunid, ar.exp_run_time, arr.iternum, arr.runtime, proc.processname
@@ -127,7 +129,7 @@ ALTER TABLE EMP_INC_RUN_CUTOFF_Info ADD PRIMARY KEY (exp_run_time, processname, 
 -- select distinct exp_run_time, iternum from EMP_INC_RUN_CUTOFF_Info where exp_run_time = 1024 and iter num 
 --select distinct exp_run_time, processname,  count(iternum) as numOls, min(pt) as min_pt, round(avg(pt),0) as avg_pt, round(stddev(pt),1) as std_pt from EMP_INC_RUN_CUTOFF_Info group by exp_run_time, processname order by exp_run_time, processname asc
 
-select distinct exp_run_time, iternum from EMP_INC_RUN_CUTOFF_Info order by exp_run_time, iternum
+select distinct exp_run_time, algrunid, iternum from EMP_INC_RUN_CUTOFF_Info order by exp_run_time, algrunid, iternum
 
 EXP_RUN_TIME	ITERNUM
 ------------ ----------
