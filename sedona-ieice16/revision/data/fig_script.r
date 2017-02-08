@@ -16,7 +16,8 @@ plot(x$METIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax),
 	pch=1, main='', 
 	xlab='Iteration', ylab='Elapsed Time (msec)')
 options(scipen = 999)
-legend(380, 171500, c(as.expression(paste("# of total samples = ",nrow(x))), 
+op <- par(cex = 1.5)
+legend(160, 155500, c(as.expression(paste("# of total samples = ",nrow(x))), 
 		    as.expression(paste("standard deviation = ",round(sd(x$METIME),1),"msec")), 
 		    as.expression(paste("relative error = ",round(re,5)))
 ))
@@ -101,7 +102,8 @@ plot(x$PRTIME, xlim=c(0,max(x$ITERNUM)), ylim=c(old_xmin, old_xmax),
 	xlab='Iteration', ylab='Process Time (msec)'
 )
 options(scipen = 999)
-legend(380, 171500, c(as.expression(paste("# of retained samples = ",nrow(x))), 
+op <- par(cex = 1.5)
+legend(200, 155500, c(as.expression(paste("# of retained samples = ",nrow(x))), 
 		    as.expression(paste("standard deviation = ",round(sd(x$PRTIME),1),"msec")), 
 		    as.expression(paste("relative error = ",round(re,5)))
 ))
