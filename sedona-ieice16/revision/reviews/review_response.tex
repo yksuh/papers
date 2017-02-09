@@ -105,14 +105,14 @@ to revise the manuscript and re-submit .
 
 Thank you for your comments. Indeed, the used statistics and heuristics greatly helped me 
 identify what daemons were infrequent, long-running on our system 
-(as described in the fourth paragraph in the left column on page~3). 
+(as described in the third paragraph in the left column on page~3). 
 Applying such statistics and heuristics can be done to any Linux system, 
 which indeed makes our protocol generic. Furthermore, the experimental results show that 
 the proposed protocol is more efficient than the traditional method relying on elapsed time. 
 
 
 I now respond to individually below. Note that my responses to your comments are 
-incorporated into the revision and marked in {\color{blue}blue}. 
+incorporated into the revision. 
 
 \rev{
 Comments: 
@@ -152,7 +152,7 @@ First, for a certain workload such as {\tt 434},
 our protocol reduced the variability up to by about 10x 
 (from 75 ms to 7 ms), 
 which cannot be said to be small. (Please refer to the last sentence 
-in the first paragraph in the second column on page~4.)
+in the fourth paragraph in Section~3 on page~4.)
 There were also some other workloads such as {\tt 410} and {\tt 445} 
 in which the improvement reached about 3x, respectively. 
 Furthermore, every benchmark's standard deviation by our protocol 
@@ -161,7 +161,7 @@ The relative error of the benchmarks was on average improved
 by 1.5x as well.
 
 Second, our protocol scaled well over increasing execution time. 
-(Please refer to the bottom paragraph in the left column on page~4.)
+(Please refer to the fifth paragraph in Section~3 on page~4.)
 The relative error of our protocol was lower than that of the traditional method 
 for a long-running benchmark such as {\tt 416}, {\tt 436}, and {\tt 454} 
 as well as for a medium-length or a short-length one. 
