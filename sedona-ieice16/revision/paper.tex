@@ -104,10 +104,10 @@ We used 128~seconds as the task length and ran the PUT program (termed PUT128)
 800~times. Note that PUT128 was run on a machine, with 
 a specification illustrated in Table~\ref{tab:machine_config}, 
 in the same timing environment as used in our prior work~\cite{Currim}, 
-with i)~non-critical daemons deactivated, 
-ii)~the Network Timing Protocol daemon switched on,  
-iii)~particular CPU features\cite{intel15,intelSpeed15} turned off, and 
-and iv)~an up-to-date kernel installed.
+with (i)~non-critical daemons deactivated, 
+(ii)~the Network Timing Protocol daemon switched on,  
+(iii)~particular CPU features~\cite{intel15,intelSpeed15} turned off, 
+and (iv)~an up-to-date kernel installed.
 
 Fig.~\ref{fig:meas_comp} shows two plots of the timing results on PUT128.
 Most of the 800 executions measured in elapsed time, 
@@ -235,7 +235,7 @@ consisting of a small number of executions (specifically, 40) of PUT16384.
 \end{figure}
 
 {\bf A Running Example.} 
-First, we set up the same measurement environment as described earlier in Section~\ref{sec:intro}, 
+First, we set up the same measurement environment as described earlier in \hbox{Section}~\ref{sec:intro}, 
 to eliminate known timing factors (Step~1).
 
 We then run a program-under-test (called PUT) of 
@@ -249,13 +249,14 @@ Note that we collect all daemon processes as well as the PUT and their measures
 through the Netlink interface from the kernel before and after each 
 timing.
 
-Fig.~\ref{fig:reg_put128} plots all the 800 elapsed times (ETs) of the run of PUT128.
+Fig.~\ref{fig:reg_put128} (= Fig.~\ref{fig:hist_before_et}) 
+plots all the 800 elapsed times (ETs) of PUT128.
 The plot clearly shows three rows; that is, 
 the top and middle rows represent over a dozen of outliers far from 
 the rest of the samples clustered in the bottom row. 
-We'll now drill down into these outliers to 
+We will now drill down into these outliers to 
 show how to reliably eliminate the indirect influence of 
-some ``infrequent, long-running daemons'' on PT (\hbox{process} time) of the PUT.
+some ``infrequent, \hbox{long-running} daemons'' on PT (\hbox{process} time) of the PUT.
 
 To identify such daemons, we use a novel \hbox{scatter} plot: 
 those of {\em pairs of successive samples}. 
@@ -341,7 +342,7 @@ is over two standard deviations above the maximum PT for
 that daemon in the central cluster samples. 
 In the running example  {\tt flush-9:0}, 
 {\tt jbd2/md0-8}, and {\tt md0\_raid1} 
-are determined as infrequent, long-running.
+are determined as infrequent, \hbox{long-running}.
 We also identify ``extra'' infrequent daemons: 
 {\tt bash}, {\tt grep}, {\tt rhn\_check}, {\tt rhnsd}, {\tt rhsmcertd}, 
 {\tt rhsmcertd-worke}, and {\tt sshd}, those 
@@ -363,7 +364,7 @@ daemon, or the valley between the maximum PT from the central cluster
 and the minimum PT from the $L$-samples, to differentiate ``short-running'' 
 from ``\hbox{long-running}'' executions of the daemon. 
 For those daemons (i.e. {\tt grep}) never appearing in the central cluster,
-this initial analysis concludes only that they are infrequent.
+this initial \hbox{analysis} concludes only that they are infrequent.
 
 In Step 8 we repeat Steps 1--6, but instead with the much-longer running
 PUT16384 (4.5 hours per \hbox{sample} versus 2 minutes), to see 
@@ -445,7 +446,7 @@ and by about two \hbox{orders} of magnitude for PUT16384.
 \label{sec:eval}
 \vspace{-0.07in}
 We now evaluate the \hbox{performance} of SEDONA 
-compared to that of the conventional timing scheme, termed ORG, based on 
+compared to that of the original timing scheme, termed ORG, based on 
 elapsed time.
 Our experiments were conducted on a \hbox{machine}
 described in Table~\ref{tab:machine_config}. 
@@ -468,7 +469,7 @@ HDD & Western Digital Caviar Black 1TB 7200rpm SATA Drive\\ \hline
 First, we compared the performance of the two approaches 
 using real-world programs such as insertion sort, termed SORT and 
 matrix multiplication (in column major), termed MM. 
-In this comparison SEDONA bettered ORG, as can be seen in Fig.~\ref{fig:synprog_test}. 
+In this comparison SEDONA outperformed ORG, as can be seen in Fig.~\ref{fig:synprog_test}. 
 As workload size increased, the performance gap between the two 
 were increasingly widened, reaching up to by 6x.
 
@@ -485,7 +486,7 @@ were increasingly widened, reaching up to by 6x.
 	}
 	\vspace{-.1in}
 	\caption{Performance Comparison on Real-world Programs~\label{fig:synprog_test}}
-\vspace{-.2in}
+\vspace{-.25in}
 \end{figure}
 
 In turn, our evaluation proceeded with SPEC CPU2006 
@@ -495,14 +496,14 @@ Note that in the table the results for {\tt 481} and {\tt 483} \hbox{benchmarks}
 are omitted because of some runtime error and incurred I/O, respectively.
 
 Table~\ref{tab:spec_real} shows that 
-SEDONA outperformed ORG,
+SEDONA bettered ORG,
 on the standard deviation and relative error across the very different SPEC benchmarks. 
 To be more specific, all the benchmarks revealed a smaller standard deviation 
 from SEDONA as compared to that of ORG. 
 Our timing protocol quite effectively filtered out infrequent daemon executions 
 in the industrial workloads. The relative error of SEDONA was also 
 lower than that of ORG for almost every benchmark.
-About a 10x \hbox{margin} between the two resulted from {\tt 434}, for example.
+For example, about a 10x \hbox{margin} between the two resulted from {\tt 434}.
 
 SEDONA also scaled well for the SPEC workloads, 
 with regard to growth of relative error as the execution time lengthened.
@@ -516,16 +517,17 @@ Even for the long-running benchmarks (e.g. {\tt 416}, {\tt 436}, and {\tt 454}, 
 the relative error of \hbox{SEDONA} was still lower than that of ORG.
 
 To summarize, our proposed SEDONA protocol can achieve {\em better} accuracy,
-precision, and scalability in measuring the execution time of real \hbox{compute-bound} benchmarks than the conventional timing method. 
+precision, and scalability in measuring the execution time of real \hbox{compute-bound} programs 
+than the ET-based existing method. 
 The experimental results demonstrate 
 the general applicability of SEDONA to timing any CPU-bound program.
 
-\vspace{-0.1in}
+%\vspace{-0.in}
 \begin{table}[t]
 \centering
 {
 \tiny
-\begin{tabular}{|p{0.1cm}|R{1.1cm}|R{1.1cm}|R{0.6cm}|R{0.6cm}|R{0.97cm}|R{0.97cm}|} \hline
+\begin{tabular}{|p{0.1cm}|R{1.1cm}|R{1.1cm}|R{0.6cm}|R{0.6cm}|R{0.92cm}|R{0.92cm}|} \hline
  		  & \multicolumn{2}{c|}{{\tiny Execution Time (ms)}} & \multicolumn{2}{c|}{{\tiny Standard}}   & \multicolumn{2}{c|}{\multirow{2}{*}{{\tiny Relative Error}}}\\ \cline{2-3}
  & \multicolumn{1}{c|}{{\tiny{ORG}}}  & \multicolumn{1}{c|}{{\tiny{SED.}}} & \multicolumn{2}{c|}{{\tiny Deviation (ms)}}  & \multicolumn{2}{c|}{{\tiny}}\\ \cline{4-7}	
  & \multicolumn{1}{c|}{{\tiny{(in ET)}}} & \multicolumn{1}{c|}{{\tiny{(in PT)}}} & {\tiny{ORG}} & {\tiny{SED.}} & \multicolumn{1}{c|}{{\tiny{ORG}}}& \multicolumn{1}{c|}{{\tiny{SED.}}}\\ \hline
