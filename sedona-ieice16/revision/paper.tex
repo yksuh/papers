@@ -516,24 +516,6 @@ As workload size increased, the performance gap between the two
 were increasingly widened, reaching up to by 6x.
 }
 
-In turn, our evaluation proceeded with SPEC CPU2006 
-benchmarks~\cite{specCpu2006}, providing various \linebreak 
-\hbox{compute-bound} real applications. The results are \hbox{provided} in Table~\ref{tab:spec_real}. 
-Note that in the table the results for {\tt 481} and {\tt 483} \hbox{benchmarks} 
-are omitted because of some runtime error and incurred I/O, respectively.
-
-{\color{blue}
-Table~\ref{tab:spec_real} shows that 
-SEDONA outperformed ORG,
-on the standard deviation and relative error across the very different SPEC benchmarks. 
-To be more specific, all the benchmarks revealed a smaller standard deviation 
-from SEDONA as compared to that of ORG. 
-Our timing protocol quite effectively filtered out infrequent daemon executions 
-in the industrial workloads. The relative error of SEDONA was also 
-lower than that of ORG for almost every benchmark.
-{\color{blue}About a 10x \hbox{margin} between the two resulted from {\tt 434}, for example.}
-}
-
 \vspace{-.2in}
 \begin{figure}[h]
 	\centering
@@ -557,6 +539,24 @@ lower than that of ORG for almost every benchmark.
 	\caption{{\color{blue}Performance Comparison on Real-world Programs~\label{fig:synprog_test}}}
 \vspace{-.2in}
 \end{figure}
+
+In turn, our evaluation proceeded with SPEC CPU2006 
+benchmarks~\cite{specCpu2006}, providing various \linebreak 
+\hbox{compute-bound} real applications. The results are \hbox{provided} in Table~\ref{tab:spec_real}. 
+Note that in the table the results for {\tt 481} and {\tt 483} \hbox{benchmarks} 
+are omitted because of some runtime error and incurred I/O, respectively.
+
+{\color{blue}
+Table~\ref{tab:spec_real} shows that 
+SEDONA outperformed ORG,
+on the standard deviation and relative error across the very different SPEC benchmarks. 
+To be more specific, all the benchmarks revealed a smaller standard deviation 
+from SEDONA as compared to that of ORG. 
+Our timing protocol quite effectively filtered out infrequent daemon executions 
+in the industrial workloads. The relative error of SEDONA was also 
+lower than that of ORG for almost every benchmark.
+{\color{blue}About a 10x \hbox{margin} between the two resulted from {\tt 434}, for example.}
+}
 
 %\vspace{-.15in}
 SEDONA also scaled well for the SPEC workloads, 
