@@ -197,8 +197,9 @@ and eventually contributing to enhancing the overall measurement-quality}.
 \vspace{-0.05in}
 
 \noindent
-{\color{blue}The rest is organized as follows. 
-We next elaborate on the proposed timing protocol. In turn we evaluate the performance of the scheme using real workloads. 
+The rest of this letter is organized as follows. 
+{\color{blue}We next elaborate on the proposed timing protocol. 
+In turn, we evaluate the performance of the scheme using real workloads. 
 \shorten{Finally, we conclude this letter.}
 }
 
@@ -247,7 +248,7 @@ consisting of a small number of executions (specifically, 40) of PUT16384.
 %iii) switching off particular CPU features\cite{intel15,intelSpeed15} if any (Step 1). 
 {\color{blue}
 First, we set up the same measurement environment as described earlier in Section~\ref{sec:intro}, 
-to eliminate known timing factors (Step~1).}
+to eliminate known timing factors in advance (Step~1).}
 
 We then run a program-under-test (called PUT) of 
 Fig.~\ref{alg:put} with a task length of 128~sec, 
@@ -316,7 +317,7 @@ of 163,913 ms (rightmost) and 161,785 ms (uppermost), respectively.
         }
     \caption{Successive Scatter Plots of PUT128 with 800 samples 
     (equivalent to Dual-PUT256 with 400 samples) in Steps~2---4~\label{fig:put128_plot}} 
-    \vspace{-0.3in}     
+    \vspace{-0.2in}     
 \end{figure} 
 
 We informally term this phenomenon of a scatter plot of a dual-PUT run an
@@ -345,11 +346,10 @@ samples had no infrequent, long-running daemons, which motivates that term.}
 
 We then perform Step~5, which computes 
 the maximum process time and standard deviation 
-of PT \shorten{(process time, note the switch in emphasis from elapsed time 
-to process time)} of the daemon processes
-%(e.g. {\tt cifsd}, {\tt flush-9:0}, {\tt jbd2/md0-8}, 
-%{\tt kblockd/0}, {\tt khugepaged}, {\tt md0\_raid1}, and {\tt ntpd})
-such as {\tt cifsd}, etc. 
+of PT (process time, note the switch in emphasis from elapsed time 
+to process time) of the daemon processes 
+(e.g. {\tt cifsd}, {\tt flush-9:0}, {\tt jbd2/md0-8}, 
+{\tt kblockd/0}, {\tt khugepaged}, {\tt md0\_raid1}, and {\tt ntpd})
 observed in the central cluster samples in Fig.~\ref{fig:dual_et_put256_cluster}. 
 \shorten{In the running example the maximum PT of those daemons was under 4 msec, 
 and their standard deviation was just about 1 msec.}
@@ -362,13 +362,11 @@ that daemon in the central cluster samples.
 In the running example  {\tt flush-9:0}, 
 {\tt jbd2/md0-8}, and {\tt md0\_raid1} 
 are determined as infrequent, long-running.
-%We also identify ``extra'' infrequent daemons: those
-%found only in the $L$-samples but not in the central cluster. 
-%The running example reveals the following extra daemons: 
-%{\tt bash}, {\tt grep}, {\tt rhn\_check}, {\tt rhnsd}, {\tt rhsmcertd}, 
-%{\tt rhsmcertd-worke}, and {\tt sshd}.
-{\color{blue}We also identify ``extra'' infrequent daemons, 
-found only in the $L$-samples but not in the central cluster.}
+We also identify ``extra'' infrequent daemons: those
+found only in the $L$-samples but not in the central cluster. 
+The running example reveals the following extra daemons: 
+{\tt bash}, {\tt grep}, {\tt rhn\_check}, {\tt rhnsd}, {\tt rhsmcertd}, 
+{\tt rhsmcertd-worke}, and {\tt sshd}.
 
 {\color{blue}
 For each of the infrequent daemons 
@@ -376,14 +374,11 @@ we use a heuristic to determine the daemon's periodicity:}
 the daemon must occur regularly in a sequence of samples.
 For instance, the {\tt rhn\_check} daemon appears 
 roughly every 112 samples (which corresponds to very close to every four 
-hours). 
-%Four others ({\tt flush-9:0}, {\tt jbd2/md0-8}, 
-%{\tt md0\_raid1}, and {\tt rhn\_check}) all occur together 
-%(in those two outliers in Fig.~\ref{fig:raw_put128}) and 
-%  have a periodicity of about every 559 samples
-%  (5x longer, or just about 20 hours). 
-{\color{blue}Four others all occur together and have a periodicity of about every 559 samples 
-(5x longer, or just about 20 hours)}. 
+hours). Four others ({\tt flush-9:0}, {\tt jbd2/md0-8}, 
+{\tt md0\_raid1}, and {\tt rhn\_check}) all occur together 
+(in those two outliers in Fig.~\ref{fig:raw_put128}) and 
+  have a periodicity of about every 559 samples
+  (5x longer, or just about 20 hours). 
 %  It is important only which samples a given daemon shows up 
 %  in; we don't care in this heuristic whether daemons are co-occurring.
 
@@ -403,16 +398,12 @@ if any of our identified \hbox{infrequent} daemons are actually frequent
 at that much longer PUT execution time. 
 We find some frequent daemon processes appearing in both of the 
 clusters of dual-PUT256 and dual-PUT32768{\color{blue}, each consisting of 
-pairs of two successive samples of PUT128 and PUT16384}.\shorten{: 
+pairs of two successive samples of PUT128 and PUT16384}: 
 {\tt flush-9.0}, {\tt jbd2/md0-8}, {\tt kblock/0}, {\tt md0\_raid1}, 
-and {\tt ntpd}.} 
-%That said, the central cluster also contains other
-%  processes not seen in the \hbox{dual-PUT256} central cluster: 
-%  {\tt grep}, {\tt rhn\_check}, {\tt rhnsd}, {\tt rhsmcertd}, 
-%  {\tt rhsmcertd-worke}, and {\tt sshd}. 
-That said, the central cluster also contains other
-  processes not seen in the \hbox{dual-PUT256} central cluster{\color{blue}, 
-  such as {\tt grep}, {\tt rhn\_check}, etc.}
+and {\tt ntpd}. That said, the central cluster also contains other
+  processes not seen in the \hbox{dual-PUT256} central cluster: 
+  {\tt grep}, {\tt rhn\_check}, {\tt rhnsd}, {\tt rhsmcertd}, 
+  {\tt rhsmcertd-worke}, and {\tt sshd}. 
   But these daemons were categorized in the \hbox{dual-PUT256} analysis as {\em
   infrequent}, several having \hbox{periodicities} estimated at four or twenty hours.
 When {\color{blue}PUT128} had a ``short'' 
@@ -438,10 +429,9 @@ We also include daemons that (a)~were identified as infrequent and
 We then take the {\em maximum} of the two cutoffs for the final cutoff PT 
 (the last column of Tab.~\ref{tab:final_infrequent_cutoff}). 
 
-\vspace{-0.2in}
 \begin{table}[ht]
 \centering
-{\tiny
+{\scriptsize
 \begin{tabular}{|p{1.2cm}|c|c|p{1cm}|p{1.45cm}|} \hline
 {\tiny Process}  & {\tiny Cutoff PT} & {\tiny Cutoff PT} & {\tiny Task}  & {\tiny{\bf Final }} \\
 {\tiny Name} & {\tiny on PUT128}  & {\tiny on PUT16K} & {\tiny Time} & {\tiny {\bf Cutoff PT}} \\\hline
@@ -467,7 +457,7 @@ We then take the {\em maximum} of the two cutoffs for the final cutoff PT
 }
 \caption{Collected Infrequent, Long-running Daemons and Their Final Cutoff
   Process Time \hbox{(Step~9)}\label{tab:final_infrequent_cutoff}}
-  \vspace{-0.3in}
+  \vspace{-0.4in}
 \end{table}
 
 Based on Tab.~\ref{tab:final_infrequent_cutoff}, 
@@ -494,7 +484,7 @@ described in Table~\ref{tab:machine_config}.
 \begin{table}[h]
 \vspace{-0.2in}
 \begin{center}
-{\tiny
+{\scriptsize
 \begin{tabular}{|l|p{7cm}|}\hline
 OS & Red Hat Ent. Linux (RHEL) 6.4 with a kernel of 2.6.32 \\ \hline
 CPU & Intel Core i7-870 Lynnfield 2.93GHz quad-core \hbox{processor}\shorten{ on a LGA 1156 95W motherboard}\\ \hline
@@ -504,7 +494,7 @@ HDD & Western Digital Caviar Black 1TB 7200rpm SATA Drive\\ \hline
 }
 \end{center}
 \caption{Machine Configurations\label{tab:machine_config}}
-\vspace{-0.35in}
+\vspace{-0.3in}
 \end{table}
 
 {\color{blue}
@@ -534,25 +524,24 @@ lower than that of ORG for almost every benchmark.
 {\color{blue}About a 10x \hbox{margin} between the two resulted from {\tt 434}, for example.}
 }
 
-\vspace{-.2in}
-\begin{figure}[h]
+\begin{figure}[t]
 	\centering
 	\subfigure[{\color{blue}SORT - Standard Deviation}]{
 		\includegraphics[scale=0.31]{sort_std.eps}
 		\label{fig:sort_std}
 	}
-%	\subfigure[{\color{blue}SORT - Relative Error}]{
-%		\includegraphics[scale=0.31]{sort_re.eps}
-%		\label{fig:sort_re}
-%	}
+	\subfigure[{\color{blue}SORT - Relative Error}]{
+		\includegraphics[scale=0.31]{sort_re.eps}
+		\label{fig:sort_re}
+	}
 	\subfigure[{\color{blue}MM - Standard Deviation}]{
 		\includegraphics[scale=0.31]{matc_std.eps}
 		\label{fig:matc_std}
 	}
-%	\subfigure[{\color{blue}MM - Relative Error}]{
-%		\includegraphics[scale=0.31]{matc_re.eps}
-%		\label{fig:matc_re}
-%	}
+	\subfigure[{\color{blue}MM - Relative Error}]{
+		\includegraphics[scale=0.31]{matc_re.eps}
+		\label{fig:matc_re}
+	}
 	\vspace{-.1in}
 	\caption{{\color{blue}Performance Comparison on Real-world Programs~\label{fig:synprog_test}}}
 \vspace{-.2in}
@@ -579,11 +568,11 @@ the general applicability of SEDONA to timing any CPU-bound program.}
 \begin{table}[t]
 \centering
 {
-\tiny
-\begin{tabular}{|p{0.1cm}|R{1.1cm}|R{1.1cm}|R{0.6cm}|R{0.6cm}|R{0.97cm}|R{0.97cm}|} \hline
- 		  & \multicolumn{2}{c|}{{\tiny Execution Time (ms)}} & \multicolumn{2}{c|}{{\tiny Standard}}   & \multicolumn{2}{c|}{\multirow{2}{*}{{\tiny Relative}}}\\ \cline{2-3}
- & \multicolumn{1}{c|}{{\tiny{ORG}}}  & \multicolumn{1}{c|}{{\tiny{SED.}}} & \multicolumn{2}{c|}{{\tiny Deviation (ms)}}  & \multicolumn{2}{c|}{{\tiny Error}}\\ \cline{4-7}	
- & \multicolumn{1}{c|}{{\tiny{(in ET)}}} & \multicolumn{1}{c|}{{\tiny{(in PT)}}} & {\tiny{ORG}} & {\tiny{SED.}} & \multicolumn{1}{c|}{{\tiny{ORG}}}& \multicolumn{1}{c|}{{\tiny{SED.}}}\\ \hline
+\scriptsize
+\begin{tabular}{|p{0.18cm}|R{1.14cm}|R{1.14cm}|R{0.64cm}|R{1cm}|R{0.97cm}|R{0.97cm}|} \hline
+ 		  & \multicolumn{2}{c|}{{\tiny Execution Time (ms)}} & \multicolumn{2}{c|}{{\tiny Standard}}   & \multicolumn{2}{c|}{\multirow{2}{*}{{\tiny Relative Error}}}\\ \cline{2-3}
+ & \multicolumn{1}{c|}{{\tiny{ORG}}}  & \multicolumn{1}{c|}{{\tiny{SEDONA}}} & \multicolumn{2}{c|}{{\tiny Deviation (ms)}}  & \multicolumn{2}{c|}{}\\ \cline{4-7}	
+ & \multicolumn{1}{c|}{{\tiny{(in ET)}}} & \multicolumn{1}{c|}{{\tiny{(in PT)}}} & {\tiny{ORG}} & {\tiny{SEDONA}} & \multicolumn{1}{c|}{{\tiny{ORG}}}& \multicolumn{1}{c|}{{\tiny{SEDONA}}}\\ \hline
 {{\tt 400}} & 454 & 445 & {3} & {2} & {6$\times$10$^{-3}$} & {3$\times$10$^{-3}$}\\
 {{\tt 401}} & 536,639 & 528,517 & {1,185} & {1,161} & {2$\times$10$^{-3}$} & {2$\times$10$^{-3}$}\\
 {{\tt 403}} & 26,109	& 25,695 & {138} & {96} & {5$\times$10$^{-3}$} & {4$\times$10$^{-3}$}\\
