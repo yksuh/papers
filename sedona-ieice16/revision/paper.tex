@@ -36,7 +36,7 @@
 \affiliate[labelA]{Supercomputing R\&{D} Center, KISTI, 245 Daehangno, Yuseong-gu, Daejeon, 34141, Republic of Korea}
 %\affiliate[labelB]{Department of Computer Science, University of Arizona, Tucson, AZ 85721, USA}
 }
-\received{2017}{2}{9}
+\received{2017}{2}{10}
 
 \definecolor{grey}{RGB}{200,200,200}
 \newcommand{\hilite}[1]{\colorbox{grey}{#1}}
@@ -51,12 +51,14 @@
 \maketitle
 
 \begin{summary}
+{\color{blue}
 Measuring program execution time is 
 a \hbox{much-used} technique for performance evaluation in computer science. 
 Without proper care, however, timed results may vary a lot, 
 thus making it hard to trust their validity. 
 In this paper we propose a novel timing protocol to significantly 
 reduce such variability.
+}
 
 \end{summary}
 \begin{keywords}
@@ -71,17 +73,19 @@ technique for performance evaluation in computer science.
 Despite the importance of accurate and precise execution-time measurement, 
 how to achieve {\em better} timing has not been well addressed. 
 Surprisingly, there is considerable variability in the measured time.
-%which indeed suggests the need for a better timing protocol.
+{\color{blue}
 The goal of this paper is to propose
 a better timing protocol that can significantly reduce such variability 
 and thus enable better timing results without a doubt of their validity.
+}
 
 Consider a simple compute-bound program, what we term {\em PUT} (program-under-test), 
 as shown in Fig.~\ref{alg:put}. 
 This program runs a nested for-loop with a specified task length ($tl$) (in seconds). 
+{\color{blue}
 The $tl$ value is used to compute 
 the number of iterations ($t$) for which that for-loop is performed 
-to reach the specified task length.
+to reach the specified task length.}
 
 \vspace{-.2in}
 \begin{figure}[h]
@@ -101,7 +105,9 @@ to reach the specified task length.
 \end{figure}
 
 We used 128~seconds as the task length and ran the PUT program (termed PUT128) 
-800~times. Note that PUT128 was run on a machine, with 
+800~times. 
+{\color{blue}
+Note that PUT128 was run on a machine, with 
 a specification illustrated in Table~\ref{tab:machine_config}, 
 in the same timing environment as used in our prior work~\cite{Currim}, 
 with (i)~non-critical daemons deactivated, 
@@ -137,6 +143,7 @@ We observe that such daemon processes substantially impact
 the execution time of the process.  
 By eliminating those executions, the protocol greatly improves
 the overall measurement quality, which would otherwise be biased by them.
+}
 
 {\bf Related Work.} 
 McGeoch introduced
@@ -152,16 +159,16 @@ timing and the impact of daemons that may disturb the timing a lot.
 
 \begin{figure}[t]
 	\centering
-	\subfigure[Initial Elapsed Time Measurement]{
+	\subfigure[{\color{blue}Initial Elapsed Time Measurement}]{
 		\includegraphics[width=0.224\textwidth]{128_sec_et_old.eps}
 		\label{fig:hist_before_et}
 	}
-	\subfigure[Program Time After Our Protocol]{
+	\subfigure[{\color{blue}Program Time After Our Protocol}]{
 		\includegraphics[width=0.224\textwidth]{128_sec_pt_new.eps}
 		\label{fig:hist_after_pt}
 	}
-	\caption{An Example of Measurement Results on a \linebreak \hbox{Compute-bound} 
-	Program-Under-Test~\label{fig:meas_comp}}
+	\caption{{\color{blue}An Example of Measurement Results on a \linebreak \hbox{Compute-bound} 
+	Program-Under-Test}~\label{fig:meas_comp}}
 	\vspace{-.18in}
 \end{figure} 
 
@@ -182,8 +189,10 @@ can be seriously affected by daemons.
 \item We propose a novel timing protocol that
 identifies infrequent, long-running daemons that impact the timing results for that program. 
 
+{\color{blue}
 \item We evaluate the performance of the protocol with rigorous experiments 
 using real-world programs.
+}
 
 \item The experimental results show a support for the effectiveness of our scheme\shorten{SEDONA: 
 early eliminating dirty executions infected with such a daemon 
@@ -193,22 +202,23 @@ and eventually contributing to enhancing the overall measurement-quality}.
 \vspace{-0.05in}
 
 \noindent
+{\color{blue}
 The rest is organized as follows. 
 We next elaborate on the proposed timing protocol. In turn we evaluate the performance of the scheme using real workloads. 
-\shorten{Finally, we conclude this letter.}
-
-%\vspace\fill
+}
 
 \section{Proposed Scheme}
 \label{sec:prop_appach}
 
 In this section we propose a novel execution time measurement scheme, 
 called {\em SEDONA} (Selective Elimination through Detection of infrequent, lOng-ruNning dAemons). 
+{\color{blue}
 Our scheme (1) utilizes PT (process time) to avoid absorbing timing noise from other co-running processes and (2)~identifies and eliminates executions including daemon processes that are infrequent and \hbox{long-running} via a {\em cutoff} measure. 
-%These two features contribute to significantly enhancing measurement quality.
+}
 
-Our SEDONA protocol consists of a total of ten steps, as described in Fig.~\ref{alg:find}. 
-Note that this protocol (algorithm) is applicable to any arbitrary Linux system.
+Our SEDONA protocol consists of a total of ten steps, as described in Fig.~\ref{alg:find}.
+{\color{blue} 
+Note that this protocol (algorithm) is applicable to any arbitrary Linux system.}
 
 \begin{figure}[h]
 \begin{center}
@@ -235,8 +245,10 @@ consisting of a small number of executions (specifically, 40) of PUT16384.
 \end{figure}
 
 {\bf A Running Example.} 
+{\color{blue}
 First, we set up the same measurement environment as described earlier in \hbox{Section}~\ref{sec:intro}, 
 to eliminate known timing factors (Step~1).
+}
 
 We then run a program-under-test (called PUT) of 
 Fig.~\ref{alg:put} with a task length of 128~sec, 
@@ -249,8 +261,15 @@ Note that we collect all daemon processes as well as the PUT and their measures
 through the Netlink interface from the kernel before and after each 
 timing.
 
-Fig.~\ref{fig:reg_put128} (= Fig.~\ref{fig:hist_before_et}) 
-plots all the 800 elapsed times (ETs) of PUT128.
+%Fig.~\ref{fig:reg_put128} (= Fig.~\ref{fig:hist_before_et}) 
+%plots all the 800 elapsed times (ETs) of PUT128.
+%The plot clearly shows three rows; that is, 
+%the top and middle rows represent over a dozen of outliers far from 
+%the rest of the samples clustered in the bottom row. 
+%We will now drill down into these outliers to 
+%show how to reliably eliminate the indirect influence of 
+%some ``infrequent, \hbox{long-running} daemons'' on PT (\hbox{process} time) of the PUT.
+Fig.~\ref{fig:reg_put128} plots all the 800 elapsed times (ETs) of the run of PUT128.
 The plot clearly shows three rows; that is, 
 the top and middle rows represent over a dozen of outliers far from 
 the rest of the samples clustered in the bottom row. 
@@ -258,6 +277,7 @@ We will now drill down into these outliers to
 show how to reliably eliminate the indirect influence of 
 some ``infrequent, \hbox{long-running} daemons'' on PT (\hbox{process} time) of the PUT.
 
+{\color{blue}
 To identify such daemons, we use a novel \hbox{scatter} plot: 
 those of {\em pairs of successive samples}. 
 So samples~\#{1} and~\#{2} form the first pair and samples~\#{3} and~\#{4} 
@@ -268,15 +288,18 @@ consists of two consecutive (odd and even)
 samples of PUT128: 
 sample~\#{1} of dual-PUT256 is equivalent 
 to samples~\#{1} and~\#{2} of PUT128.
+}
 
 Fig.~\ref{fig:raw_put128} presents such a scatter plot 
 of 400 samples of a run of \hbox{dual-PUT256} constructed 
 from a run of the 800 PUT128 samples (Step~3). 
+{\color{blue}
 The $xy$-plane corresponds to the dual-PUT samples. 
 For example, \hbox{sample}~\#{2} of a run of dual-PUT256 
 is plotted as a point with samples~\#{3} and~\#{4} of a run of PUT128 
 on the respective $x$ and $y$ axes. In that sense 
 the $x$ ($y$) axis is named as ``Odd (Even) Sample's ET.''
+}
 There are two quite obvious outliers with ETs 
 of 163,913 ms (rightmost) and 161,785 ms (uppermost), respectively.
 
@@ -289,8 +312,7 @@ of 163,913 ms (rightmost) and 161,785 ms (uppermost), respectively.
 	\subfigure[Dual-PUT256 Samples]{
 		\includegraphics[width=0.224\textwidth]{dual_et_put256_empv4.eps}
 		\label{fig:raw_put128}
-	}
-	%\vspace{-0.1in}    
+	}\vspace{-0.15in}
 	\subfigure[Zooming in on the $L$-shape]{
 		\includegraphics[width=0.224\textwidth]{zooming_in_dual_et_put256_empv4.eps}
 		\label{fig:dual_put256_liters}
@@ -306,10 +328,7 @@ of 163,913 ms (rightmost) and 161,785 ms (uppermost), respectively.
 
 We informally term this phenomenon of a scatter plot of a dual-PUT run an
 ``$L$-shape,'' and attribute it to the
-presence of infrequent long-running daemons.\shorten{Again, samples containing such
-daemons (termed the $L$-samples) will appear
-along the left y-axis or along the bottom x-axis, but will not occur in the
-top right of the scatter plot of the dual-PUT.}
+presence of infrequent long-running daemons.
 
 Figure~\ref{fig:dual_put256_liters} zooms into the lower left region,
 focusing on the
@@ -322,16 +341,11 @@ We continue zooming until we get to Figure~\ref{fig:dual_et_put256_cluster},
 which shows a central cluster (Step 4). 
 We confirm the symmetry of the ET measurements in the central cluster: there
 is no $L$-shape, and thus no $L$-samples, and thus no obvious infrequent
-long-running daemons.\shorten{(We emphasize that these samples may have lots of
-frequent daemons, as well as infrequent, {\em short-running} daemons.) There
-were 384 dual-PUT256 samples in this central cluster, implying that 16 of
-the PUT128 samples were $L$-samples and the 785 remaining of the original 800 PUT128
-samples had no infrequent, long-running daemons, which motivates that term.}
+long-running daemons.
 
 We then perform Step~5, which computes 
 the maximum process time and standard deviation 
-of PT\shorten{(process time, note the switch in emphasis from elapsed time 
-to process time)} of the daemon processes
+of PT (process time, note the switch in emphasis from ET to PT) of the daemon processes
 (i.e. {\tt flush-9:0}) 
 observed in the central cluster samples in Fig.~\ref{fig:dual_et_put256_cluster}. 
 
@@ -343,6 +357,7 @@ that daemon in the central cluster samples.
 In the running example  {\tt flush-9:0}, 
 {\tt jbd2/md0-8}, and {\tt md0\_raid1} 
 are determined as infrequent, \hbox{long-running}.
+{\color{blue}
 We also identify ``extra'' infrequent daemons: 
 {\tt bash}, {\tt grep}, {\tt rhn\_check}, {\tt rhnsd}, {\tt rhsmcertd}, 
 {\tt rhsmcertd-worke}, and {\tt sshd}, those 
@@ -356,6 +371,7 @@ roughly every 112 samples (or almost every four hours).
 Four others ({\tt flush-9:0}, {\tt jbd2/md0-8}, {\tt md0\_raid1}, and {\tt rhn\_check}) 
 all occur together and have a periodicity of about every 559 samples 
 (5x longer, or just about 20 hours). 
+}
 
 Next, we can compute for each so-identified infrequent, long-running daemon its
 minimum time in the \hbox{$L$-samples} (Step 7). 
@@ -371,24 +387,25 @@ PUT16384 (4.5 hours per \hbox{sample} versus 2 minutes), to see
 if any of our identified \hbox{infrequent} daemons are actually frequent 
 at that much longer PUT execution time. 
 We find some frequent daemon processes appearing in both of the 
-clusters of \hbox{dual-PUT256} and \hbox{dual-PUT32768}, each consisting of 
-pairs of two successive samples of PUT128 and PUT16384. 
+clusters of \hbox{dual-PUT256} and \hbox{dual-PUT32768}{\color{blue}, each consisting of 
+pairs of two successive samples of PUT128 and PUT16384.}
 That said, the central cluster also contains other
   processes not seen in the \hbox{dual-PUT256} central cluster: 
   {\tt grep}, {\tt rhn\_check}, {\tt rhnsd}, {\tt rhsmcertd}, 
   {\tt rhsmcertd-worke}, and {\tt sshd}. 
   But these daemons were categorized in the \hbox{dual-PUT256} analysis as {\em
   infrequent}, several having \hbox{periodicities} estimated at four or twenty hours.
+{\color{blue}
 When PUT128 had a ``short'' 
 program time (or, two minutes), daemons with a periodicity of
 hours are \hbox{infrequent}. But with PUT16384 
-with a ``long'' program time (or, 4.5 hours), 
+with a ``long'' program time (or, 4.5 hours),} 
 some of those daemons are now frequent, and appear in the central cluster.
 
 In Step~9 we compute 
 the cutoff for each of those infrequent, long-running daemons so
-identified, based on the runs of PUT128 and 
-PUT16384 as collected in Tab.~\ref{tab:final_infrequent_cutoff}. 
+identified, based on {\color{blue}the runs of PUT128 and 
+PUT16384} as collected in Tab.~\ref{tab:final_infrequent_cutoff}. 
 Here is how to compute the cutoff. For the cutoff of such a daemon with PUT128, 
 we take the \hbox{midpoint} between the maximum of that daemon's PTs in the 
 central cluster (or 0, if absent) and the \hbox{minimum} of those in the $L$-samples. 
@@ -466,21 +483,23 @@ HDD & Western Digital Caviar Black 1TB 7200rpm SATA Drive\\ \hline
 \vspace{-0.35in}
 \end{table}
 
+{\color{blue}
 First, we compared the performance of the two approaches 
 using real-world programs such as insertion sort, termed SORT and 
 matrix multiplication (in column major), termed MM. 
 In this comparison SEDONA outperformed ORG, as can be seen in Fig.~\ref{fig:synprog_test}. 
 As workload size increased, the performance gap between the two 
 were increasingly widened, reaching up to by 6x.
+}
 
 \vspace{-.2in}
 \begin{figure}[h]
 	\centering
-	\subfigure[SORT - Standard Deviation]{
+	\subfigure[{\color{blue}SORT - Standard Deviation}]{
 		\includegraphics[scale=0.31]{sort_std.eps}
 		\label{fig:sort_std}
 	}
-	\subfigure[MM - Standard Deviation]{
+	\subfigure[{\color{blue}MM - Standard Deviation}]{
 		\includegraphics[scale=0.31]{matc_std.eps}
 		\label{fig:matc_std}
 	}
@@ -495,6 +514,7 @@ benchmarks~\cite{specCpu2006}, providing various \linebreak
 Note that in the table the results for {\tt 481} and {\tt 483} \hbox{benchmarks} 
 are omitted because of some runtime error and incurred I/O, respectively.
 
+{\color{blue}
 Table~\ref{tab:spec_real} shows that 
 SEDONA bettered ORG,
 on the standard deviation and relative error across the very different SPEC benchmarks. 
@@ -504,6 +524,7 @@ Our timing protocol quite effectively filtered out infrequent daemon executions
 in the industrial workloads. The relative error of SEDONA was also 
 lower than that of ORG for almost every benchmark.
 For example, about a 10x \hbox{margin} between the two resulted from {\tt 434}.
+}
 
 SEDONA also scaled well for the SPEC workloads, 
 with regard to growth of relative error as the execution time lengthened.
@@ -513,14 +534,17 @@ For the short benchmarks
 our scheme outperformed the ORG method by about 3.5x, on average. 
 The SEDONA protocol continued its dominance against the conventional technique 
 for the medium-length benchmarks (e.g. {\tt 447}, {\tt 456}, {\tt 470}, and {\tt 473}).
+{\color{blue}
 Even for the long-running benchmarks (e.g. {\tt 416}, {\tt 436}, and {\tt 454}, both $>$1,000 sec), 
 the relative error of \hbox{SEDONA} was still lower than that of ORG.
+}
 
 To summarize, our proposed SEDONA protocol can achieve {\em better} accuracy,
 precision, and scalability in measuring the execution time of real \hbox{compute-bound} programs 
 than the ET-based existing method. 
+{\color{blue}
 The experimental results demonstrate 
-the general applicability of SEDONA to timing any CPU-bound program.
+the general applicability of SEDONA to timing any CPU-bound program.}
 
 %\vspace{-0.in}
 \begin{table}[t]
@@ -538,7 +562,7 @@ the general applicability of SEDONA to timing any CPU-bound program.
 {{\tt 416}} & 1,015,342 & 999,846 & {965} & {876} & {1$\times$10$^{-3}$} & {9$\times$10$^{-4}$}\\%% V
 {{\tt 429}} & 235,811 & 232,209 & {623} & {600} & {3$\times$10$^{-3}$} & {3$\times$10$^{-3}$}\\
 {{\tt 433}} & 480,586 & 473,256  & {743} & {725} & {2$\times$10$^{-3}$} & {2$\times$10$^{-3}$}\\ %% V
-{{\tt 434}} & 16,495  & 16,242  & {75} & {7} & {5$\times$10$^{-3}$} & {5$\times$10$^{-4}$}\\
+{{\tt 434}} & 16,495  & 16,242  & {\color{blue}{75}} & {\color{blue}{7}} & {{\color{blue}5$\times$10$^{-3}$}} & {{\color{blue}5$\times$10$^{-4}$}}\\
 {{\tt 435}} & 990,575 & 975,445  & {947} & {900} & {1$\times$10$^{-3}$} & {9$\times$10$^{-4}$}\\
 {{\tt 436}} & 1,160,742 & 1,143,078   & {3,914} & {3,843} & {3$\times$10$^{-3}$} & {3$\times$10$^{-3}$}\\
 {{\tt 437}} & 581,635 & 572,775 & {1,492} & {1,475}  & {3$\times$10$^{-3}$} & {3$\times$10$^{-3}$}\\
@@ -569,12 +593,13 @@ the general applicability of SEDONA to timing any CPU-bound program.
 \vspace{-0.25in}
 \end{table}
 
+{\color{blue}
 \section{Conclusion}
 \label{sec:conclusion}
 \vspace{-0.07in}
 We proposed a novel timing protocol called {\em SEDONA}, and 
 performed an empirical evaluation to show that 
-it is more precise and accurate than the extant method.
+it is more precise and accurate than the extant method.}
 
 \balance
 
