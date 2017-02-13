@@ -1,0 +1,74 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+ \usepackage{auto-pst-pdf}
+\usepackage{graphicx}
+%\usepackage{arydshln}
+\usepackage{ifpdf}
+\ifpdf
+  \usepackage{epstopdf}
+\fi
+\usepackage{multirow}
+\usepackage{epsfig}
+\usepackage{float}
+\usepackage{url}
+\usepackage{color}
+\usepackage{subfigure}
+
+%\newcommand\solidrule[1][1cm]{\rule[0.5ex]{#1}{.4pt}}
+%\newcommand\dashedrule{\mbox{%
+%  \solidrule[2mm]\hspace{2mm}\solidrule[2mm]\hspace{2mm}\solidrule[2mm]}}
+  
+%\usepackage{hyperref}
+
+\begin{document}
+\title{Machine Homogeneity Check on EMPv5}
+
+\author{
+Young-Kyoon Suh\\
+}
+\maketitle
+
+\section{Experiment Notes}
+%% done
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|p{2cm}|p{3cm}|p{6cm}|p{4cm}|} \hline
+Machine & Task Length & Description & Time Length\\ \hline
+{\tt sodb8} &  INC1$\sim$INC128 & Runs of 300 samples & 2017-02-09 $\sim$ 2017-02-10\\ \hline
+{\tt sodb9} &  INC1$\sim$INC128 & Runs of 300 samples & 2017-02-09 $\sim$ 2017-02-10\\ \hline
+{\tt sodb10} & INC1$\sim$INC128 & Runs of 300 samples & 2017-02-09 $\sim$ 2017-02-10\\ \hline
+{\tt sodb12} & INC1$\sim$INC128 & Runs of 300 samples & 2017-02-09 $\sim$ 2017-02-10\\ \hline
+\end{tabular}
+\end{center}
+\vspace{-.2in}
+\caption{Detailed description of INC data used for histograms\label{tab:exp_notes}}
+\end{table}
+
+The following sections presents experimental results on a machine basis. 
+We used four nodes in a cluster. 
+Each section exhibits histograms of elapsed time (ET) and process time (PT) 
+over increasing INC's task lengths on each individual machine. 
+
+%\begin{table}[h]
+%\begin{center}
+%\begin{tabular}{|l|l|l|l}|} \hline
+%Machine & {\tt sodb8} & {\tt sodb9} & {\tt sodb10} & {\tt sodb12} \\ \hline
+%1  & \\ \hline
+%2  & \\ \hline
+%4  & \\ \hline
+%8  & \\ \hline
+%16 & \\ \hline
+%32 & \\ \hline
+%64 & \\ \hline
+%128 & \\ \hline
+%\end{tabular}
+%\end{center}
+%\caption{Machine-wise Run Statistics: Standard Deviation\label{tab:std_machine}}
+%\end{table}
+
+\input{sodb8/res.tex}
+\input{sodb9/res.tex}
+\input{sodb10/res.tex}
+\input{sodb12/res.tex}
+
+\end{document}
