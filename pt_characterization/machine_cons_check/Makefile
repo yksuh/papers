@@ -77,6 +77,7 @@ clean:
 		    -name "*.log" -or \
 		    -name "*.bbl" -or \
 		    -name "*-converted*.pdf" -or \
+		    -name "*-pics.pdf" -or \
 		    -name "*.ps" -or \
 		    -name "*.spl" -or \
 		    -name "*.blg" -or \

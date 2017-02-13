@@ -21,14 +21,22 @@
 %\usepackage{hyperref}
 
 \begin{document}
-\title{Machine Homogeneity Check on EMPv5}
+\title{Empirical Check of Machine Homogeneity on Timing Protocol}
 
 \author{
 Young-Kyoon Suh\\
 }
 \maketitle
 
+\section{Description}
+In this work we do a check to see if the result on the same experiment is different 
+on different nodes, each with the same machine specification.
+
 \section{Experiment Notes}
+We provide a short description of our experimental runs. 
+In these experiments we used four nodes ({\tt sodb8}, {\tt sodb9}, {\tt sodb10}, and {\tt sodb12} ) 
+in the same cluster. 
+
 %% done
 \begin{table}[h]
 \begin{center}
@@ -44,31 +52,51 @@ Machine & Task Length & Description & Time Length\\ \hline
 \caption{Detailed description of INC data used for histograms\label{tab:exp_notes}}
 \end{table}
 
-The following sections presents experimental results on a machine basis. 
-We used four nodes in a cluster. 
-Each section exhibits histograms of elapsed time (ET) and process time (PT) 
-over increasing INC's task lengths on each individual machine. 
+\paragraph{Measurement Quality Across the SoDB Nodes:} 
+Fig.~\ref{fig:machine_comp} shows 
+the standard deviation and relative error of 
+elapsed time (ET) and process time (PT) on the different SoDB nodes 
+as the task length of INC increases. 
 
-%\begin{table}[h]
-%\begin{center}
-%\begin{tabular}{|l|l|l|l}|} \hline
-%Machine & {\tt sodb8} & {\tt sodb9} & {\tt sodb10} & {\tt sodb12} \\ \hline
-%1  & \\ \hline
-%2  & \\ \hline
-%4  & \\ \hline
-%8  & \\ \hline
-%16 & \\ \hline
-%32 & \\ \hline
-%64 & \\ \hline
-%128 & \\ \hline
-%\end{tabular}
-%\end{center}
-%\caption{Machine-wise Run Statistics: Standard Deviation\label{tab:std_machine}}
-%\end{table}
+\begin{figure}[t]
+	\centering
+	\subfigure[Standard Deviation - ET]{
+		\includegraphics[scale=0.6]{overall/machine_et_std.eps}
+        \label{fig:pt_std}
+    }
+    \subfigure[Relative Error - ET]{
+        \includegraphics[scale=0.6]{overall/machine_et_re.eps}
+        \label{fig:pt_re}
+    }
+	\subfigure[Standard Deviation - PT]{
+		\includegraphics[scale=0.6]{overall/machine_pt_std.eps}
+        \label{fig:pt_std}
+    }
+    \subfigure[Relative Error - PT]{
+        \includegraphics[scale=0.6]{overall/machine_pt_re.eps}
+        \label{fig:pt_re}
+    }
+    \caption{Measurement Quality Comparison among Different SoDB Machines}
+    \label{fig:machine_comp}
+\end{figure}
+
+\newpage
+
+Each of the following sections exhibits histograms of ET and PT 
+over increasing INC's task lengths on each individual node. 
 
 \input{sodb8/res.tex}
 \input{sodb9/res.tex}
 \input{sodb10/res.tex}
 \input{sodb12/res.tex}
+
+\newpage
+
+\section{Conclusion}
+My recommendation is to avoid {\tt sodb8} and to use the rest of 
+the SoDB nodes for the rest of our experiments. Further investigation is 
+needed to examine why the experiment results on {\tt sodb8} are different 
+than those of the other nodes. 
+
 
 \end{document}
