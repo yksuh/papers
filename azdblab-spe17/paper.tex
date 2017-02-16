@@ -1,0 +1,126 @@
+\documentclass[times]{speauth}
+\usepackage{moreverb}
+\usepackage{url}
+\usepackage{textcomp}
+\usepackage{amssymb,amsmath}
+\usepackage{balance}
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{subfigure}
+\usepackage{float}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{url}
+\usepackage{comment}
+\usepackage{graphicx}           
+\usepackage{epsfig}
+\usepackage{algorithmic}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{etoolbox}
+%\def\ert{\mbox{{\it expRunTime}}}
+%\def\rpe{\mbox{{\it recordImageDiff}}}
+%\def\procDiff{\mbox{{\it procDiff}}}
+%\def\uintMax{\mbox{{\tt UINT\_MAX}}}
+%\def\numRep{\mbox{{\tt NUM\_REPETITIONS}}}
+%\def\DiffA{\mbox{{\it Diff$_{A}$}}}
+%\def\DiffB{\mbox{{\it Diff$_{B}$}}}
+%\def\getProcDiff{\mbox{{\it getProcDiff}}}
+%\def\bfps{\mbox{{\it beforeImage}}}
+%\def\afps{\mbox{{\it afterImage}}}
+%\def\gpi{\mbox{{\it getProcInfo}}}
+%\def\stm{\mbox{{\it startTime}}}
+%\def\gtm{\mbox{{\it getTime}}}
+%\def\prog{\mbox{{\it userProgram}}}
+%\def\eput{\mbox{{\it executeProgram}}}
+%\def\etm{\mbox{{\it endTime}}}
+%\def\ect{\mbox{{\it elapsedClockTime}}}
+%\def\et{\mbox{{\it elapsedTime}}}
+%\def\pt{\mbox{{\it ProgramTime}}}
+%\def\cpt{\mbox{{\it computeProgramTime}}}
+%\def\inc{\mbox{INC}}
+\def\azdblab{\mbox{{\sc AZDBLab}}}
+\definecolor{grey}{RGB}{200,200,200}
+\newcommand{\hilite}[1]{\colorbox{grey}{#1}}
+\newcommand{\hilitey}[1]{\colorbox{yellow}{#1}}
+\newcommand{\hiliting}[1]{\colorbox{grey}{#1}}
+\long\def\todo#1{\hilitey{{\bf TODO: [}} {\em #1}\hilitey{]}}
+\long\def\shorten#1{}
+\makeatletter
+\def\@xfootnote[#1]{
+  \protected@xdef\@thefnmark{#1}
+  \@footnotemark\@footnotetext}
+\makeatother
+%c2j: Conference to Journal: first parameter is conference, second is journal
+% For Conferences: c2j#1#2{#1}
+% For Journals: c2j#1#2{2}
+\long\def\c2j#1#2{#1}
+\def\volumeyear{2017}
+\begin{document}
+
+\runningheads{Y-K.~Suh, R.~T.~Snodgrass}{$\azdblab$: A Laboratory Information System for Large-Scale Empirical DBMS Studies}
+
+\title{$\azdblab$: A Laboratory Information System \\ for Large-Scale Empirical DBMS Studies}
+
+\author{Young-Kyoon Suh\affil{1}\corrauth, Richard T.~Snodgrass\affil{1}
+}
+
+\address{
+\affilnum{1}University of Arizona, Tucson, AZ 85721
+}
+
+\corraddr{KISTI, 245 Daehak-ro, Yuseong-gu, Daejeon, 34141, Rep. of KOREA (current address).
+E-mail: \hbox{yksuh}@kisti.re.kr}
+
+\begin{abstract}
+In database field, scientific approach has been much less prominent while very stong
+mathematical and engineering work has been done.
+Understanding database query optimizers is of critical importance in a sense that it can provide
+great insights into their improvements by looming which parts should be reexamined.
+However, there have been few systems for supporting this scientific approach in which one can
+simultaneously run and monitor a variety of experiments on DBMSes and analyze the
+results to test his/her hypotheses.
+
+In this manuscript we present a novel DBMS-oriented research infrastructure, 
+called {\em Arizona Database Laboratory} ($\azdblab$), to assist database researchers 
+in conducting a {\em large-scale} empirical study across multiple \hbox{DBMSes} in a {\em scientific} manner. 
+For them to test their hypotheses on the behavior of query \hbox{optimizers}, 
+$\azdblab$ can run and monitor a large-scale \hbox{experiment} with thousands (or millions) of queries on 
+\hbox{different} \hbox{DBMSes}. 
+Furthermore, $\azdblab$ can help users \hbox{automatically} analyze these queries. 
+We elaborate in detail how $\azdblab$ seamlessly supports scientific research on a variety of relational \hbox{DBMSes}.
+\end{abstract}
+
+\keywords{}
+
+\maketitle
+
+\section{Introduction\label{sec:introduction}}
+
+\section{Background}\label{sec:background}
+
+\subsection{Accuracy and Precision in Timing}\label{sec:prec_accuracy}
+
+\section{Conclusion}
+In this paper, we presented a novel laboratory information system 
+for empirical studies of different relational DBMSes.
+
+\section{Future Work}\label{sec:future_work}
+
+\section{Acknowledgments}
+We give special thanks to Rui Zhang, for his initial development on $\azdblab$. 
+We also thank Ricardo Carlos, Preetha Chatterjee, Pallavi
+Chilappagari, Jennifer Dempsey, David Gallup, Kevan Holdaway, Andrey
+Kvochko, Siou Lin, Adam Robertson, Lopamudra Sarangi, Linh Tran, Cheng Yi, and Man Zhang for
+their contributions to the $\azdblab$. and Phil Kaslo, Tom Lowry, and John
+Luiten for constructing and maintaining our experimental instrument\c2j{}{,
+  a laboratory of six machines and associated software}. 
+This research was supported in part by NSF grants \hbox{IIS-0639106} and \hbox{IIS-1016205}.
+
+\bibliographystyle{wileyj}
+%\bibliography{paper}
+
+\end{document}
+
