@@ -616,7 +616,7 @@ pgsql
 
 16 rows selected.
 
-select round(avg(rel_delta),2) as avg_rd, max(rel_delta) as max_rd, count(*) as counts 
+select round(avg(rel_delta),3) as avg_rd, max(rel_delta) as max_rd, count(*) as counts 
 from NSO_Calc_RD 
 where rel_delta >= 0 and rel_delta < 1 --- SubOpt
 
@@ -684,7 +684,7 @@ pgsql
 
 
 select newer_gen_num, 
-	round(avg(rel_delta),2) as avg_rd, 
+	round(avg(rel_delta),3) as avg_rd, 
 	max(rel_delta) as max_rd,
 	count(*) as counts
 from NSO_Calc_RD 
@@ -708,13 +708,13 @@ NEWER_GEN_NUM	  AVG_RD     MAX_RD	COUNTS
 10 rows selected.
 
 --- NSO
-select round(avg(rel_delta),2) as avg_rd, min(rel_delta) as max_rd, count(*) as counts 
+select round(avg(rel_delta),3) as avg_rd, min(rel_delta) as max_rd, count(*) as counts 
 from NSO_Calc_RD 
 where rel_delta > -1 and rel_delta < 0 
 
     AVG_RD     MAX_RD	  COUNTS
 ---------- ---------- ----------
-      -.23	 -.01	    1378
+      -.225	 -.93	    1378
 
 
 select dbms, newer_gen_num, count(*) as counts
@@ -776,7 +776,7 @@ pgsql
 15 rows selected.
 
 select newer_gen_num, 
-	round(avg(rel_delta),2) as avg_rd, 
+	round(avg(rel_delta),3) as avg_rd, 
 	min(rel_delta) as max_rd,
 	count(*) as counts
 from NSO_Calc_RD 

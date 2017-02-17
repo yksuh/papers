@@ -2929,6 +2929,7 @@ INSERT INTO NSOExh_RowCount (dbmsName, exprName, stepName, stepResultSize)
 	       COUNT(*) as stepResultSize
 	FROM NSOExh_S4_TQ
 	GROUP BY dbms, experimentname;
+--select sum(numQs) from (select runid, count(distinct querynum) as numQs from NSOExh_S4_CTQatC group by runid);
 -- select sum(stepResultSize) from NSOExh_RowCount where stepName = 'NSOExh_S4_TQ'/
 DROP VIEW NSOExh_S5_EQCTV_PDE CASCADE CONSTRAINTS;
 CREATE VIEW NSOExh_S5_EQCTV_PDE AS

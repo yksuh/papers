@@ -1551,7 +1551,7 @@ INSERT INTO EP_Analysis_RowCount_Ver1 (dbmsName, exprName, stepName, stepResultS
 	       COUNT(*) as stepResultSize
 	FROM EP_Analysis_S4_CTQatC_Ver1
 	GROUP BY dbms, experimentname;
-
+select sum(numQs) from (select runid, count(distinct querynum) as numQs from EP_Analysis_S4_CTQatC_Ver1 group by runid);
 -- Step 5 : Post sanity check - Excessive query time variation and monotonicity violations
 
 -- Counts Q@Cs revealing excessive variation in query time per DBMS per Experiment
