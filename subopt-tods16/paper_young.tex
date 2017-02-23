@@ -1574,9 +1574,8 @@ with primary keys,
 (c)~100 queries on the data set without skew and primary keys,  
 (d)~100 queries with a subquery on the data set without primary keys,  
 (e)~100 queries on the data set with primary keys and secondary indexes defined, 
-(f)~100 queries with a subquery on the data set with primary keys defined,  
-(e)~100 queries with a subquery on the data set with primary keys and secondary indexes defined, and 
-(g)~100 queries on the data set with primary keys and secondary indexes defined, 
+(f)~100 queries with a subquery on the data set with primary keys defined, and 
+(e)~200 queries with a subquery on the data set with primary keys and secondary indexes defined,
 for a total of 1,910 queries and a total of 7,640 query instances (over the
 four \hbox{DBMSes}).
 Again, we ran the \hbox{DBMSes} at the 99,558 {\QatC}s that were observed,
@@ -3036,9 +3035,9 @@ We first discuss the features shared between the four data sets. As
 introduced in Section~\ref{sec:motivation}, the queries referenced tables
 {\tt ft\_HT1}, {\tt ft\_HT2}, {\tt ft\_HT3}, and {\tt ft\_HT4}. All four
 tables contain four columns, each of type integer. The specific values of
-the rows \todo{Young: is this correct?:}for all but the first column depend
+the rows for all but the first column depend
 on the percentage of skewed data. Section~\ref{sec:datacomplexity} provides
-the algorithm for generated the values for different values of skew; this
+the algorithm for generating the values for different values of skew; this
 algorithm is used in columns two--four, which for any row will have
 identical values. The first column holds a unique integer starting from 1
 and going to 60K or 2M, for use in an optional primary key.
@@ -3122,9 +3121,9 @@ Table~\ref{tab:run_stat} dropped query executions and Q@Cs via its many
 }
 \end{table}
 
+\todo{Rick: I (Young) updated the following. Please review it.}
 The following sets of queries were used in the seven experiments.
 
-\todo{Young: how does the following look? Any changes needed?}
 \begin{description}
 \item[QSa] 100 queries over the four tables, generated as described in Section~\ref{sec:querycomplexity}
 \item[QSb] 100 queries, generated the same way
@@ -3140,18 +3139,12 @@ The following sets of queries were used in the seven experiments.
   QSa}--{\em QSf}
 \item[QSm] A primary key query set consisting of 160 queries: 40 queries
   drawn from each of {\em QSg}--{\em QSj}
-%\item[QSlm] A primary key query set consisting of 390 queries from QSl and QSm
 \item[QSn] A primary key query set consisting of 110 new queries
-\item[QSo] A no-skew query set consisting of 100 queries without aggregates
-  for no skew\todo{Young: skew is an aspect of the {\bf data}, not the queries...}
+\item[QSo] A query set consisting of 100 queries without aggregates (for Data Set C)
 \item[QSp] A subquery query set consisting of 100 queries, each with a subquery
 \item[QSq] A subquery query set consisting of 100 queries, each with a subquery
-\item[QSr] A \todo{Young: isn't this redundant?:}primary key query set consisting of 100 queries drawn from {\em
-  QSl} and {\em QSm}
-\item[QSab'] 100 queries drawn from {\em QSa} and {\em QSb} for which the where
-     selection involved a primary key column
-\todo{Young what does this mean (from your notes): ``This query set was revised to QSI and
-  QSm.''? Also, it doesn't seem like this set is used anywhere...}
+\item[QSr] A query set consisting of 390 queries drawn from {\em QSl} + {\em QSm}
+\item[QSs] A primary key query set consisting of 100 queries drawn from {\em QSr}
 \end{description}
 
 Experiment 1 (Monotonicity) used the first 50 queries from QSa
@@ -3172,12 +3165,18 @@ one DBMS), the first 20 queries from {\em QSa}--{\em QSf} (for another DBMS), th
 (non-primary key) queries from {\em QSa} (for the other two DBMSes), for a total of 780 query instances.
 
 Experiment 6 (Exploratory) used {\em QSa} and {\em QSb}, plus the first 100 (primary
-key) queries from {\em QSl} and {\em QSm}, for all four DBMSes, for a total of 1200 query
+key) queries from {\em QSr}, for all four DBMSes, for a total of 1200 query
 instances. 
 
-Experiment 7 (Confirmatory) used {\em QSc}--{\em QSr}, along with {\em QSp} for primary key and
-subquery, {\em QSp} for subquery, {\em QSp} and {\em QSq} for primary key and secondary index and
-subquery), all across all four DBMSes, for a total of 7,640 query instances.
+Experiment 7 (Confirmatory) used {\em QSc}--{\em QSj}, 
+along with {\em QSr} except the (first 100) queries included in Experiment 6, 
+{\em QSn} for primary key (for two runs, or 220 queries), 
+{\em QSo} for no data skew, 
+{\em QSp} for primary key and subquery, 
+{\em QSp} for subquery, 
+{\em QSp} and {\em QSq} for primary key and secondary index and subquery, 
+{\em QSs} for primary key and secondary index, 
+all across all four DBMSes, for a total of 7,640 query instances.
 
 \shorten{
 \newpage

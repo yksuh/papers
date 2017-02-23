@@ -1,0 +1,59 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+ \usepackage{auto-pst-pdf}
+\usepackage{graphicx}
+%\usepackage{arydshln}
+\usepackage{ifpdf}
+\ifpdf
+  \usepackage{epstopdf}
+\fi
+\usepackage{multirow}
+\usepackage{epsfig}
+\usepackage{float}
+\usepackage{url}
+\usepackage{color}
+\usepackage{subfigure}
+
+%\newcommand\solidrule[1][1cm]{\rule[0.5ex]{#1}{.4pt}}
+%\newcommand\dashedrule{\mbox{%
+%  \solidrule[2mm]\hspace{2mm}\solidrule[2mm]\hspace{2mm}\solidrule[2mm]}}
+  
+%\usepackage{hyperref}
+
+\begin{document}
+\title{Histogram on Recent Runs by EMPv5}
+
+\author{
+Young-Kyoon Suh\\
+}
+\maketitle
+
+\section{Description}
+This document presents histograms based on the most recent runs 
+of a program under test, called {\em INC}, over its increasing task lengths. 
+
+\section{Experiment Notes}
+Table~\ref{tab:exp_notes} provides a short description of our experimental runs, 
+on which the following histograms are based.
+
+%% done
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|p{2cm}|p{3cm}|p{6cm}|p{4cm}|} \hline
+Machine & Task Length & Description & Time Length\\ \hline
+{\tt sodb9} &  INC1$\sim$INC1024 & Runs of 300 samples & 2017-02-09 $\sim$ 2017-02-10 / 2017-02-12 $\sim$ 2017-02-19\\ \hline
+{\tt sodb10} & INC2048 & Runs of 300 samples & 2017-02-12 $\sim$ 2017-02-20\\ \hline
+\end{tabular}
+\end{center}
+\vspace{-.2in}
+\caption{Detailed description of INC data used for histograms\label{tab:exp_notes}}
+\end{table}
+
+Now we show histograms of elapsed time (ET) and process time (PT) 
+over increasing INC's task lengths. 
+
+\newpage
+
+\input{sodb9/res.tex}
+
+\end{document}
