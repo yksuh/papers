@@ -1,0 +1,1608 @@
+\documentclass[paper]{ieice}
+
+%\usepackage[margin=1in]{geometry}
+\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{amssymb,amsthm,amsmath}
+\usepackage{balance}
+\usepackage{subfigure}
+\usepackage{float}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{url}
+\usepackage{comment}
+\usepackage[dvips]{graphicx}          % graphicx package for including ps files  
+
+\setcounter{page}{1}
+%\breakauthorline{}% breaks lines after the n-th author
+
+\field{D}
+%\SpecialIssue{}
+%\SpecialSection{}
+%\theme{}
+\title{MLPPI Wizard: An Automated Multi-Level Partitioning Tool on Analytical Workloads}
+\titlenote{An earlier version of this article was presented as a short paper at ACM CIKM'12.}
+%\title[title for header]{title}
+%\titlenote{}
+\authorlist{% fill arguments of \authorentry, otherwise error will be caused. 
+ \authorentry[yksuh@kisti.re.kr]{Young-Kyoon SUH}{m}{labelA}
+ %\authorentry{Ahmad GHAZAL}{n}{labelB}
+ \authorentry{Alain CROLOTTE}{n}{labelC}
+ \authorentry{Pekka KOSTAMAA}{n}{labelC}
+% \authorentry{name}{membership}{affiliate label}
+% \authorentry{name}{membership}{affiliate label}[present affiliate label]
+% \authorentry[e-mail address]{name}{membership}{affiliate label}
+% \authorentry[e-mail address]{name}{membership}{affiliate label}[present affiliate label]
+}
+\affiliate[labelA]{Korea Inst. of Sci. and Tech. Info. (KISTI), 245 Daehangno, Yuseong-gu, Daejeon, Korea, 34141}
+%\affiliate[labelB]{Oracle Endeca, Cambridge, MA 02142, USA}
+\affiliate[labelC]{Teradata Corporation, El Segundo, CA 90245, USA}
+%\paffiliate[present affiliate label]{Presently, the author is with the }
+
+\received{2016}{8}{18}
+%\revised{}{}{}
+%\finalreceived{2011}{1}{1}
+
+\def\form#1{$\langle{#1}\rangle$}
+\def\range#1{$[{#1}]$}
+\def\openrange#1{$({#1})$}
+\def\lopenrange#1{$({#1}]$}
+\def\ropenrange#1{$[{#1})$}
+\def\product#1{$(#1)$}
+\definecolor{grey}{RGB}{200,200,200}
+\newcommand{\hilite}[1]{\colorbox{grey}{#1}}
+\newcommand{\hilitey}[1]{\colorbox{yellow}{#1}}
+\newcommand{\hiliting}[1]{\colorbox{grey}{#1}}
+\long\def\todo#1{\hilitey{{\bf TODO:} {\em #1}}}
+\long\def\shorten#1{}
+\long\def\comment#1{}
+\def\MAX{\mbox{\sl MAX}}
+\def\LIMIT{\mbox{\sl LIMIT}}
+\def\getQueryCost{\mbox{\sl getQueryCost}}
+\def\getScanCost{\mbox{\sl getScanCost}}
+\def\BigO{\mbox{\sl O}}
+\def\NULL{\mbox{\sl NULL}}
+\def\SolA{\mbox{\sl A}}
+\def\SolB{\mbox{\sl B}}
+\def\SolC{\mbox{\sl C}}
+\def\SolS{\mbox{\sl S}}
+\def\Qone{\mbox{\sl q1}}
+\def\Qtwo{\mbox{\sl q2}}
+\def\Sone{\mbox{\sl s1}}
+\def\Stwo{\mbox{\sl s2}}
+\def\SolSone{\mbox{\sl S1}}
+\def\SolStwo{\mbox{\sl S2}}
+\def\SolSthree{\mbox{\sl S3}}
+\def\SolSfour{\mbox{\sl S4}}
+\def\SolSfive{\mbox{\sl S5}}
+
+\begin{document}
+
+\maketitle
+
+\begin{summary}
+This article introduces a new tool to \hbox{recommend} 
+an optimized multi-level partitioning solution, called 
+\hbox{Multi-Level} Partitioned Primary Index (MLPPI), for a fact table accessed by a query workload. 
+This tool uses a novel greedy algorithm for search space enumeration. The space is driven by query \hbox{predicates}. 
+This \hbox{technique} fits very well Teradata MLPPI, 
+as it is based on a \hbox{general} \hbox{framework} \hbox{using} general
+expressions, ranges and case expressions for partition 
+definitions. 
+The tool takes \hbox{advantage} of the optimizer’s cost model to prune the search space for yielding a final recommendation. 
+The tool resides completely on the client and interacts with the optimizer via APIs 
+used to 1) simplify the workload queries, 
+to 2) extract the predicates, and 
+to 3) estimate the workload execution cost on a candidate recommendation. 
+The predicate-driven method can be applied to any clustering or partitioning schemes, 
+based on simple field expressions and complex SQL predicates. 
+We demonstrate that the recommendation from the tool outperforms a human expert. The experiments also show that the recommendation is scalable with the workload complexity and the size of the fact table.
+
+\end{summary}
+\begin{keywords}
+Star Schema, Fact Table, Multi-Level Partitioning
+\end{keywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+Tables and materialized views in Teradata are hash distributed based 
+on a user-specified column or set of columns called {\em primary index}. 
+Each virtual processor, a unit of parallelism called {\em AMP} in the \hbox{Teradata} \hbox{relational} 
+database management system (DBMS), 
+receives a subset of the data and stores it in hash order. 
+
+Teradata users typically choose primary index fields, 
+so that the data is evenly distributed among the AMPs. 
+The primary index fields are also chosen to \hbox{reflect} join fields 
+in workloads to accomplish cheaper local joins that do not require 
+data shuffling. 
+
+PPI (Partitioned Primary Index)~\cite{sinclair:ppi} is an optional horizontal 
+partitioning scheme applied locally on each AMP's data. 
+Note that in other database products, this type of partitioning would 
+most likely to be called {\em clustering}. 
+In the rest article we use the term \hbox{{\em partitioning}} only, not clustering, to avoid confusion. 
+Database \hbox{administrators} (DBAs) usually choose the columns for PPI, 
+based on join fields and single table \hbox{predicates} to optimize the queries included 
+in the workload. 
+The PPI columns are used to physically cluster data with the same values 
+together in contiguous data blocks. 
+This allows ``partition elimination'' in scans and joins for performance improvement.
+PPI can be specified as single or multiple (or nested) levels. 
+This type of partitioning scheme is known as 
+Multi-Level PPI ({\em MLPPI)}~\cite{klindt09mlppi}.
+
+By allowing non-qualified partitions to be eliminated, MLPPI can reduce 
+significantly the amount of data to be scanned to answer a query. 
+But a large number of partitions can create significant overhead, 
+particularly in joins and table maintenance operations 
+such as inserts and deletes, so that the selection of partitions can be usually a balancing act. 
+
+Figure~\ref{fig:exam} exemplifies an MLPPI table with potential partitioning schemes. 
+This example is a subset of the {\tt LINEORDER} table from the Star Schema Benchmark (SSB)~\cite{oneil:ssb}. 
+Note that the full table with modified data types was actually used in our experiments. 
+
+\vspace{-.15in}
+
+\begin{figure}[htp!]
+\begin{center}
+{\small
+\begin{tabular}{l}
+{\tt CREATE TABLE LINEORDER(} \\
+\hspace{0.1in}{\tt LO\_ORDERKEY INTEGER,} \\
+\hspace{0.1in}{\tt LO\_QUANTITY INTEGER,} \\
+\hspace{0.1in}{\tt LO\_DISCOUNT INTEGER} \\
+{\tt )} \\
+{\tt PRIMARY INDEX ( LO\_ORDERKEY )} \\
+{\tt PARTITION BY (} \\
+\hspace{0.1in}{\tt CASE\_N(} \\
+\hspace{0.2in}{\tt LO\_DISCOUNT >= 7,} \\
+\hspace{0.2in}{\tt NO CASE OR UNKNOWN),} \\
+\hspace{0.1in}{\tt CASE\_N(}\\
+\hspace{0.2in}{\tt LO\_QUANTITY < 25,} \\
+\hspace{0.2in}{\tt LO\_QUANTITY >= 25 AND LO\_QUANTITY <= 30,} \\
+\hspace{0.2in}{\tt LO\_QUANTITY > 30 AND LO\_QUANTITY <= 35,} \\
+\hspace{0.2in}{\tt NO CASE OR UNKNOWN)} \\
+{\tt );} \\
+\end{tabular}
+}
+\end{center}
+%\vspace{-0.1in}
+\caption{An Example of MLPPI Table\label{fig:exam}}
+\end{figure}
+
+\vspace{-.15in}
+
+In the definition of {\tt LINEORDER} in the figure, the primary index 
+is {\tt LO\_ORDERKEY}. 
+The \hbox{primary} index \hbox{dictates} the AMP on which a row will be located, 
+while the partitioning of data will be dictated by the values and 
+ranges associated with {\tt LO\_DISCOUNT} and {\tt LO\_QUANTITY}. 
+{\tt LO\_DISCOUNT}, for example, has two ranges for \hbox{values} 
+larger than or equal to 7 and one ({\tt NO CASE OR UNKNOWN}) 
+for all the other values, while {\tt LO\_QUANTITY} has four ranges. 
+As a result, the relational table will have a total of 2$\times$4 = 8 partitions as follows.
+
+\begin{center}
+\begin{tabular}{|c|p{6cm}|}\hline 
+Partition & Condition \\ \hline
+1		& {\scriptsize  {\tt LO\_DISCOUNT >= 7 \&\& LO\_QUANTITY < 25}} \\ \hline
+2		& {\scriptsize  {\tt LO\_DISCOUNT >= 7 \&\& 25 <= LO\_QUANTITY <= 30}} \\ \hline
+3		& {\scriptsize {\tt LO\_DISCOUNT >= 7 \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
+4		& {\scriptsize {\tt LO\_DISCOUNT >= 7 \&\& LO\_QUANTITY no case}}\\ \hline
+5       & {\scriptsize {\tt LO\_DISCOUNT no case \&\& LO\_QUANTITY < 25}} \\ \hline 
+6		& {\scriptsize {\tt LO\_DISCOUNT no case \&\& 25 <= LO\_QUANTITY < 30}} \\\hline								  	        
+7		& {\scriptsize {\tt LO\_DISCOUNT no case \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
+8		& {\scriptsize  {\tt LO\_DISCOUNT no case \&\& LO\_QUANTITY no case}} \\ \hline
+\end{tabular}
+\end{center}
+
+Whatever partition set is chosen, 
+the selection must be semantically correct; namely, 
+the mapping of rows to partitions must be an injection. 
+In other words, the constraints must form a covering of 
+the entire range, so that a row will belong to exactly one and one partition. 
+The Teradata optimizer then applies \hbox{partition} elimination for queries 
+that specify conditions on {\tt LO\_DISCOUNT} and/or {\tt LO\_QUANTITY}. 
+For \hbox{example}, only partitions 1 and 2 are needed for the query 
+``{\tt SELECT * FROM LINEORDER WHERE LO\_DISCOUNT >= 7 AND} {\tt LO\_QUANTITY <= 30}.'' 
+Similarly, partitions 1 and 5 are sufficient to answer the query 
+``{\tt SELECT * FROM LINEORDER WHERE LO\_QUANTITY < 25}.'' 
+The respective sizes of the partitions are a factor of the data distribution. 
+To see MLPPI in greater detail, check our references~\cite{sinclair:ppi,klindt09mlppi}. 
+
+Next, using the full version of {\tt LINEORDER} as defined in SSB~\cite{oneil:ssb} 
+we provide examples of partitioning schemes that 
+a DBA may define based on a small query set. 
+Consider a query set $Q$ consisting of two queries $q$1 and $q$2 from the SSB set~\cite{oneil:ssb}, as shown below.
+
+\begin{center}
+{\small
+\begin{tabular}{rl}
+$q$1:	& {\tt SELECT SUM(l.LO$\_$EXTENDEDPRICE*l.LO\_DISCOUNT)} \\ 
+		& {\tt FROM LINEORDER l, DDATE d} \\
+		& {\tt WHERE l.LO\_ORDERDATE = d.D\_DATEKEY} \\
+		& {\tt AND d.D\_YEAR = `1993'} \\
+		& {\tt AND l.LO\_DISCOUNT IN (1, 4, 5)} \\
+        & {\tt AND l.LO\_QUANTITY <= 30} \\ 
+		&								   \\	        
+$q$2:	& {\tt SELECT c.C\_NATION, SUM(l.LO\_REVENUE)} \\ 
+		& {\tt FROM CUSTOMER c, LINEORDER l} \\
+		& {\tt WHERE l.LO\_CUSTKEY = c.LO\_CUSTKEY} \\
+		& {\tt AND c.C\_REGION=`EUROPE'} \\
+		& {\tt AND l.LO\_DISCOUNT >= 7} \\
+		& {\tt AND l.LO\_QUANTITY >= 25 AND l.LO\_QUANTITY <= 35} \\
+		& {\tt GROUP BY c.C\_NATION} \\
+		& {\tt ORDER BY revenue desc}. \\
+\end{tabular}
+}
+\end{center}
+
+Let's now focus on the {\tt LINEORDER} fact table and 
+the predicates involving {\tt LINEORDER} fields only. 
+There are five constraints identified by the query number 
+and the sequence number of the constraint in each query, as illustrated below.
+\begin{center}
+\begin{tabular}{|c|l|}\hline 
+$q$1.1 & {\tt LO\_DISCOUNT IN (1,4,5)} \\ \hline
+$q$1.2 & {\tt LO\_QUANTITY <= 30} \\ \hline
+$q$2.1 & {\tt LO\_DISCOUNT >= 7} \\ \hline
+$q$2.2 & {\tt LO\_QUANTITY >= 25}\\ \hline
+$q$2.3 & {\tt LO\_QUANTITY <= 35} \\ \hline 
+\end{tabular}
+\end{center}
+
+At this point, the DBA needs to look at options 
+based only on two fields and a total of five constraints. 
+There are many possibilities from a {\em fine-grained} partition set 
+to a loser definition. 
+
+Considering for the time being the column {\tt LO\_DISCOUNT}, 
+one solution is to identify each value 
+for the {\tt IN} predicate in $q$1.1 
+and use $q$2.1 as is. This yields the following partitioning expression 
+for {\tt LO\_DISCOUNT}:
+\begin{center}
+\begin{tabular}{l}
+{\tt CASE\_N(} \\
+\hspace{0.1in}{\tt LO\_DISCOUNT = 1,} \\
+\hspace{0.1in}{\tt LO\_DISCOUNT = 4,} \\
+\hspace{0.1in}{\tt LO\_DISCOUNT = 5,} \\
+\hspace{0.1in}{\tt LO\_DISCOUNT >= 7,} \\
+\hspace{0.1in}{\tt NO CASE OR UNKNOWN} \\
+{)}. \\
+\end{tabular}
+\end{center}
+The above expression minimizes the size of the partitions 
+by focusing exactly on the values required to satisfy the constraints, 
+but creates a large number of small partitions. 
+
+Another possibility is to look at the maximum and minimum 
+values in the {\tt IN} set and to build an {\tt AND} clause equivalent to 
+a between clause yielding the following:
+\begin{center}
+\begin{tabular}{l}
+{\tt CASE\_N(} \\
+\hspace{0.1in}{\tt LO\_DISCOUNT >= 1 AND LO\_DISCOUNT <= 5,} \\
+\hspace{0.1in}{\tt LO\_DISCOUNT >= 7,} \\
+\hspace{0.1in}{\tt NO CASE OR UNKNOWN} \\
+{)}. \\
+\end{tabular}
+\end{center}
+
+\noindent The above partitioning solution decreases the number of partitions, 
+compared to the previous solution but still focuses sharply on the constraints 
+with still relatively small partitions. 
+
+Another possibility is to use the partitioning associated with {\tt LO\_DISCOUNT} shown 
+in the beginning of this section with only two partitions. 
+
+\begin{figure*}[t!]
+\centering
+\includegraphics[scale=0.5]{architecture}
+%\vspace{-0.2in}
+\caption{The MLPPI Wizard Architecture\label{fig:arch}}
+\end{figure*}
+
+Similar considerations apply to the partitioning associated with {\tt LO\_QUANTITY} 
+this time with ranges and covering problems difficult to deal with. 
+The resulting partitioning scheme for the table includes both {\tt LO\_DISCOUNT}
+and {\tt LO\_QUANTITY}, so that the number of possible combinations is the product of 
+the potential combinations for each field. 
+Also, there are two queries, and one partitioning scheme may be better for one query or the other. 
+As a result, the DBA will be faced with a daunting combinatorial search problem 
+and no clear basis to decide on which combination is the best. 
+This state of affairs begs for a {\em tool} to assist the DBA.
+
+In the sequel, we introduce an automated tool, called {\em MLPPI wizard}. 
+Indeed, the \hbox{wizard} is the first physical database design tool 
+developed at Teradata.
+The tool is based on a novel technique using a greedy algorithm for 
+search space enumeration. 
+This tool based on a general framework allowing general expressions, 
+ranges and case expressions for \hbox{partition} \hbox{definitions} 
+is particularly well-suited for an MLPPI definition. \linebreak
+The {\em predicate-driven} \hbox{technique} used by the tool can be applied 
+to any clustering or partitioning based on simple fields and expressions or complex SQL predicates. 
+The wizard also borrows the optimizer's cost model 
+to prune the search space and reach a final solution. 
+
+Figure~\ref{fig:arch} illustrates how our tool recommends 
+the final MLPPI customized for a given workload consisting of 
+a set of queries and corresponding weights. 
+The wizard passes through a series of phases: {\em Preprocessing}, 
+{\em Initial}, and {\em Optimized} Phases. 
+In the preprocessing phase the tool produces the most granular partitioning (MGP) based on the predicates collected from every query.
+In the initial phase the wizard refines the passed MGP 
+by merging a pair of partitions with the least {\em scan cost} (as will be explained in \hbox{Section~\ref{sec:init_phase}}) 
+and then yields an initial (feasible) MLPPI based on the refined partitions.
+In the \hbox{optimization} phase, the tool makes a further attempt to optimize the initial MLPPI. 
+We provide in greater \hbox{detail} each phase, 
+using the query set $Q$ consisting of $q$1 and $q2$ in the rest of the article.
+
+\shorten{
+An initial MLPPI is produced through the top two phases reflecting practical constraints by field or partition. 
+It is further optimized in the last phase.
+In the preprocessing phase, 
+for each query its predicate(s) is extracted via an API call (on {\tt explain}) made to the server. 
+Then, the wizard produces the most granular partitioning (MGP) based on the 
+predicates collected from every query. 
+If the MGP has too many fields over a field count limit, 
+then the wizard \hbox{incrementally} throws away a field from the MGP until the limit. 
+
+In the initial phase, the passed MGP gets reduced if it includes more partitions than a partition count limit allowed by an MLPPI. 
+The refinement can be \hbox{incrementally} done by merging a pair of partitions 
+with the least {\em scan cost} (as will be explained in \hbox{Section~\ref{sec:init_phase}}), 
+until the limit. 
+After the phase, an initial (feasible) MLPPI is produced based on the refined partitions.
+
+In the optimization phase, the tool makes a further attempt to optimize the initial MLPPI. 
+Similar to the initial phase, more partitions can be reduced by merging ones with the 
+least {\em query cost} (as will be described in Section~\ref{sec:opt_phase}). 
+If the ongoing solution cannot be further improved, the tool makes the final MLPPI recommendation. 
+We will provide more details about each phase later, 
+using the query set $Q$ consisting of $q$1 and $q2$ 
+in the rest of the article.}
+
+To the best of our knowledge, there is no existing industrial tool 
+to solve the {\it {\bf multi-level partitioning}} problem except our wizard. 
+The wizard is contained completely on the client side, as opposed to 
+previous work~\cite{agrawal04:integrating,Lightstone04:db2auto,nehme2011automated} 
+requiring optimizer code extension. 
+Our tool simply uses existing APIs to simplify the queries, capture fact table 
+predicates and costs, and uses these items to make a recommendation. 
+This makes the wizard extensible and portable to different releases 
+of the Teradata DBMS server. 
+
+The article is a substantial extension of prior work~\cite{Suh12}, 
+and organized in the following way. 
+Section~\ref{sec:algorithms} presents the multi-level \hbox{partitioning} 
+algorithms for the wizard. 
+In turn, Section~\ref{sec:analysis} conducts an analysis of the complexity of 
+the algorithms. 
+Section~\ref{sec:experiment} reports the performance evaluation results. 
+Section~\ref{sec:related_work} states how \hbox{Teradata} MLPPI wizard 
+is different from some existing tools proposed by other vendors. 
+Lastly, Section~\ref{sec:conclusion} summarizes our discussion.
+
+
+\section{The MLPPI wizard}
+\label{sec:algorithms}
+
+In this section we describe in detail each phase of the wizard using the query set $Q$ provided in Section~\ref{sec:intro}. 
+
+\subsection{The Preprocessing Phase}
+\label{sec:pre_phase}
+
+Algorithm~\ref{algo:pre_phase} sketches 
+the steps in the preprocessing phase. 
+This phase consists of a total of six steps. 
+
+\vspace{-.1in}
+
+\begin{algorithm}	
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+\SetKw{func}{Function}
+\SetKwBlock{begin}{}{end}
+{
+\Input{$Q$ (input query set) }
+\Output{$R$ (non-overlapping range set), $M$ (query-to-range-set map)}
+\hspace{.05in} Query Simplification (on $Q$)\\
+\hspace{.05in} Range Extraction (from $Q$) \\
+\hspace{.05in} Non-Overlapping Range ($R$) Construction \\
+\hspace{.05in} Field Count Limit Check (on $R$) \\
+\hspace{.05in} Query-to-Range-Set Map ($M$) Construction \\
+\hspace{.05in} Partition Count Limit Check (on $R$) \\
+}
+\caption{The Preprocessing Phase}
+\label{algo:pre_phase}
+\end{algorithm}
+
+\vspace{-.3in}
+
+\subsubsection{Query Simplification}
+
+The first step of this phase is to simplify the predicate(s) of each query 
+by removing redundant conditions. 
+For instance, if a query predicate has the condition of 
+``{\tt LO\_DISCOUNT IN (1, 4, 5) AND LO\_DISCOUNT IN (2, 3, 4, 5)}'', 
+then the predicate can be simplified as ``{\tt LO\_DISCOUNT IN (4, 5)}.'' 
+This can be done via an API call to the DBMS server. 
+In the running example this simplification is not required. 
+
+\vspace{-.3in}
+
+\subsubsection{Range Extraction}
+
+The following step is to gather the simplified predicates and 
+then obtain ranges from the collected predicates. 
+This can also be done through an API call to the server. 
+The query predicate is of the form  
+\begin{center}
+\begin{tabular}{l} 
+\form{\tt variable} \form{\tt op} \form{\tt constant},
+\end{tabular}
+\end{center}
+where \form{\tt variable} is a field from {\tt LINEORDER}, 
+\form{\tt op} is in 
+\begin{center}
+\begin{tabular}{l} 
+\{{\tt $ = $ }, {\tt $ < $}, {\tt $ <= $}, {\tt $ >= $}, {\tt $ > $}, 
+{\tt IN}\},
+\end{tabular}
+\end{center}
+and \form{\tt constant} represents a constant value(s). 
+All \form{\tt op}s are self-explanatory. 
+In particular, `{\tt IN}' is a list predicate implying `{\tt OR}' operator.
+In the running example, 
+we can collect a set of predicates $P$ = \{$p$1,$p$2,$p$3,$p$4\} from $Q$, where 
+
+\vspace{-.15in}
+
+\begin{center}
+\begin{tabular}{l} 
+$p$1: {\tt l.LO\_DISCOUNT IN (1, 4, 5)} \\ 
+$p$2: {\tt l.LO\_DISCOUNT >= 7} \\ 
+$p$3: {\tt l.LO\_QUANTITY <= 30} \\ 
+$p$4: {\tt l.LO\_QUANTITY >= 25} {\tt AND} {\tt l.LO\_QUANTITY <= 35}. \\ 
+\end{tabular}
+\end{center}
+
+%\vspace{-.15in}
+
+In turn, the wizard constructs a bi-directional {\em map} between a query and 
+associated predicates, so that for each query the corresponding predicate(s) can be 
+found directly in the map, and vice versa. 
+In the example, a map, called $M$1, is built 
+between $Q$ and $P$, and $M$1 is filled with the following entries:
+
+$M$1:
+\begin{center}
+\begin{tabular}{ll} 
+\form{q1, \{p1, p3\}} \\
+\form{q2, \{p2, p4\}}.
+\end{tabular}
+\end{center}
+
+Next, we gather fields referenced by predicates in $P$, extract 
+ranges from the predicates, and group the ranges on each of the fields. 
+Assume $I$ to be the list of fact table fields referenced by $P$. 
+In the workload $Q$, we can see that there are two fields used by $P$: 
+{\tt LO\_DISCOUNT}, {\tt LO\_QUANTITY}. 
+These are added to $I$. 
+
+After that, we construct a set of distinct ranges on each field in $I$, using the predicates in $P$. 
+Then, the whole range set becomes a kind of two-dimensional array, called $R$. 
+The array $R$ captures the range representation of the predicates. 
+Each entry under a field in $R$ represents a pair of (start and end) values forming the range. 
+In the range representation, infinity ($\infty$) or -infinity (-$\infty$) can 
+be used for unbounded ranges. 
+``['' or ``]'' are used for closed ranges, and ``('' or ``)'' for open ranges. 
+In particular, {\tt IN} predicate is represented by multiple ranges. 
+For instance, the above $p$1 can be represented by the following three ranges 
+\range{1, 1}, \range{4, 4}, \range{5, 5}; however, the last two consecutive 
+ranges can be consolidated as \range{4, 5}. 
+In the continuing example the range set $R$ is formed by the entries below.
+
+$R$:
+\begin{center}
+\begin{tabular}{c|c} 
+ {\tt LO\_DISCOUNT} & {\tt LO\_QUANTITY} \\ \hline
+\range{1, 1} & \lopenrange{\infty, 30}\\
+\range{4, 5} & \range{25, 35} \\
+\ropenrange{7, \infty} &  \\
+\end{tabular}
+\end{center}
+
+Then, each predicate can be mapped to its associated ranges in $R$. That is, 
+we can have another map, called $M$2, between $P$ and $R$. 
+Let $R$[$i$, $j$] denote the interval value for the $i$-th field and $j$-th range in $R$. 
+$R$[1, 3], for instance, indicates range \ropenrange{7, \infty} under {\tt LO\_DISCOUNT}. 
+In the running example, $M$2 is constructed as follows:
+
+$M$2:
+\begin{center}
+\begin{tabular}{l}
+$\langle${$p$1}, \{$R$[1, 1],$R$[1, 2]\}$\rangle$ \\
+$\langle${$p$2}, \{$R$[1 ,3]\}$\rangle$ \\ 
+$\langle${$p$3}, \{$R$[2, 1]\}$\rangle$ \\
+$\langle${$p$4}, \{$R$[2, 2]\}$\rangle$. \\
+\end{tabular}
+\end{center} 
+
+\subsubsection{Non-Overlapping Range Construction}
+
+Since there could be multiple predicates on the same field across queries, 
+extracted ranges may overlap each other. 
+The overlapping ranges must be broken without any common portion, so that 
+a pair of consecutive, \hbox{non-overlapping} ranges can be 
+considered for a merge in further phases. 
+
+Algorithm~\ref{algo:split_overlap} describes the way of breaking 
+the \hbox{overlap} of ranges. 
+
+\vspace{-.1in}
+
+\begin{algorithm}[h]
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+\SetKw{func}{Function}
+\SetKwBlock{begin}{}{end}
+{
+\Input{$R$ having overlapping ranges}
+\Output{$R$ with consecutive, non-overlapping ranges}
+	\ForEach{field $i$ $\in$ $R$}{	
+		$L$ $\leftarrow$ Get the range set of $i$ from $R$ and sort by start value \\
+		$j$ = 0 \;
+		\While{$j$ $<$ $|L|$-1}{
+			$r_{j}$, $r_{j+1}$ $\leftarrow$ Adjacent ranges in $L$ \\
+			\If{$r_{j}$.$end$ $\geq$ $r_{j+1}$.$start$}{
+				Make a split by modifying values of $r_{j}$ and $r_{j+1}$. \\
+				Insert into $L$ an intermediate range if any. \\
+				Re-sort ranges in $L$ and reset $j$ to 0. \\
+			}\lElse{$j$++;}
+		}
+		Update $R$ with the final $L$. 
+	} 
+}
+\caption{Splitting Overlapping Ranges}
+\label{algo:split_overlap}
+\end{algorithm}
+
+\vspace{-.1in}
+
+\noindent For each field, the tool gets its associated ranges and sorts them 
+by start value. 
+It then checks whether or not adjacent ranges overlap each other.
+If that is the case, then we make a split between the ranges. 
+In the example, the split is applied on the 
+overlapping ranges, \lopenrange{\infty, 30} and \range{25, 35}, under {\tt LO\_QUANTITY}. 
+Subsequently, a common, intermediate range (\range{25, 30}) is newly created and inserted into the range set 
+belonging to the {\tt LO\_QUANTITY} field, in order to fill the gap. 
+Then, $R$ in the example is shown as follows.
+
+\
+{\it $R$}:
+\begin{center}
+\begin{tabular}{c|c} 
+ {\tt LO\_DISCOUNT} & {\tt LO\_QUANTITY} \\ \hline
+\range{1, 1}      & \openrange{\infty, 25} \\
+\range{4, 5}      & \range{25, 30} \\
+\ropenrange{7, \infty} & \range{31, 35} \\
+\end{tabular}
+\end{center}
+
+The update of $R$ affects the existing map $M$2. 
+In the running example, $p$3 and $p$4 influenced by the split get mapped to 
+new range sets, \{$R$[2, 1], $R$[2, 2]\} and \{$R$[2, 2], $R$[2, 3]\}, respectively. 
+Of course, the range sets mapped to $p$1 and $p$2 referencing {\tt LO\_DISCOUNT} remain unchanged. 
+As a result, in the example we obtain the updated $M$2 as follows:
+
+$M$2:
+\begin{center}
+\begin{tabular}{l}
+$\langle${$p$1}, \{$R$[1, 1],$R$[1, 2]\}$\rangle$ \\
+$\langle${$p$2}, \{$R$[1, 3]\}$\rangle$ \\ 
+$\langle${$p$3}, \{$R$[2, 1], $R$[2, 2]\}$\rangle$ \\
+$\langle${$p$4}, \{$R$[2, 2], $R$[2, 3]\}$\rangle$. \\
+\end{tabular}
+\end{center} 
+
+\vspace{.1in}
+
+\subsubsection{Field Count Limit Check}
+
+%The DBMS or user may impose a limit on the number of fields in the final 
+%MLPPI recommendation. 
+At present, the Teradata DBMS has a limit (64) of the fields 
+that can be used in an MLPPI definition.
+If the number of fields present in $R$ exceeds the field count limit, 
+we determine which field(s) should be thrown away to satisfy the limit. 
+(The star schema fact table we use has much fewer fields than the limit, 
+and thus, this step will not be executed.)
+To choose victim fields, the tool computes the weighted sum of 
+{\em query cost} of queries regarding each field. 
+The sum can be obtained by adding up every query cost on an MLPPI using 
+only the ranges under the field. 
+(We will cover how to measure the query cost in Section~\ref{sec:opt_phase}.) 
+We incrementally discard a field with the highest query cost sum 
+until the limit is reached. 
+Accordingly, we can update the existing $M$2. 
+One might say that the MLPPI may not be exploited if too many ranges, 
+exceeding a partition count limit (or 65,536 as of now) are found in one field. 
+But we assume that such an extreme case is not expected. Even if 
+it happens, we can utilize the merges of consecutive ranges to make 
+the MLPPI feasible. 
+
+\subsubsection{Query-to-Range-Set Map Construction}
+
+Now, the tool can create a bi-directional {\em query-to-range-set} map, called $M$, 
+between $Q$ and $R$, using the existing maps $M$1 and $M$2. 
+It leverages a transitive property from $M$1 to $M$2.
+Once $M$ is constructed, 
+the intermediate maps ($M$1 and $M$2) are not used in the rest of phases. 
+$M$ is shown as below:
+
+{\it $M$}:
+\begin{center}
+\begin{tabular}{ll} 
+$\langle${$q$1}, \{$R$[1, 1], $R$[1, 2], $R$[2, 1], $R$[2, 2]\}$\rangle$ \\
+$\langle${$q$2}, \{$R$[1, 3], $R$[2, 2], $R$[2, 3]\}$\rangle$.
+\end{tabular}
+\end{center} 
+
+In the subsequent phases $M$ gets used for computing costs and updated 
+along with a merge of ranges, and $R$ is refined for an MLPPI recommendation. 
+
+\subsubsection{Partition Count Limit Check}
+
+In this regard, the range set $R$ can be used to define an MLPPI using each field as one level. 
+However, if the current number of partitions by $R$ is greater than 
+the partition count limit, 
+then it is not possible to make a feasible MLPPI based on ranges in $R$. 
+
+The actual partition count limit is ample enough to pass the running example, 
+but to continue our discussion, assume that in our discussion the limit is {\it 15}.
+From $R$ in the running example, we can obtain a total of (number of ranges in {\tt LO\_DISCOUNT}) 
+$\cdot$(number of ranges in {\tt LO\_QUANTITY}) = (3+1) $\cdot$ (3+1) = {\it 16}
+partitions. 
+Because the total partitions surpass the limit, 
+the tool should pass through the initial phase in which 
+fewer partitions than the limit are made. 
+(Otherwise, the wizard will proceed to the optimized phase immediately.) 
+Note that one more range is counted per field in the calculation. 
+The added range is equivalent to the ``{\tt NO CASE OR UNKNOWN)}'' case in Figure~\ref{fig:exam}. 
+
+The tool is now ready to proceed to the next phases, 
+with $R$ (input range set, or MGP) and the prepared $M$ (query-to-range-set map). 
+%In the following subsections, we describe how the MLPPI solution for $Q$ 
+%can be eventually made using $M$ and $R$.
+
+\subsection{The Initial Phase}
+\label{sec:init_phase}
+
+In this phase, we incrementally merge a range pair in $R$ to reduce partitions. 
+The merge continues until the number of ongoing partitions 
+drop below the partition count limit. 
+Once reaching the limit, we can have a feasible MLPPI with 
+the remaining partitions. 
+
+By and large, overall I/O cost may be increased by the merge. 
+Since every row is hash-sorted in each AMP of the Teradata DBMS server, 
+typically the full scan on a partition is done to retrieve 
+all the rows matching a given query. 
+In the case of a merged partition, we may read the non-qualifying rows 
+that would not be seen before the merge, thereby paying more I/O to answer 
+the query.  
+To minimize the merge overhead, we pick up the range pair incurring 
+the least I/O increase in a heuristic fashion.
+
+To choose the desirable range pair for a merge, 
+the tool leverages the scan cost of a query on a range pair.
+Algorithm~\ref{algo:comp_scan_cost} represents how 
+the scan cost can be computed on the range pair that \hbox{influences} a query. 
+The scan cost represents the I/O cost to answer the query when the range pair is merged. It is 
+modeled as the {\em number of blocks} that are to be read 
+for the target query. To compute the scan cost of a query $q$, we use 
+a corresponding scan cost query ($s$), and 
+it can be constructed as follows: 
+\begin{center}
+$s$: {\tt SELECT * FROM $F$ WHERE} {\it CP},
+\end{center} 
+where $F$ is a fact table, and 
+{\it CP} indicates the predicates  
+restored from the ranges mapped to $q$ from $M$.
+
+\begin{algorithm}[t]
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+\SetKw{func}{Function}
+\SetKwBlock{begin}{}{end}
+{
+\Input{$q$ (query), $rp$ (range pair), $M$ (query-to-range-set map)}
+\Output{Scan cost for answering $q$ when considering a merge of $rp$}
+	$r_{m}$ $\leftarrow$ Consolidate $rp$ \;
+	$L$ $\leftarrow$ Copy the range set mapped to $q$ from $M$\; 
+	Delete ranges in $rp$ from and insert $r_{m}$ into $L$. \\
+	$s$ $\leftarrow$ ``{\tt SELECT * FROM FACT$\_$TABLE WHERE }'' \;
+	\ForEach{range $r$ $\in$ $L$}{	
+		Restore a predicate $p$ from $r$. \\
+		Add $p$ to {\tt WHERE} clause of $s$.
+	}
+	Make an API call with $s$ to the server. \\
+	Extract the spool size (in bytes) from the result. \\
+	$blc$ $\leftarrow$ Calculate the block counts from the spool size. \\
+	Update $q$'s scan cost to $blc$. \\
+	{\bf return} $blc$ \;
+}
+\caption{Scan Cost Computation}
+\label{algo:comp_scan_cost}
+\end{algorithm}
+
+If $q$ turns out to be affected by the merge of a range pair, 
+then the range set associated with $q$ in $M$ is temporarily updated 
+by removing the parent ranges and adding the merged one. 
+The altered range set is remapped to $q$ in $M$ and then 
+translated to the equivalent predicates, 
+so that {\it CP} for $s$ based on the predicates can be built.
+Unless the merge range pair influences $q$, then 
+{\it CP} can be simply built based on the 
+predicates restored from the existing ranges mapped to $q$.
+
+To help understand the scan cost construction, let us 
+consider a range pair ($rp$) of \hbox{$R$[2, 2]} and $R$[2, 3] in the running example. 
+$rp$ produces the merged range, \range{25, 35}, \hbox{under} {\tt LO\_QUANTITY}. 
+The merge by $rp$ affects both $q$1 and $q$2 in the workload.  
+
+Thus, the range sets of $q$1 and $q$2 on {\tt LO\_QUANTITY} are 
+altered to \{\openrange{\infty, 25}, \range{25, 35}\} and \{\range{25, 35}\}, 
+respectively. Of course, no change is made to the existing range sets 
+of the queries on {\tt LO\_DISCOUNT}. 
+Therefore, the corresponding scan cost queries for $q$1 and $q$2 
+can be built as below:
+\begin{center}
+\begin{tabular}{rl}
+$\Sone$:	& {\tt SELECT * FROM LINEORDER l} \\
+		& {\tt WHERE ((l.LO\_DISCOUNT = 1)} \\
+		& {\tt OR (l.LO\_DISCOUNT >= 4} \\ 
+		& {\tt AND l.LO\_DISCOUNT <= 5))} \\
+		& {\tt AND l.LO\_QUANTITY <= 35}  \\ 
+$\Stwo$:	& {\tt SELECT * FROM LINEORDER l} \\
+        & {\tt WHERE l.LO\_DISCOUNT >= 7} \\
+        & {\tt AND (l.LO\_QUANTITY >= 25 AND} \\ 
+        & {\tt l.LO\_QUANTITY <= 35)}.
+\end{tabular}
+\end{center}
+
+It is possible to combine all the (consecutive) ranges in the (temporarily) altered set of $q$1, 
+and hence, a single predicate ({\tt l.LO\_QUANTITY <= 35}) can be built. 
+
+The wizard sends such a scan cost query to the server via an API call, 
+and it extracts from the server's response the {\em spool size} (in bytes), or the size of scan query result. 
+Then, the tool computes as scan cost the {\em block counts} using the spool size. 
+If the merge of a range pair does not impact on any query in the workload, 
+the existing (previously computed) scan cost of queries 
+will be reused for the range pair. 
+That is, the wizard will only recompute 
+the scan cost of a query {\em iff} the query is affected by 
+the merge of two consecutive ranges. 
+
+In this way, the weighted sum of scan cost of queries, $T_{s}$ can be computed 
+for each range pair. 
+$T_{s}$ can be defined as follows:
+\begin{center}
+\begin{tabular}{c} 
+$T_{s}$ = $\sum_{i=1}^{n}$($sc_{i}${$\cdot$}{$w_{i}$}),
+\end{tabular}
+\end{center}
+where $n$ is the number of queries in $Q$, $sc_{i}$ is the scan cost of a query $q_{i}$ in $Q$, and 
+$w_{i}$ denotes the (\hbox{non-negative}) weight associated with $q_{i}$. 
+
+Once all range pairs are examined, the tool chooses the range pair 
+with the least $T_{s}$ for a merge. 
+If several range pairs end up with the same least $T_{s}$, 
+then the tool applies the heuristic of favoring the range pair that produces 
+fewer number of partitions when merged, to make 
+it faster to reach the partition count limit. 
+
+In the example, suppose that the running range pair $rp$ produces the least $T_{s}$, 
+and thus, the tool merges $rp$. 
+Thus we can update both $R$ and $M$ as follows.
+
+$R$:
+\begin{center}
+\begin{tabular}{c|c} 
+{\tt LO\_DISCOUNT} & {\tt LO\_QUANTITY} \\ \hline
+\range{1, 1} & \openrange{\infty, 25} \\
+\range{4, 5} & \range{25, 35}		  \\
+\ropenrange{7, \infty} &  \\
+\end{tabular}
+\end{center}
+
+$M$:
+\begin{center}
+\begin{tabular}{ll} 
+$\langle${$q$1}, \{$R$[1, 1], $R$[1, 2], $R$[2, 1], $R$[2, 2]\}$\rangle$ \\
+$\langle${$q$2}, \{$R$[1, 3], $R$[2, 2]\}$\rangle$
+\end{tabular}
+\end{center} 
+
+Note that we see that $q$2 may have the most customized partition based on the updated $M$. 
+Only the single partition formed by ($R$[1, 3]$\cap${$R$[2, 2]}) is sufficient 
+to retrieve all the qualifying 
+rows for $q$2; thus, the other partitions can be simply eliminated. 
+In the meantime, to answer $q$1, we need to read the four partitions formed by 
+the top two ranges of each field. 
+Unfortunately, because the partitions formed by (({$R$[1, 1]{$\cup$}$R$[1, 2]})$\cap$($R$[2, 2]) 
+contain the non-qualifying rows for $q$1, $R$ cannot provide $q$1 with as much benefit as $q$2. 
+However, $R$ can be a good compromise to satisfy both queries, in that 
+the MLPPI derived by $R$ can potentially minimize the total execution cost 
+of $Q$. 
+
+
+\begin{algorithm}[t]
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+\SetKw{func}{Function}
+\SetKwBlock{begin}{}{end}
+{
+\Input{$M$ (query-to-range-set map), $R$ (input range set)}
+\Output{$R$ with \# partitions $\leq$ partition limit}
+	$W$ $\leftarrow$ Query weights \\
+	\While{(\# partitions by $R$ $>$ partition limit)}{
+		\ForEach{a range pair ($rp$) in $R$}{	 
+			$T_{s}$ $\leftarrow$ 0 \;
+			\ForEach{$q$ in $M$}{	
+				$w$ $\leftarrow$ Get $q$'s weight from $W$ \\
+				$L$ $\leftarrow$ Get the range set mapped to $q$ in $M$ \\
+				\uIf(\tcp*[f]{Affected}) {(($rp$ $\cap$ $L$) $\neq$ $\varnothing$)}{
+					$T_{s}$ += $w{\cdot}$({\it getSC}($q$,$rp$,$M$)) \tcp*[r]{See Algo.~\ref{algo:comp_scan_cost} regarding {\it getSC}()}
+				}
+				%\lElse{ $T_{s}$ += $w{\cdot}$($q$'s existing scan cost)}
+			}
+			Associate $T_{s}$ with $rp$.
+		}
+		Find $rp$(s) with the least $T_{s}$. \\
+		If a tie happens, select the $rp$ to make fewer partitions when consolidated. \\
+		Update $M$ and $R$ by the chosen $rp$.
+	}
+	{\bf return} $R$\;
+}
+\caption{The Initial Phase}
+\label{algo:init_phase}
+\end{algorithm}
+
+
+Algorithm~\ref{algo:init_phase} represents the initial phase 
+that has been proposed so far. 
+The algorithm starts with a query-to-range set map ($M$) and an input range set ($R$). 
+Until the number of the partitions in $R$ falls below the partition limit threshold, 
+the algorithm determines the range pair yielding the least total execution cost ($T_{s}$) 
+and updates $M$ and $R$. At the end, the algorithm produces a final recommendation based on $R$.
+%\vspace{-.1in}
+
+Now that the total partition counts ($4${$\times$}$3$=$12$) by $R$ falls  
+below the assumed limit ($15$), the wizard 
+proceeds to the optimized phase with $R$ without repeating the initial phase. 
+
+\subsection{The Optimized Phase}
+\label{sec:opt_phase}
+
+%We verified the effectiveness of the tool by running it on a workload based
+In this regard, using $R$ we have an initial MLPPI recommendation for the {\tt LINEORDER} fact table.
+The recommendation can be used sufficiently, but 
+having fewer partitions, induced by further merges, 
+can enhance the overall workload performance for the following reasons. 
+First, multiple file contexts by many partitions can incur 
+huge overhead that impacts on the query optimizer. 
+There also exists an operational threshold 
+that the optimizer can handle the maximum number of the partitions at a time.
+Therefore, further reducing partitions greatly helps the optimizer to manage these partitions.
+
+A similar algorithm, as suggested in the initial phase, 
+can be applied to this optimized phase. 
+Instead of the scan cost, the {\em query cost} can be used thanks to a feasible MLPPI. 
+The query cost is modeled as the estimated processing time 
+of a query on a ``faked'' fact table applying the MLPPI definition 
+reflecting the merge of a range pair. 
+This cost estimation technique is similar 
+to the ``\hbox{what-if}" approach~\cite{chaudhuri1998autoadmin}.
+
+\begin{algorithm}[t]
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+\SetKw{func}{Function}
+\SetKwBlock{begin}{}{end}
+{
+\Input{$q$ (query), $rp$ (range pair), $M$ (query-to-range-set map), $R$ (input range set)}
+\Output{Query cost to answer $q$ when considering a merge of $rp$}
+	Create an empty shadow table $H$ having the same definition as the fact table $F$, 
+	including indexes and all constraints (check and referential integrity constraints). \\
+	Propagate all (field and index) statistics of $F$ to $H$. \\
+	\If{$F$ has materialized views (MVs)}{
+		Create the equivalent MVs on $H$. \\
+		Propagate the statistics of the MVs on $F$ to those of $H$. \\
+	}
+	$r_{m}$ $\leftarrow$ Merge $rp$ \;
+	$L$ $\leftarrow$ Copy ranges associated with $q$ from $M$\; 
+	Remove ranges in $rp$ from and add $r_{m}$ to $L$. \\
+	$R'$ $\leftarrow$ Update $R$ with $L$ \\
+	Alter $H$ using a fictitious MLPPI with $R'$. \\
+	Construct and send to the server an $H$-based shadow query $h$ equivalent to $q$. \\	
+	$ept$ $\leftarrow$ Estimated processing time of $h$ extracted from the server response \;
+	Update $q$'s query cost to $ept$. \\
+	{\bf return $ept$} 
+}
+\caption{Query Cost Computation}
+\label{algo:comp_query_cost}
+\end{algorithm}
+
+Algorithm~\ref{algo:comp_query_cost} illustrates the steps for computing 
+the query cost of a query $q$, 
+given a range pair ($rp$) affecting $q$ when merged. 
+First, we create an empty shadow table $H$ with the same definition as $F$, 
+including all indexes and constraints such as check and referential integrity 
+ones. Next, we propagate all statistics of $F$ to $H$. 
+This covers field and index statistics. 
+If $F$ has materialized views (MVs), then we create the equivalent MVs on $H$ and subsequently, 
+propagate the statistics of the MVs on $F$ to the new MVs on $H$. 
+After that, we alter $H$ by an MLPPI with $R$' applying the merge of $rp$. 
+The wizard then builds a {\em shadow} query $h$ equivalent to the input query $q$ 
+but replacing $F$ in $q$ with $H$, and makes an API call to the {\tt EXPLAIN} tool with $h$. 
+Eventually, the tool extracts from the result and returns the estimated elapsed time 
+of $h$ as the query cost of $q$. 
+As done in the initial phase, the query cost of a query is recomputed only if the merge affects the query.
+
+For each range pair the wizard computes the weighted sum ($T_{q}$) of query cost of queries. 
+$T_{q}$ can be similarly defined as $T_{s}$, described in Section~\ref{sec:init_phase}.
+%and thus the definition of $T_{q}$ is omitted.
+Let the current least $T_{q}$ be $T$ and the existing least $T_{q}$ be $T_{p}$. 
+If $T$ $<=$ $T_{p}$, then for the next iteration $T_{p}$ is updated to $T$. 
+In turn, the tool merges the range pair that produces $T$ and updates $M$ and $R$ along with the merge. 
+The wizard repeats the process until 1) no ranges in $R$ remain, or 2) pre-defined iterations are reached. 
+The optimized phase is finished if $T$ $\geq$ $T_{p}$.  
+
+In the running example, suppose that in the first round, ranges $R$[1, 1] and $R$[1, 2] are chosen for a merge. 
+Then, the wizard produces a merged range \range{1, 5} \hbox{under} {\tt LO\_DISCOUNT} and proceeds to the next round. 
+If a range pair selected for the subsequent merge fails to improve $T_{p}$, 
+then, the tool exits the optimized phase and \hbox{produces} the final MLPPI recommendation for the given workload $Q$ 
+as shown in Figure~\ref{fig:mlppi}. 
+
+\vspace{-.1in}
+
+\begin{figure}[htp!]
+\begin{center}
+\begin{tabular}{|l|} \hline
+{\tt ALTER TABLE LINEORDER} \\
+{\tt MODIFY PRIMARY INDEX} \\
+{\tt PARTITION BY(} \\
+\hspace{.1in}{\tt CASE\_N(} \\
+	\hspace{.2in}{\tt LO\_DISCOUNT $\geq$ 1 AND LO\_DISCOUNT $\leq$ 5,} \\
+	\hspace{.2in}{\tt LO\_DISCOUNT $\geq$ 7,} \\ 
+	\hspace{.2in}{\tt NO CASE OR UNKNOWN),} \\
+\hspace{.1in}{\tt CASE\_N(} \\
+	\hspace{.2in}{\tt LO\_QUANTITY $<$ 25,} \\
+	\hspace{.2in}{\tt LO\_QUANTITY $\geq$ 25 AND LO\_QUANTITY $\leq$ 35,} \\
+	\hspace{.2in}{\tt NO CASE OR UNKNOWN)} \\ 
+{\tt );} \\ \hline
+\end{tabular}
+\end{center}
+\caption{The MLPPI Recommendation for Workload $Q$\label{fig:mlppi}}
+\end{figure}
+
+%\vspace{-.1in}
+
+\begin{algorithm}[t]
+\SetKwInOut{Input}{input}
+\SetKwInOut{Output}{output}
+\SetKw{func}{Function}
+\SetKwBlock{begin}{}{end}
+{
+\Input{$M$ (query-to-range-set map), $R$ (input range set)}
+\Output{MLPPI such that the total query cost is minimal}
+	$W$ $\leftarrow$ Query weights \\
+	$T_{p}$ $\leftarrow$ Total query cost sum on an initial MLPPI by $R$ \\
+	\While{(Pre-defined iterations or $R$ $\neq$ $\varnothing$)}{
+		\ForEach{range pair $rp$ in $R$}{	 
+			$T_{q}$ $\leftarrow$ 0 \;
+			\ForEach{$q$ in $M$}{	
+				$w$ $\leftarrow$ Get $q$'s weight from $W$ \\
+				$L$ $\leftarrow$ Get the range set mapped to $q$ in $M$ \\
+				\uIf(\tcp*[f]{Affected}) 
+				{(($rp$ $\cap$ $L$) $\neq$ $\varnothing$)}{
+					$T_{q}$ += $w${$\cdot$}({\it getQC}($q$,$rp$,$M$,$R$)) 	
+					\tcp*[r]{See Algo.~\ref{algo:comp_query_cost} regarding {\it getQC}()}				
+				}
+				\lElse{ $T_{q}$ += $w${$\cdot$}($q$'s existing query cost)}
+			}
+			Map $T_{q}$ to $rp$.
+		}
+		$T$ $\leftarrow$ The least $T_{q}$ that has been so far seen.  \\
+		\lIf{$T$ $>$ $T_{p}$}{ {\bf break} \;}
+		\Else{
+			$T_{p}$ $\leftarrow$ $T$ \tcp*[r]{Query Cost Sum Update} 
+			Find $rp$(s) with $T$. \\
+			If a tie happens, select the $rp$ to make fewer partitions when consolidated. \\
+			Update $M$ and $R$ by the chosen $rp$. \\
+		}
+	}
+	{\bf return} an MLPPI by $R$ \;
+}
+\caption{The Optimized Phase}
+\label{algo:opt_phase}
+\end{algorithm}
+
+\vspace{-.2in}
+
+Algorithm~\ref{algo:opt_phase} exhibits the proposed optimized phase, 
+which also applies the same heuristic to favor a range pair 
+that produces fewer partitions to break a tie.  
+The order of the different partitioning levels may have some impact on 
+the execution time. A range condition on lower levels like the query 
+in Section~\ref{sec:intro} 
+``{\tt SELECT * FROM LINEORDER WHERE LO\_QUANTITY < 25}'' 
+requires scanning non-consecutive partitions. 
+This may \hbox{incur} some overhead at run time. 
+To reduce this \hbox{effect}, we sort the partition \hbox{levels} based on number of 
+partitions in descending order \hbox{before} making a final \hbox{recommendation}. 
+The solution in \hbox{Figure}~\ref{fig:exam} follows this heuristic 
+making the two-partition case in the first level 
+followed by the four-partition case in the second level. 
+The order in Figure~\ref{fig:mlppi} can go \hbox{either} way 
+since both levels have the same number of \hbox{partitions}.
+
+\section{Analysis}
+\label{sec:analysis}
+
+In this section we analyze the time complexity of 
+the proposed preprocessing, initial, and optimized phases.
+For the time complexity we compute the logical running time of the wizard, using the {\em number of API calls} 
+made to the server during the phases. 
+
+%In this section the complexity of the proposed algorithms 
+%is analyzed.
+
+\subsection{The Preprocessing Phase}
+
+\begin{lemma}
+\label{lemma:pre_phase}  
+The running time complexity for building a query-to-range map is 
+$\BigO$($N${$\cdot$}$C${$\cdot$}$V$), where $N$ is the number of queries 
+in a workload, $C$ is the total number of fields in the fact table, 
+and $V$ is the max number of values in a field. 
+\end{lemma}
+
+{\bf Proof}. Let us consider a worst case such that given a workload of 
+$N$ queries, each query references all the fields of the fact table, and 
+each field is associated with at most $V$ values by the predicates of the queries. 
+Each query may have a single-value range. 
+A range consisting of only a single value per field can be mapped to each query. 
+Thus, the running time complexity for the map construction 
+is $\BigO$($N${$\cdot$}$C${$\cdot$}$V$). \qed
+
+{\bf Comment:} In practice, our experiments showed that the bound 
+$\BigO$($N${$\cdot$}$C${$\cdot$}$V$) is overly pessimistic. 
+
+\subsection{The Initial and Optimized Phases}
+
+\begin{lemma}
+\label{lemma:init_phase}  
+The running time complexity for the initial or optimized phases is 
+$\BigO$($M^{2}${$\cdot$}$N$), 
+where $M$ is the number of range pairs, and $N$ is the number of queries in 
+a given workload. 
+\end{lemma}
+
+{\bf Proof}. Suppose that the merge of every range pair influences all the queries. 
+Every iteration, either the scan or query costs need to be recomputed 
+for each query. 
+In the first round the \hbox{re-computation} cost is paid as many times as $M${$\cdot$}$N$, 
+and a chosen range pair is merged. In the subsequent round 
+$M$-1 range pairs remains, and the following cost amounts to ($M$-1){$\cdot$}$N$. 
+In the worst case we may end up consolidating all range pairs, thus having no partition on 
+a target table. The total calls to the server can be increased up to 
+
+\begin{center}
+$M${$\cdot$}$N$+($M$-1){$\cdot$}$N$+$\cdots$+$N$ = ($\sum_{i=1}^M i$){$\cdot$}$N$ = $\frac{M(M-1)}{2}${$\cdot$}$N$. 
+\end{center}
+
+\noindent Hence, the running time complexity is $\BigO$($M^{2}${$\cdot$}$N$). $\qed$
+
+%\vspace{0.1in}
+
+Our experiments showed that $\BigO$($M^{2}${$\cdot$}$N$), the running time complexity, 
+is overly \hbox{pessimistic}. 
+In \hbox{practice}, the number of calls made was much fewer than the \hbox{theoretic} bound, 
+since it was very rare for a range pair to be associated with all queries in a workload. 
+In \hbox{Section}~\ref{sec:stat} we will show how many API calls take place on the workloads 
+used for evaluation. 
+
+\section{Experiment}
+\label{sec:experiment}
+
+In this section, we describe our environment settings, 
+report the statistics measured in our experiments, and 
+demonstrate the performance of the MLPPI wizard (WIZARD), compared with 
+that of no partitioning and the partitioning by a human expert (EXP). 
+
+\subsection{Environment Settings}
+\label{sec:env_set}
+
+The MLPPI wizard was implemented as a prototype 
+on top of the Teradata DBMS server. 
+It was written in Java. 
+The performance of the wizard was evaluated 
+on the Teradata DBMS server machine running Unix. 
+
+When it comes to workload generation, we took advantage of 
+our simple star schema query \hbox{generator}. 
+The generator assumes that 1) available operators, 2) fields, 
+and 3) the minimum and \hbox{maximum} values of the fields are already known. 
+For each query, the generator first randomly selects the number of single-table 
+predicates to create. 
+Then, it arbitrarily chooses a field and a specific operator 
+for each predicate. 
+If {\tt IN} operator on a chosen field is picked up, the query generator 
+determines the number of values to add to the {\tt IN} list and then chooses random values within the min-max value 
+range of the field. 
+In this way the generator builds a query involving the generated predicates.
+
+A generated query is based on a template that joins {\tt LINEORDER} and {\tt DDATE} with constraints defined by the predicates. 
+This template is common in customer cases like reports and form 
+templates. 
+Using the query generator we generated two workloads consisting of 10 queries (10Q) and 20 queries (20Q). 
+
+For the query workloads we populated the fact table with a scale of 1TByte (1TB) and 3TBytes (3TB).
+
+\begin{table*}[t]
+\caption{The statistics measured on the used workloads\label{tab:workload_stat}}
+\begin{center}
+{\scriptsize
+\begin{tabular}{|l|l|l|l|l|} \hline
+		   			   							   & \multicolumn{2}{|c|}{Init. Phase} & \multicolumn{2}{|c|}{Opt. Phase} \\ \cline{2-5}
+		   			   							   & 10Q & 20Q & 10Q & 20Q \\ \hline
+{\# Input Partitions}  							   & 1,008,000 & 110,739,200 & 51,840 & 59,520 \\ \hline
+{\# Input Range Pairs} 							   & 441 & 4,180 & 24 & 48\\ \hline
+{\# Total Iterations}  							   & 14 & 55 & 1 & 1 \\ \hline
+{\# Total API Calls (Worst Calls by Lemma~\ref{lemma:init_phase}})   & 1,305 (1,944,810) & 31,915 (349,448,000) & 78 (5,760) & 388 (46,080) \\ \hline
+{\# Average API calls per Range Pair} 		  	   & 2.96 & 7.63 & 3.25 & 8.08 \\ \hline
+%{\# avg. range pairs compared per iteration} 	   & 31.5 & 76.0 & 24 & 48 \\ \hline
+%{\# max. range pairs compared within an iteration} & 38 & 103 & 24 & 48 \\ \hline
+%{\# min. range pairs compared within an iteration} & 25 & 49 & N/A & N/A\\ \hline
+%{\# max. API Calls made per range pair} 		   & 4.92 & 16.14 & & \\ \hline
+%{\# min. API Calls made per range pair} 		   & 1.92 & & & \\ \hline
+%{\# avg. API calls made per iteration}		 	   & 93.21 & 580 & 78 & 388 \\ \hline
+%{\# max. API calls made within an iteration} 	   & 123 & 791 & 78 & 388 \\ \hline
+%{\# min. API calls made within an iteration} 	   & 73 & 381 & N/A & N/A \\ \hline
+\end{tabular}
+}
+\end{center}
+\end{table*}
+
+\subsection{Statistics Report}
+\label{sec:stat}
+
+Table~\ref{tab:workload_stat} summarizes the WIZARD's execution statistics, 
+which were obtained while the recommendations for the \hbox{workloads} were produced. 
+The statistics includes input partitions, 
+range pairs, number of API calls made, and total iterations 
+observed in each phase. 
+
+About 1 million partitions were initially derived for 10Q whereas roughly 0.11 billion partitions for 20Q. 
+Although the workload size doubled, the total number of partitions was increased exponentially. 
+Much more predicates with different bindings produced two orders of magnitude more ranges in 20Q than those of 10Q. 
+While the huge input partitions were made, the number of collected range pairs per field was relatively small. 
+
+The total number of iterations in the initial phases 
+tended to be proportional to the input \hbox{partitions} 
+\hbox{generated} from the workloads. 
+Note that there \hbox{happened} only one iteration in the optimized phase. 
+The reason was that since the partitions produced by the \hbox{initial} phase were customized enough, 
+no more \hbox{iterations} were \hbox{necessary} for further optimization. 
+
+As mentioned in Section~\ref{sec:analysis}, the total calls made to 
+the server per workload were by far fewer than the theoretical bound shown in parentheses. 
+The worst call counts were calculated regarding the number of queries and range pairs observed in each phase. 
+The average number of calls per range pair was limited within 10. %across workloads and phases. 
+
+\begin{figure*}[t]
+\vspace{-.2in}
+\centering
+\subfigure[1TB]{
+	\includegraphics[scale=0.6]{1T_total_time}
+	\label{fig:1T_eval_res}
+}
+\subfigure[3TB]{
+	\includegraphics[scale=0.6]{3T_total_time}
+	\label{fig:3T_eval_res}
+}
+\vspace{-0.1in}
+\caption{Total Elapsed Time\label{fig:total_elapsed_time}}
+\end{figure*}
+
+\begin{figure*}[t]
+\vspace{-.2in}
+\centering
+\subfigure[1TB]{
+	\includegraphics[scale=0.6]{1T_quality}
+	\label{fig:1T_quality}
+}
+\subfigure[3TB]{
+	\includegraphics[scale=0.6]{3T_quality}
+	\label{fig:3T_quality}
+}
+\vspace{-0.1in}
+\caption{Recommendation Quality Comparison\label{fig:recomm_qual}}
+\vspace{-.1in}
+\end{figure*}
+
+\subsection{Performance Evaluation}
+
+The main focus of our demonstration is to see the performance (quality) 
+of MLPPI \hbox{recommendations} made by the MLPPI wizard (WIZARD), 
+compared with the performance of no partitioning (NO PPI) and EXP (partitioning 
+by a human expert). 
+
+%Our evalution results are exhibited in Figures ~\ref{fig:eval_res} 
+%and ~\ref{fig:improvement}.
+%Figure~\ref{fig:eval_res} shows the times (in seconds) taken 
+%to run the 10Q or 20Q workloads over the 1TB or 3TB fact tables. 
+%Based on the run results, Figure~\ref{fig:improvement} displays 
+%how much improvement could be achieved by the EXP or the WIZARD 
+%recommendations against the NO PPI one. 
+
+Figures~\ref{fig:total_elapsed_time} and \ref{fig:recomm_qual} exhibit our evaluation results.
+Figure~\ref{fig:total_elapsed_time} shows the times (in seconds) taken 
+to run the 10Q and 20Q workloads over the 1TB and 3TB fact tables. 
+Based on the run results, Figure~\ref{fig:recomm_qual} shows 
+how much improvement was gained by the EXP and WIZARD solutions, compared with the NO PPI solution. 
+
+Overall, the WIZARD recommendations were very effective at partitioning 
+the fact tables by leveraging the predicates in the workloads. 
+On average, the \hbox{total} execution time of the workloads on the WIZARD solutions was 
+about 3.5 and 2 times faster than those of NO PPI and EXP, respectively. 
+Also, the quality of the \hbox{WIZARD} solutions outperformed that of the EXP solutions; 
+the WIZARD solutions yielded an average of about 77\% improvement on the NO PPI solutions.  
+
+Furthermore, the WIZARD recommendations 
+scaled very well with growing workload size and table size, 
+as illustrated in Figure~\ref{fig:recomm_qual}. 
+Although we doubled the workload scale from 10Q to 20Q, 
+the performance improvement of the WIZARD solution stayed the same in Figure~\ref{fig:1T_quality} 
+and got almost negligibly decreased in Figure~\ref{fig:3T_quality}. 
+This result showed that our WIZARD \hbox{solution} was scalable over increasing workload size.
+
+We also increased the table scale from 1TB to 3TB. 
+For 10Q the performance improvement (about 77\%) was almost the same over the increasing scales, 
+and for 20Q it was decreased from 76\% to 74\%, which was \hbox{almost} negligible.
+The WIZARD partitioning \hbox{recommendation} scaled well with increasing table size.
+
+In sum, our experiment results attest the effectiveness of the proposed algorithms for WIZARD 
+and show the superiority of the recommendations of WIZARD.
+
+\shorten{Regarding the scale of 1TB in Figure~\ref{fig:1T_quality}, 
+although we doubled the workload scale (from 10Q to 20Q) 
+the performance improvement of the WIZARD solution compared with that of NO PPI was not decrease although we doubled the workload scale (from 10Q to 20Q).
+In Figure~\ref{fig:3T_quality}, for the 3TB scale the improvement of WIZARD was slightly decreased, but it was negligible.
+In sum, the performance of the WIZARD solution was scalable over increasing workload and table scale. 
+
+%Also, we scaled up the table from 1TB to 3TB on the fixed workload, but 
+%the \hbox{recommendation} quality was not degraded at all. 
+These results attest the effectiveness of our algorithms, 
+and show the superiority of our recommendations.}
+
+\section{Related Work}
+\label{sec:related_work}
+
+Physical database design~\cite{finkelstein1988physical,labio1997physical,rozen1991framework,Zilio1998} 
+has been discussed in \hbox{academic} research and industrial sectors in the past years.
+The major DBMS vendors (e.g., IBM, MS, and Oracle) have driven much of the work. 
+Their specific interests have been in automating the physical design for table 
+partitioning~\cite{agrawal04:integrating,Lightstone04:db2auto,nehme2011automated,sheet2009oracle,saa2007oracle,rao2002automating}, indexes/materialized views~\cite{agrawal2000automated,Agrawal04:sqlserver,dash2011cophy,Kimura11,itwsqlserver,valentin2000db2,zilio2004recommending}, 
+and integration~\cite{Zilio04:db2design}.
+
+%Lightstone's work~\cite{Lightstone04:db2auto} introduces the MDC (Multidimensional 
+%Clustering) Advisor that automates the selection of MDC 
+%keys customized for a specific workload on DB2 Universal Databases to use MDC structure. 
+%DB2 Advisor~\cite{Zilio04:db2design} is an integrated commercial 
+%tool that captures a variety of aspects of physical database design 
+%by automation in a comprehensive way. 
+%Oracle Partitioning Advisor~\cite{sheet2009oracle} for recommending 
+%table partitionings is  integrated into 
+%the SQL Access Advisor~\cite{saa2007oracle}. 
+
+%Since data clustering significantly influences on the performance of 
+%multidimensional queries, the MDC advisor helps DBAs that may have 
+%nontrivial troubles in finding proper clustering dimensions and 
+%granularity. 
+%To enumerate and determine possible clustering dimensions, 
+%his work relies on {\it what-if} query cost modeling, data sampling and a search algorithm. 
+
+%DB2 Advisor~\cite{Zilio04:db2design} is an integrated commercial 
+%tool that captures a variety of aspects of physical database design 
+%by automation in a comprehensive way. 
+%It makes an attempt to cover a variety of design choices-partitioning, 
+%MDC, materialized views and indexes. 
+%DB2 Advisor leverages the DB2 query optimizer for yielding a recommendation, and 
+%takes a hybrid searching approach for considering different features.
+
+%Oracle has a tool, called Partitioning Advisor~\cite{sheet2009oracle}, 
+%to make a partitioning recommendation for tables. 
+%The tool is now integrated into 
+%the SQL Access Advisor~\cite{saa2007oracle} that recommends indexes and materialized 
+%views. 
+%However, its technical details are not yet released in public. 
+%
+%Also, MS SQL Server provides some similar, automated tools~\cite{agrawal2000automated,agrawal04:integrating,
+%itwsqlserver} for table partitioning, materialized views or indexes fitting to a given workload.
+%The optimizer cost model is exploited to acquire estimates for 
+%candidate materialized views or indexes. 
+%In particular, Agrawal's work~\cite{agrawal04:integrating} presents 
+%an approach of integrating vertical and horizontal partitioning schemes 
+%into their physical database design, considering scalability.
+
+Some of the tools in IBM DB2~\cite{Lightstone04:db2auto}, 
+Oracle~\cite{sheet2009oracle}, and MS SQL Server~\cite{agrawal04:integrating} 
+appear to be similar to our MLPPI wizard. 
+However, in light of problem scope and approach, the wizard 
+is fundamentally different from the existing tools excluding Oracle Partitioning \hbox{Advisor}~\cite{sheet2009oracle} 
+providing no published technical details. 
+
+DB2 MDC Advisor~\cite{Lightstone04:db2auto} actually tackles 
+a different problem of automatically recommending the most well-suited MDC 
+keys for a given workload. 
+Agrawal's work~\cite{agrawal04:integrating} 
+discusses another problem of merging \hbox{single-level} range partitionings on objects such as tables and indexes. 
+This article addresses the multi-level \hbox{partitioning} problem. 
+Hence, the existing solutions cannot be directly applied to our MLPPI wizard.   
+
+Regarding the approach, DB2 MDC Advisor~\cite{Lightstone04:db2auto} uses 
+the search space driven by {\em fields}. In contrast, our search 
+space is driven by query-predicates, which is superior because 
+\hbox{predicates} are more customized and specific to a workload than fields. 
+Agrawal's horizontal partitioning scheme~\cite{agrawal04:integrating} 
+also uses the search space driven by simple range predicates, but 
+his technique has a \hbox{shortcoming} as follows. 
+His work produces a solution for each individual query and attempt 
+to merge the solutions. But this approach cannot reach 
+an optimized solution in a global \hbox{perspective}.
+Our wizard generates the whole search space upfront and in turn merges partitions, leading to a globally-optimized \hbox{solution}. 
+Moreover, only a single column is considered in his work~\cite{agrawal04:integrating}, 
+whereas our tool deals with multiple fields. 
+
+Implementations of previous tools~\cite{agrawal04:integrating,Lightstone04:db2auto,nehme2011automated} \hbox{required} instrumentation for optimizer code.
+These instrumentations are needed to facilitate the required 
+information for the physical design tools API calls. 
+The \hbox{instrumentation} code need to be enhanced and tested for new database 
+releases that add complexity and additional cost for software upgrades. 
+The Teradata optimizer has a rich set of existing APIs originally coded 
+for system and workload management tools. 
+The APIs are sufficient to avoid the costly optimizer code change. 
+
+Also, Nehme's work~\cite{nehme2011automated}, deeply-integrated with 
+optimizer, reveals a concern about the quality of the recommendations 
+made by some tools, shallowly integrated with optimizer. 
+But we observed in our experiments that the quality of 
+the wizard's solutions was much superior to that of the base solutions. 
+In addition, some might argue that in our loosely-coupled approach 
+the cost to invoke the optimizer might be significant. 
+But the measured call counts were much fewer than 
+the theoretical bound, since most calls were made only when queries were affected by a merge.  
+%If the remote communication cost is expensive, the tool can also be run, 
+%{\em co-located} with the server. 
+
+%The existing work requires their database engine to be extended 
+%to support their features. 
+%This strong coupling may impose a nontrivial burden on their servers whenever 
+%a new feature of the existing tools is desired. 
+%As illustrated in Figure~\ref{fig:arch}, our tool is completely outside 
+%the DBMS server. Thus, we are free of the constraint. 
+%A literature~\cite{nehme2011automated} claims that 
+%such loosely-coupled approaches might suffer from the reduced performance of a tool 
+%and the poor quality of the partitioning recommendations. 
+%The powerful Teradata APIs, however, help the wizard receive from the server 
+%everything needed for yielding a MLPPI recommendation. 
+%Moreover, as demonstrated in Figure~\ref{fig:perf_eval}, the quality of the 
+%partitioning solutions by the wizard was also much superior to that of the base solutions.
+%Some might argue that the cost of invoking the optimizer could be significant as well. 
+%Again, the actual calls are mainly made only when queries are affected by a merge. 
+%As a result, they were much fewer than 
+%the theoretical bound as shown in Table~\ref{tab:workload_stat}.  
+%To further save the remote communication cost, the tool can also be run, 
+%{\em co-located} with the server. 
+%Therefore, we believe that the shallowly-integrated strategy perfectly matches 
+%with the wizard. 
+
+Lastly, there has been some previous work~\cite{nehme2011automated,rao2002automating,tatarowicz2012lookup} 
+regarding table partitioning in multi-node \hbox{systems}, but 
+our problem is discussed in the context of a single node system, as in the existing work~\cite{agrawal04:integrating}. 
+Database cracking~\cite{idreoskm07}
+%, self-reorganizing column values in accordance with query workload, 
+assumes a single node environment, but 
+it does not address our multi-level partitioning problem. 
+
+\section{Summary}
+\label{sec:conclusion}
+%We verified the effectiveness of the tool by running it on a workload based
+
+Given workloads, it is difficult for DBAs to select appropriate fields 
+in partitioning the fact table due to large search space. 
+DBAs cannot easily determine how granular partitions should be made 
+for the workloads. 
+
+To address this concern, we presented the MLPPI wizard to recommend a fact-table partitioning for a given star schema workload. 
+Since \hbox{query-predicates} are exploited 
+to capture necessary ranges for fields and define partitions, 
+the MLPPI \hbox{recommendation} can be very optimized, customized to the workload.  
+
+We proposed the wizard's algorithms consisting of the three phases. 
+The wizard \hbox{incrementally} reduced its search space by merging 
+the range pair with the least scan or query cost, and eventually reached an MLPPI recommendation. 
+In addition, we analyzed the running complexity for the initial and optimized phases. 
+Despite the theoretically high bound, in practice, the wizard made much fewer calls in the phases.
+
+We measured the performance of the recommendation by the wizard using 
+our workloads.  
+We demonstrated that the produced MLPPI solutions by 
+the wizard could reduce the total elapsed time by more than a factor of two, 
+compared with those of no partitioning approach and partitioning 
+done by a human expert. 
+
+\section*{Acknowledgments} 
+This work was carried out while the first author visited Teradata. 
+The work was supported in part under the EDISON program (grant number: 2011-0020576).
+
+\begin{thebibliography}{99}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+{\footnotesize
+%\vspace{-.1in}
+
+\bibitem{Suh12}
+{Y.-K.~Suh et. al.}, {A New Tool for Multi-level Partitioning in Teradata}, 
+in: CIKM'12, pp. 2214--2218.
+  
+\bibitem{sinclair:ppi}
+P.~Sinclair, {Using PPIs to Improve Performance},
+  \url{http://www.teradata.com/tdmo/v08n03/pdf/AR5731.pdf}
+  %(accessed August 27, 2015) (2008).
+
+\bibitem{klindt09mlppi}
+J.~Klindt, {Single-level and Multilevel Partitioned \hbox{Primary} Indexes},
+  \url{http://www.teradata.com/white-papers/Single}\linebreak\url{-level-and-Multilevel-Partitioned-Primary-Indexes}\linebreak\url{-eb1889/}
+  %(accessed July 27, 2015) (2009).
+
+\bibitem{oneil:ssb}
+{P.~O’Neil et. al.}, {The Star Schema Benchmark (SSB)},
+  \url{http://www.cs.umb.edu/~poneil/StarSchemaB.PDF} 
+  %(accessed \hbox{August} 26, 2015) (2007).
+
+\bibitem{agrawal04:integrating}
+{S.~Agrawal et. al.}, {Integrating Vertical and Horizontal \hbox{Partitioning} into Automated Physical Database Design}, 
+in: \hbox{SIGMOD} '04, pp. 359--370.
+
+\bibitem{Lightstone04:db2auto}
+{S.~Lightstone et. al.}, {Automated Design of
+  \hbox{Multi-dimensional} Clustering Tables for Relational Databases}, in:
+  VLDB '04, pp. 1170--1181.
+
+\bibitem{nehme2011automated}
+{R.~Nehme et. al.}, {Automated Partitioning Design in Parallel
+  Database Systems}, in: SIGMOD '11, pp. 1137--1148.
+
+\bibitem{chaudhuri1998autoadmin}
+{S.~Chaudhuri et. al.}, {AutoAdmin `What-If' Index Analysis Utility}, ACM SIGMOD Rec. 27~(2) (1998) 367--378.
+
+\bibitem{finkelstein1988physical}
+{S.~Finkelstein et. al.}, {Physical Database Design for \hbox{Relational} Databases}, ACM TODS, 13~(1) (1988) 91--128.
+
+\bibitem{labio1997physical}
+{W.~Labio et. al.}, {Physical Database Design for Data Warehouses}, in: ICDE '97, pp. 277--288.
+
+\bibitem{rozen1991framework}
+{S.~Rozen et. al.}, {A Framework for Automating Physical
+  Database Design}, in: VLDB '91, pp. 401--411.
+
+\bibitem{Zilio1998}
+{C.~Zilio}, {Physical Database Design Decision Algorithms and Concurrent
+  \hbox{Reorganization} for Parallel Database Systems}, Ph.D. thesis,
+  Dept. of CS, Univ. of Toronto (1998).
+
+\bibitem{sheet2009oracle}
+{Oracle}, {Oracle White Paper---Partitioning with \hbox{Oracle} Database 11g
+  \hbox{Release 2}},
+  \url{http://www.oracle.com/technetw}\linebreak\url{ork/database/options/partitioning/twp-partitioning}\linebreak\url{-11gr2-2009-09-130569.pdf}
+  %(accessed June 23, 2014) (2009).
+
+\bibitem{saa2007oracle}
+{Oracle}, {SQL Access Advisor},
+  \url{http://docs.oracle.com/cd/B19306_01/server.102/b14211/advisor.htm}
+  %(accessed March 30, 2012) (2007).
+
+\bibitem{rao2002automating}
+{J.~Rao et. al.}, {Automating
+  Physical Database Design in A Parallel Database}, in: SIGMOD '02, pp. 558--569.
+
+\bibitem{agrawal2000automated}
+{S.~Agrawal et. al.}, {Automated Selection of Materialized Views and Indexes in SQL Databases}, in:
+  {VLDB '00}, pp. 496--505.
+
+\bibitem{Agrawal04:sqlserver}
+{S.~Agrawal et. al.}, {Database Tuning Advisor for Microsoft
+  SQL Server 2005: Demo}, in: SIGMOD '05, pp. 930--932.
+
+\bibitem{dash2011cophy}
+{D.~Dash}, {CoPhy: A
+  Scalable, Portable, and Interactive Index Advisor for Large Workloads},
+  in: PVLDB, 4~(6) (2011) 362--372.
+
+\bibitem{Kimura11}
+{H.~Kimura et. al.}, {Compression Aware
+  \hbox{Physical} Database Design}, in: PVLDB, 4~(10) (2011) 657--668.
+
+\bibitem{itwsqlserver}
+{Microsoft SQL Server 2000}, {Index Tuning Wizard SQL Server 2000},
+  \url{http://technet.microsoft.com/en-us/library/cc966541.aspx} 
+  %(2000).
+
+\bibitem{valentin2000db2}
+{G.~Valentin}, {DB2 Advisor: An Optimizer Smart Enough to Recommend Its Own
+  Indexes}, in: {ICDE '00}, pp. 101--110.
+
+\bibitem{zilio2004recommending}
+{D.~Zilio et. al.},
+  {Recommending Materialized Views and Indexes with the IBM DB2 Design
+  Advisor}, in: ICAC '04, pp. 180--188.
+
+\bibitem{Zilio04:db2design}
+{D.~Zilio et. al.}, {DB2 Design Advisor:
+  Integrated Automatic Physical Database}, in: VLDB '04, pp. 1087--1097.
+
+\bibitem{tatarowicz2012lookup}
+{A.~Tatarowicz et. al.}, {Lookup Tables: Fine-grained Partitioning for Distributed Databases},
+  in: ICDE'12, pp. 102--113.
+
+\bibitem{idreoskm07}
+{S.~Idreos et. al.}, {Database Cracking}, in: CIDR'07, pp. 68--78.
+}
+
+\vspace{-.8in}
+
+\profile[yksuh.eps]{Young-Kyoon Suh}{
+received MS and PhD degrees in \hbox{computer science} from KAIST, Korea, and the University of \hbox{Arizona}, USA, in 2005 and 2015, respectively. 
+He is a senior researcher at KISTI. His research interests include database \hbox{design} and \hbox{systems}, 
+science of databases, and big data management.}
+
+%\profile[ahmad.eps]{Ahmad Ghazal}
+%{received the PhD degree in computer science from Univ. of Illinois at Chicago.  
+%He is now at \hbox{Oracle} Endeca. He is a well-known industry expert in query optimization theory and practice. 
+%%He peer-reviewed submissions to the Journal of Systems and Software, IEEE TKDE and DOLAP. 
+%His research interest lies in query optimization, big data systems, and physical database design.}
+
+\vspace{-.2in}
+
+\profile[alain.eps]{Alain Crolette}
+{received a PhD degree from Univ. of California at Los \hbox{Angeles} (UCLA).  
+He is a performance specialist at Teradata. 
+He also worked as senior benchmark consultant at Teradata.
+Prior to joining Teradata, he was also a technical \hbox{consultant} at Abacus Programming Corporation. 
+His research focuses on big data systems, query optimization, and physical database design.}
+
+\profile[pekka.eps]{Pekka Kostamaa}
+{is a director of Product Management at Teradata. 
+He worked as VP of Engineering and Big Data Lab at Teradata Aster.
+Prior to VP, he was a director in the Department of Advanced Development at Teradata.
+He is interested in query optimization and physical database design.}
+
+%\vspace\fill
+
+\end{thebibliography}
+\end{document}

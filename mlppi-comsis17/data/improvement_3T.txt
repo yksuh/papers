@@ -1,0 +1,3 @@
+# EXP-YR	EXP-MON	WIZARD
+1 57.44	-2.91	76.98 # 3T-10Queries
+2 62.46	-16.19	74.01 # 3T-20Queries
