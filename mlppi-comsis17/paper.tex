@@ -1,34 +1,83 @@
 \documentclass[runningheads]{comsis2}
 
+%\usepackage[ruled,linesnumbered]{algorithm2e}
+%\usepackage{amssymb,amsthm,amsmath}
+\usepackage{balance}
+\usepackage{subfigure}
+\usepackage{float}
+%\newtheorem{theorem}{Theorem}[section]
+%\newtheorem{lemma}[theorem]{Lemma}
+\usepackage{latexsym}
+\usepackage{multirow}
+\usepackage{color}
+\usepackage{url}
+\usepackage{comment}
+\usepackage[dvips]{graphicx}          % graphicx package for including ps files  
+
 %% Necessary definitions for the running heads
 \def\journalissue{Computer Science and Information Systems ?(?):??--??}
 \def\paperidnum{DOI: N/A}
 \setcounter{page}{1}
 
-\title{The Long Title of Your Computer Science\\and Information Systems Paper}
-
+\title{An Automated Multi-level Partitioning Tool on Analytical Workloads}
+%\titlenote{An earlier version of this article was presented as a short paper at ACM CIKM'12.}
 %% Use this if the title is too long for the running heads
-\titlerunning{Short Title of ComSIS Paper}
+%\titlerunning{An Automated Multi-level Partitioning Tool on Analytical Workloads}
 
-\author{First Author\inst{1} \and Second Author\inst{2}}
-
+\author{Young-Kyoon Suh\inst{1} \and Alain Crolotte\inst{2} \and Pekka Kostamaa\inst{2}}
+%Correspondence to Young-Kyoon Suh, now at Korea Institute of Science and Technology Information
 %% Use this the list of authors is too long for the running heads
-%\authorrunning{First Author et al.}
+%\authorrunning{Correspondence to Young-Kyoon Suh, now at Korea Institute of Science and Technology Information}
 
-\institute{Institute of the First Author\\
-  Address\\
-  \email{author1@institute.org}
+\institute{Department of Computer Science, The University of Arizona, Tucson, AZ 85721, USA\\ 
+  \email{yksuh@cs.arizona.edu}
   \and
-  Faculty of the Second Author\\
-  Address\\
-  \email{author2@faculty.edu}}
+  Teradata Corporation, El Segundo, CA 90245, USA\\
+  \email{\{alain.crolotte,pekka.kostamaa\}@teradata.com}
+%  \and
+%  Korea Institute of Science and Technology Information, Daejeon 34141 Republic of Korea\\ 
+%  \email{yksuh@kisti.re.kr}
+}
+
+\def\form#1{$\langle{#1}\rangle$}
+\def\range#1{$[{#1}]$}
+\def\openrange#1{$({#1})$}
+\def\lopenrange#1{$({#1}]$}
+\def\ropenrange#1{$[{#1})$}
+\def\product#1{$(#1)$}
+\definecolor{grey}{RGB}{200,200,200}
+\newcommand{\hilite}[1]{\colorbox{grey}{#1}}
+\newcommand{\hilitey}[1]{\colorbox{yellow}{#1}}
+\newcommand{\hiliting}[1]{\colorbox{grey}{#1}}
+\long\def\todo#1{\hilitey{{\bf TODO:} {\em #1}}}
+\long\def\shorten#1{}
+\long\def\comment#1{}
+\def\MAX{\mbox{\sl MAX}}
+\def\LIMIT{\mbox{\sl LIMIT}}
+\def\getQueryCost{\mbox{\sl getQueryCost}}
+\def\getScanCost{\mbox{\sl getScanCost}}
+\def\BigO{\mbox{\sl O}}
+\def\NULL{\mbox{\sl NULL}}
+\def\SolA{\mbox{\sl A}}
+\def\SolB{\mbox{\sl B}}
+\def\SolC{\mbox{\sl C}}
+\def\SolS{\mbox{\sl S}}
+\def\Qone{\mbox{\sl q1}}
+\def\Qtwo{\mbox{\sl q2}}
+\def\Sone{\mbox{\sl s1}}
+\def\Stwo{\mbox{\sl s2}}
+\def\SolSone{\mbox{\sl S1}}
+\def\SolStwo{\mbox{\sl S2}}
+\def\SolSthree{\mbox{\sl S3}}
+\def\SolSfour{\mbox{\sl S4}}
+\def\SolSfive{\mbox{\sl S5}}
 
 \begin{document}
 
 \maketitle
 
-\begin{abstract}
-The abstract goes here, and keywords in a new paragraph.
+\begin{abstract} 
+Typically, it is a daunting task for a database administrator (DBA) to devise a solution to partitioning a huge fact table accessed by query workloads, for better performance. To relieve such a burden for the DBA, we introduce an intelligent physical database designer to recommend an optimized partitioning on the fact table. This designer uses a greedy algorithm for search space enumeration. This space is driven by predicates of a given query workload. The designer takes advantage of the cost model of a query optimizer to prune the search space. The wizard resides completely on a client and interacts with the optimizer via APIs. Thus, there is no overhead to instrument the optimizer code. Furthermore, the predicate-driven method can be applied to any clustering or partitioning schemes. We show that the designer’s recommendation outperforms a human expert’s solution. We also demonstrate that the recommendation scale very well with increasing workload and growing fact table.
 
 \vspace{6pt}\textbf{Keywords:} keyword1, keyword2.
 \end{abstract}
@@ -38,8 +87,8 @@ The abstract goes here, and keywords in a new paragraph.
 The text of the paper\dots
 
 
-\bibliographystyle{splncs03}
-\bibliography{example}
+%\bibliographystyle{splncs03}
+%\bibliography{example}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
