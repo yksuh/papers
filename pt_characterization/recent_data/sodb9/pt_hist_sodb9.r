@@ -232,3 +232,24 @@ plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-4,max(x$PRTIM
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
 xlab='PT (ms)', ylab=expression('Frequency'))
 dev.off()
+
+### run on sodb12
+x = read.csv(file="../sodb12/4096_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("../sodb12/4096_sec_pt_hist_v5.eps")
+x <- subset(x, x$ITERNUM != 5 & x$ITERNUM != 26 & x$ITERNUM != 47 & x$ITERNUM != 68 & x$ITERNUM != 89 & x$ITERNUM != 110 & x$ITERNUM != 131 & x$ITERNUM != 152 & x$ITERNUM != 173 & x$ITERNUM != 195 & x$ITERNUM != 215 & x$ITERNUM != 236 & x$ITERNUM != 258 & x$ITERNUM != 278 & x$ITERNUM != 299) 
+x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
+x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
+x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
+xmax <- max(x$PRTIME)
+xmin <- min(x$PRTIME)
+nbins <- ceiling((xmax-xmin) / binsize)
+h = hist(x$PRTIME, right=F, breaks=nbins,plot=F)
+binsize=1
+ymax <- max(h$counts)
+ymax <- ceiling(ymax/100)*100
+ymax <- 15
+plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-4,max(x$PRTIME)+10),col="green", main='PT frequency on INC4096', 
+sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
+xlab='PT (ms)', ylab=expression('Frequency'))
+dev.off()

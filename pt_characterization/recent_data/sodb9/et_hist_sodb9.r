@@ -256,3 +256,25 @@ sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""),
 xlab='ET (ms)', ylab=expression('Frequency'))
 dev.off()
 
+### run on sodb12
+x = read.csv(file="../sodb12/4096_sec.dat",head=TRUE,sep="\t")
+setEPS()
+postscript("../sodb12/4096_sec_et_hist_v5.eps")
+x <- subset(x, x$ITERNUM != 5 & x$ITERNUM != 26 & x$ITERNUM != 47 & x$ITERNUM != 68 & x$ITERNUM != 89 & x$ITERNUM != 110 & x$ITERNUM != 131 & x$ITERNUM != 152 & x$ITERNUM != 173 & x$ITERNUM != 195 & x$ITERNUM != 215 & x$ITERNUM != 236 & x$ITERNUM != 258 & x$ITERNUM != 278 & x$ITERNUM != 299) 
+x_up = mean(x$METIME) + 2*sd(x$METIME)
+x_dn = mean(x$METIME) - 2*sd(x$METIME)
+binsize=5
+x = subset(x, x$METIME >= x_dn & x$METIME <= x_up)
+nbins <- ceiling((max(x$METIME)-min(x$METIME)) / binsize)
+h = hist(x$METIME, right=F, breaks=nbins,plot=F)
+xmin <-min(x$METIME)
+xmax <-max(x$METIME)
+ymax <- max(h$counts)
+ymax <- ceiling(ymax/100)*100
+ymax <- max(h$counts)
+ymax <- 50
+plot(h, freq=TRUE,ylim=c(0,ymax), xlim=c(xmin-50,xmax+50),col="blue", main='ET frequency on INC4096', 
+sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
+xlab='ET (ms)', ylab=expression('Frequency'))
+dev.off()
+
