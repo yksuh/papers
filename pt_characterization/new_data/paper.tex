@@ -49,21 +49,20 @@ Young-Kyoon Suh\\
 %% done
 \begin{table}[h]
 \begin{center}
-\begin{tabular}{|p{3cm}||p{9cm}|p{4cm}|} \hline
-Task Length & Description & Time Length\\ \cline{1-3}
-%\multicolumn{3}{|c|}{Regular INC experiment. Refer to Sections~\ref{sec:emp4_summary},~\ref{sec:empv4_hist}, and~\ref{sec:empv5_hist}.} \\ \hline
-INC1$\sim$INC64 & Runs of 1000 samples (on {\tt sodb12}). & 2013-10-14 $\sim$ 2013-10-15\\ \hline
-INC128$\sim$INC2048 & Runs of 300 samples (on {\tt sodb12}). & 2013-12-12 $\sim$ 2013-12-21\\ \hline 
-INC4096 & A run of 300 samples (on {\tt sodb12}). & 2014-06-23 $\sim$ 2014-07-10 \\ \hline 
+\begin{tabular}{|l|p{3cm}||p{5cm}|p{4cm}|} \hline
+Machine & Task Length (sec) & Description & Experiment Period\\ \hline
+\multirow{5}{*}{{\tt sodb12}}  & 1$\sim$64 & Each run with 1000 samples & 2013-10-14 $\sim$ 2013-10-15\\ \cline{2-4}
+& 128$\sim$2048 & Each with 300 samples & 2013-12-12 $\sim$ 2013-12-21\\ \cline{2-4}
+& 4096 & A run of 300 samples & 2014-06-23 $\sim$ 2014-07-10 \\ \cline{2-4}
 %INC4096 & A run of 40 samples (on {\tt sodb12}). & 2015-05-07 $\sim$ 2015-05-09  \\ \hline 
 %INC8192 & Runs of 40/260 samples (on {\tt sodb12}). & 2015-04-23 $\sim$ 2015-04-27 / 2015-10-31 $\sim$ 2015-11-24\\ \hline
-INC8192 & Runs of 40/40/40 samples (on {\tt sodb12}). & 2015-04-23 $\sim$ 2015-04-27 / 2017-01-16 $\sim$ 2017-01-20 / 2017-01-25 $\sim$ 2017-01-29\\ \hline
 %INC16384 & Runs of 40/260 samples (on {\tt sodb12}). & 2015-04-23 $\sim$ 2015-04-23 / 2015-11-25 $\sim$ 2016-01-14\\ \hline 
-INC16384 & Runs of 40/40/40 samples (on {\tt sodb12}). & 2015-04-23 $\sim$ 2015-04-23 / 2017-01-05 $\sim$ 2017-01-13 / 2017-01-29 $\sim$ 2017-02-06\\ \hline 
+& 8192 & A run of 40 samples & 2015-04-23 $\sim$ 2015-04-27 \\ \cline{2-4}
+& 16384 & A run of 40 samples& 2015-04-23 $\sim$ 2015-04-23 \\ \hline
 \end{tabular}
 \end{center}
 \vspace{-.2in}
-\caption{Notes on the regular INC data used for the histograms\label{tab:exp_notes1}}
+\caption{Notes on experiment runs used for histograms\label{tab:exp_notes1}}
 \end{table}
 
 %\clearpage
@@ -81,7 +80,7 @@ INC16384 & Runs of 40/40/40 samples (on {\tt sodb12}). & 2015-04-23 $\sim$ 2015-
         \includegraphics[scale=0.6]{overall_pt_re.eps}
         \label{fig:pt_re}
     }
-    \caption{Measurement Quality Comparison among the EMP versions: updated with INC4096's another run}
+    \caption{Measurement quality of EMP over increasing task length of a program-under-test (named INC)}
     \label{fig:emp_comp}
 \end{figure}
 
