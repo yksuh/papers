@@ -84,22 +84,28 @@ Typically, it is a daunting task for a database administrator (DBA) to figure ou
 \vspace{6pt}\textbf{Keywords:} Star Schema, Fact Table, Multi-Level Partitioning.
 \end{abstract}
 
-%\section{Introduction}
-%
-%The text of the paper\dots
-
 \section{Introduction}
 \label{sec:intro}
 
-Tables and materialized views in Teradata are hash distributed based 
+Over the past decades much attention has been paid 
+to improve the performance on analytical workloads in a data warehousing environment. 
+Typically, a relational database management system (\hbox{DBMS}) 
+has been exploited to process such analytical queries faster 
+and assist its customers to make a timely business-decision in 
+rapidly changing enterprise data warehousing.
+Teradata DBMS has been a leading database product in this data warehousing marketplace 
+that has been increasingly more competitive than ever.
+
+To optimize the performance of analytical processing, 
+tables and materialized views in the Teradata DBMS are hash-distributed based 
 on a user-specified column or set of columns called {\em primary index}. 
-Each virtual processor, a unit of parallelism called {\em AMP} in the \hbox{Teradata} \hbox{relational} 
-database management system (DBMS), 
+Each virtual processor, a unit of parallelism called {\em AMP} in 
+the \hbox{Teradata} \hbox{DBMS}, 
 receives a subset of the data and stores it in hash order. 
 
-Teradata users typically choose primary index fields, 
+Users typically choose primary index fields in the DBMS, 
 so that the data is evenly distributed among the AMPs. 
-The primary index fields are also chosen to \hbox{reflect} join fields 
+The primary index fields are also chosen to reflect join fields 
 in workloads to accomplish cheaper local joins that do not require 
 data shuffling. 
 
@@ -152,7 +158,7 @@ Note that the full table with modified data types was actually used in our exper
 }
 \end{center}
 \vspace{-0.2in}
-\caption{An Example of MLPPI Table\label{fig:exam}}
+\caption{An Example of an MLPPI Table in the Teradata DBMS\label{fig:exam}}
 \end{figure}
 
 In the definition of {\tt LINEORDER} in the figure, the primary index 
@@ -166,16 +172,16 @@ for all the other values, while \linebreak {\tt LO\_QUANTITY} has four ranges.
 As a result, the relational table will have a total of 2$\times$4 = 8 partitions as follows.
 
 \begin{center}
-\begin{tabular}{|c|p{6cm}|}\hline 
+\begin{tabular}{|c|l|}\hline 
 Partition & Condition \\ \hline
-1		& {\scriptsize  {\tt LO\_DISCOUNT >= 7 \&\& LO\_QUANTITY < 25}} \\ \hline
-2		& {\scriptsize  {\tt LO\_DISCOUNT >= 7 \&\& 25 <= LO\_QUANTITY <= 30}} \\ \hline
-3		& {\scriptsize {\tt LO\_DISCOUNT >= 7 \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
-4		& {\scriptsize {\tt LO\_DISCOUNT >= 7 \&\& LO\_QUANTITY no case}}\\ \hline
-5       & {\scriptsize {\tt LO\_DISCOUNT no case \&\& LO\_QUANTITY < 25}} \\ \hline 
-6		& {\scriptsize {\tt LO\_DISCOUNT no case \&\& 25 <= LO\_QUANTITY < 30}} \\\hline								  	        
-7		& {\scriptsize {\tt LO\_DISCOUNT no case \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
-8		& {\scriptsize  {\tt LO\_DISCOUNT no case \&\& LO\_QUANTITY no case}} \\ \hline
+1		& {{\tt LO\_DISCOUNT >= 7 \&\& LO\_QUANTITY < 25}} \\ \hline
+2		& {{\tt LO\_DISCOUNT >= 7 \&\& 25 <= LO\_QUANTITY <= 30}} \\ \hline
+3		& {{\tt LO\_DISCOUNT >= 7 \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
+4		& {{\tt LO\_DISCOUNT >= 7 \&\& LO\_QUANTITY no case}}\\ \hline
+5       & {{\tt LO\_DISCOUNT no case \&\& LO\_QUANTITY < 25}} \\ \hline 
+6		& {{\tt LO\_DISCOUNT no case \&\& 25 <= LO\_QUANTITY < 30}} \\\hline								  	        
+7		& {{\tt LO\_DISCOUNT no case \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
+8		& {{\tt LO\_DISCOUNT no case \&\& LO\_QUANTITY no case}} \\ \hline
 \end{tabular}
 \end{center}
 
@@ -207,7 +213,6 @@ $q$1:	& {\tt SELECT SUM(l.LO$\_$EXTENDEDPRICE*l.LO\_DISCOUNT)} \\
 		& {\tt AND d.D\_YEAR = `1993'} \\
 		& {\tt AND l.LO\_DISCOUNT IN (1, 4, 5)} \\
         & {\tt AND l.LO\_QUANTITY <= 30} \\ 
-		&						   \\	        
 $q$2:	& {\tt SELECT c.C\_NATION, SUM(l.LO\_REVENUE)} \\ 
 		& {\tt FROM CUSTOMER c, LINEORDER l} \\
 		& {\tt WHERE l.LO\_CUSTKEY = c.LO\_CUSTKEY} \\
@@ -215,7 +220,7 @@ $q$2:	& {\tt SELECT c.C\_NATION, SUM(l.LO\_REVENUE)} \\
 		& {\tt AND l.LO\_DISCOUNT >= 7} \\
 		& {\tt AND l.LO\_QUANTITY >= 25 AND l.LO\_QUANTITY <= 35} \\
 		& {\tt GROUP BY c.C\_NATION} \\
-		& {\tt ORDER BY revenue desc}. \\
+		& {\tt ORDER BY revenue desc} \\
 \end{tabular}
 }
 \end{center}
@@ -224,7 +229,7 @@ Let's now focus on the {\tt LINEORDER} fact table and
 the predicates involving {\tt LINEORDER} fields only. 
 There are five constraints identified by the query number 
 and the sequence number of the constraint in each query, as illustrated below.
-%\vspace{-0.05in}	
+\vspace{-0.03in}	
 \begin{center}
 \begin{tabular}{|c|l|}\hline 
 $q$1.1 & {\tt LO\_DISCOUNT IN (1,4,5)} \\ \hline
@@ -245,7 +250,9 @@ one solution is to identify each value
 for the {\tt IN} predicate in $q$1.1 
 and use $q$2.1 as is. This yields the following partitioning expression 
 for {\tt LO\_DISCOUNT}:
+
 \begin{center}
+{\footnotesize
 \begin{tabular}{l}
 {\tt CASE\_N(} \\
 \hspace{0.1in}{\tt LO\_DISCOUNT = 1,} \\
@@ -255,6 +262,7 @@ for {\tt LO\_DISCOUNT}:
 \hspace{0.1in}{\tt NO CASE OR UNKNOWN} \\
 {)}. \\
 \end{tabular}
+}
 \end{center}
 The above expression minimizes the size of the partitions 
 by focusing exactly on the values required to satisfy the constraints, 
@@ -306,8 +314,8 @@ to prune the search space and reach a final solution.
 \begin{figure*}[htp!]
 \centering
 \includegraphics[scale=0.5]{architecture}
-%\vspace{-0.2in}
-\caption{The MLPPI Wizard Architecture\label{fig:arch}}
+\vspace{-0.1in}
+\caption{The MLPPI wizard architecture\label{fig:arch}}
 \end{figure*}
 
 Figure~\ref{fig:arch} illustrates how our tool recommends 
@@ -357,21 +365,19 @@ predicates and costs, and uses these items to make a recommendation.
 This makes the wizard extensible and portable to different releases 
 of the Teradata DBMS server. 
 
-The article is a substantial extension of prior work~\cite{Suh12}, 
-and organized in the following way. 
-Section~\ref{sec:algorithms} presents the multi-level \hbox{partitioning} 
-algorithms for the wizard. 
-In turn, Section~\ref{sec:analysis} conducts an analysis of the complexity of 
-the algorithms. 
-Section~\ref{sec:experiment} reports the performance evaluation results. 
-Section~\ref{sec:related_work} states how \hbox{Teradata} MLPPI wizard 
-is different from some existing tools proposed by other vendors. 
-Lastly, Section~\ref{sec:conclusion} summarizes our discussion.
+The article is a substantial extension of prior work~\cite{Suh12}. 
+The rest of this article is \hbox{organized} in the following way. 
+In the following section we propose a \hbox{multi-level} partitioning algorithm---consisting of a series of phases---used by our MLPPI wizard, 
+which is applicable to any clustering or partitioning scheme in an arbitrary DBMS. 
+In turn, we conduct a detailed analysis of the complexity of the algorithms. 
+Next, we report the performance evaluation results. 
+We then elaborate on how our wizard is distinguished from several existing tools proposed by other DBMS vendors. 
+Finally, we conclude this article by summarizing our discussion.
 
 \section{The MLPPI wizard}
 \label{sec:algorithms}
 
-In this section we describe in detail each phase of the wizard using the query set $Q$ provided in Section~\ref{sec:intro}. 
+In this section we describe in detail each phase of the wizard using the query set $Q$ \hbox{provided} in Section~\ref{sec:intro}. 
 
 \subsection{The Preprocessing Phase}
 \label{sec:pre_phase}
