@@ -96,43 +96,44 @@ rapidly changing enterprise data warehousing.
 Teradata DBMS has been a leading database product in this data warehousing marketplace 
 that has been increasingly more competitive than ever.
 
+%\subsection{Background}
+%\label{sec:background}
+
+\paragraph{Background:} 
 To optimize the performance of analytical processing, 
 tables and materialized views in the Teradata DBMS are hash-distributed based 
 on a user-specified column or set of columns called {\em primary index}. 
 Each virtual processor, a unit of parallelism called {\em AMP} in 
 the \hbox{Teradata} \hbox{DBMS}, 
 receives a subset of the data and stores it in hash order. 
-
 Users typically choose primary index fields in the DBMS, 
 so that the data is evenly distributed among the AMPs. 
 The primary index fields are also chosen to reflect join fields 
-in workloads to accomplish cheaper local joins that do not require 
-data shuffling. 
+in workloads to accomplish cheaper local joins that do not require data shuffling. 
 
-PPI (Partitioned Primary Index)~\cite{sinclair:ppi} is an optional horizontal 
-partitioning scheme applied locally on each AMP's data. 
-Note that in other database products, this type of partitioning would 
-most likely to be called {\em clustering}. 
-In the rest article we use the term \hbox{{\em partitioning}} only, not clustering, to avoid confusion. 
+Partitioned Primary Index (PPI)~\cite{sinclair:ppi} is an optional horizontal 
+partitioning scheme applied locally on the data belonging to each AMP. 
+In some database products, this type of partitioning is termed {\em clustering}, 
+but hereafter we call the term \hbox{{\em partitioning}} only to avoid confusion.
 Database \hbox{administrators} (DBAs) usually choose the columns for PPI, 
 based on join fields and single table \hbox{predicates} to optimize the queries included 
 in the workload. 
-The PPI columns are used to physically cluster data with the same values 
+The PPI columns are used to physically group data with the same values 
 together in contiguous data blocks. 
-This allows ``partition elimination'' in scans and joins for performance improvement.
-PPI can be specified as single or multiple (or nested) levels. 
+This grouping enables ``partition elimination'' in scans and joins for performance enhancement.
+PPI can be specified as single or multiple levels. 
 This type of partitioning scheme is known as 
-Multi-Level PPI ({\em MLPPI)}~\cite{klindt09mlppi}.
+\hbox{Multi-Level} PPI ({\em MLPPI)}~\cite{klindt09mlppi}.
 
-By allowing non-qualified partitions to be eliminated, MLPPI can reduce 
-significantly the amount of data to be scanned to answer a query. 
+By allowing non-qualified partitions to be eliminated, MLPPI can considerably 
+reduce the amount of data to be scanned to answer a query. 
 But a large number of partitions can create significant overhead, 
 particularly in joins and table maintenance operations 
 such as inserts and deletes, so that the selection of partitions can be usually a balancing act. 
 
-Figure~\ref{fig:exam} exemplifies an MLPPI table with potential partitioning schemes. 
+Figure~\ref{fig:exam} exemplifies an MLPPI table with a defined partitioning option. 
 This example is a subset of the {\tt LINEORDER} table from the Star Schema Benchmark (SSB)~\cite{oneil:ssb}. 
-Note that the full table with modified data types was actually used in our experiments. 
+(Note that the full table with modified data types was actually used in our experiments.)
 
 \begin{figure}[t]
 \begin{center}
@@ -162,18 +163,19 @@ Note that the full table with modified data types was actually used in our exper
 \end{figure}
 
 In the definition of {\tt LINEORDER} in the figure, the primary index 
-is {\tt LO\_ORDERKEY}. 
-The \hbox{primary} index \hbox{dictates} the AMP on which a row will be located, 
+is on {\tt LO\_ORDERKEY}. 
+The \hbox{primary} index \hbox{dictates} the AMP on which a row will be located 
 while the partitioning of data will be dictated by the values and 
 ranges associated with {\tt LO\_DISCOUNT} and {\tt LO\_QUANTITY}. 
-{\tt LO\_DISCOUNT}, for example, has two ranges for \hbox{values} 
-greater than or equal to 7 and one ({\tt NO CASE OR UNKNOWN}) 
-for all the other values, while \linebreak {\tt LO\_QUANTITY} has four ranges. 
-As a result, the relational table will have a total of 2$\times$4 = 8 partitions as follows.
+For example, {\tt LO\_DISCOUNT} has two ranges: (i)~one for \hbox{values} $\geq$ 7 
+and (ii)~another for all the other values (or {\tt NO CASE OR UNKNOWN}). 
+{\tt LO\_QUANTITY} has four ranges. 
+Hence, the relation will have a total of 2$\times$4 = 8 partitions as follows.
 
 \begin{center}
+{\footnotesize
 \begin{tabular}{|c|l|}\hline 
-Partition & Condition \\ \hline
+Partition Number & Condition \\ \hline
 1		& {{\tt LO\_DISCOUNT >= 7 \&\& LO\_QUANTITY < 25}} \\ \hline
 2		& {{\tt LO\_DISCOUNT >= 7 \&\& 25 <= LO\_QUANTITY <= 30}} \\ \hline
 3		& {{\tt LO\_DISCOUNT >= 7 \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
@@ -183,27 +185,30 @@ Partition & Condition \\ \hline
 7		& {{\tt LO\_DISCOUNT no case \&\& 30 < LO\_QUANTITY <= 35}} \\ \hline
 8		& {{\tt LO\_DISCOUNT no case \&\& LO\_QUANTITY no case}} \\ \hline
 \end{tabular}
+}
 \end{center}
 
-Whatever partition set is chosen, 
+Whatever partition is chosen, 
 the selection must be semantically correct; namely, 
 the mapping of rows to partitions must be an injection. 
 In other words, the constraints must form a covering of 
 the entire range, so that a row will belong to exactly one and one partition. 
 The Teradata optimizer then applies \hbox{partition} elimination for queries 
 that specify conditions on {\tt LO\_DISCOUNT} and/or {\tt LO\_QUANTITY}. 
-For \hbox{example}, only partitions 1 and 2 are needed for the query 
+For \hbox{example}, only partitions~1 and~2 are needed for the query 
 ``{\tt SELECT * FROM LINEORDER WHERE LO\_DISCOUNT >= 7 AND} {\tt LO\_QUANTITY <= 30}.'' 
-Similarly, partitions 1 and 5 are sufficient to answer the query 
+Similarly, partitions~1 and~5 are sufficient to answer the query 
 ``{\tt SELECT * FROM LINEORDER WHERE LO\_QUANTITY < 25}.'' 
 \linebreak The respective sizes of the partitions are a factor of the data distribution. 
-To see MLPPI in greater detail, check our references~\cite{sinclair:ppi,klindt09mlppi}. 
+To see MLPPI in greater detail, check our references~\cite{klindt09mlppi,sinclair:ppi}. 
 
-Next, using the full version of {\tt LINEORDER} as defined in SSB~\cite{oneil:ssb} 
-we provide examples of partitioning schemes that 
-a DBA may define based on a small query set. 
-Consider a query set $Q$ consisting of two queries $q$1 and $q$2 from the SSB set~\cite{oneil:ssb}, as shown below.
+%\vspace{-.1in}
 
+%Next, using {\tt LINEORDER} defined in the SSB we provide examples of partitioning options that 
+%a DBA may define based on a small query set. 
+\paragraph{Challenge:}
+Consider a query set $Q$ having two queries $q$1 and $q$2 on the SSB, as shown below.
+\vspace{-.05in}
 \begin{center}
 {\small
 \begin{tabular}{rl}
@@ -223,34 +228,35 @@ $q$2:	& {\tt SELECT c.C\_NATION, SUM(l.LO\_REVENUE)} \\
 		& {\tt ORDER BY revenue desc} \\
 \end{tabular}
 }
+\vspace{-.01in}
 \end{center}
 
-Let's now focus on the {\tt LINEORDER} fact table and 
+A DBA may focus on the {\tt LINEORDER} fact table and 
 the predicates involving {\tt LINEORDER} fields only. 
-There are five constraints identified by the query number 
-and the sequence number of the constraint in each query, as illustrated below.
-\vspace{-0.03in}	
+He can figure out the following five constraints, identified by the query number 
+and the sequence number of predicates in each query: 
+\vspace{-.05in}
 \begin{center}
-\begin{tabular}{|c|l|}\hline 
-$q$1.1 & {\tt LO\_DISCOUNT IN (1,4,5)} \\ \hline
-$q$1.2 & {\tt LO\_QUANTITY <= 30} \\ \hline
-$q$2.1 & {\tt LO\_DISCOUNT >= 7} \\ \hline
-$q$2.2 & {\tt LO\_QUANTITY >= 25}\\ \hline
-$q$2.3 & {\tt LO\_QUANTITY <= 35} \\ \hline 
+\begin{tabular}{cl}
+$q$1.1: & {\tt LO\_DISCOUNT IN (1,4,5)} \\ 
+$q$1.2: & {\tt LO\_QUANTITY <= 30} \\ 
+$q$2.1: & {\tt LO\_DISCOUNT >= 7} \\ 
+$q$2.2: & {\tt LO\_QUANTITY >= 25}\\ 
+$q$2.3: & {\tt LO\_QUANTITY <= 35}. \\ 
 \end{tabular}
 \end{center}
-%\vspace{-0.05in}	
-At this point the DBA needs to consider options 
+\vspace{-.05in}
+At this point the DBA needs to take into account options 
 based only on two fields and the five constraints. 
-There are many possibilities from a {\em fine-grained} partition set 
-to a loser definition. 
+There are many other possibilities from a {\em fine-grained} partition set 
+to a {\em coarser-grained} definition. 
 
 Considering for the time being the column {\tt LO\_DISCOUNT}, 
 one solution is to identify each value 
 for the {\tt IN} predicate in $q$1.1 
 and use $q$2.1 as is. This yields the following partitioning expression 
 for {\tt LO\_DISCOUNT}:
-
+\vspace{-.05in}
 \begin{center}
 {\footnotesize
 \begin{tabular}{l}
@@ -265,12 +271,13 @@ for {\tt LO\_DISCOUNT}:
 }
 \end{center}
 The above expression minimizes the size of the partitions 
-by focusing exactly on the values required to satisfy the constraints, 
+by focusing exactly on the values required to satisfy the constraints 
 but creates a large number of small partitions. 
 
 Another possibility is to look at the maximum and minimum 
 values in the {\tt IN} set and to build an {\tt AND} clause equivalent to 
 a between clause yielding the following:
+\vspace{-.1in}
 \begin{center}
 \begin{tabular}{l}
 {\tt CASE\_N(} \\
@@ -279,41 +286,47 @@ a between clause yielding the following:
 \hspace{0.1in}{\tt NO CASE OR UNKNOWN} \\
 {)}. \\
 \end{tabular}
+\vspace{-.1in}
 \end{center}
 
 \noindent The above partitioning solution decreases the number of partitions, 
 compared to the previous solution but still focuses sharply on the constraints 
 with still relatively small partitions. 
 
-Another possibility is to use the partitioning associated with {\tt LO\_DISCOUNT} shown 
-in the beginning of this section with only two partitions. 
+(Another possibility would be to use the partitioning associated with {\tt LO\_DISCOUNT} shown 
+in the beginning of this section with only two partitions.)
 
-Similar considerations apply to the partitioning associated with {\tt LO\_QUANTITY} 
-this time with ranges and covering problems difficult to deal with. 
-The resulting partitioning scheme for the table includes both {\tt LO\_DISCOUNT}
-and {\tt LO\_QUANTITY}, so that the number of possible combinations is the product of 
+Similar considerations apply to the partitioning associated with {\tt LO\_QUANTITY}. 
+The resulting partitioning definition for the table includes both {\tt LO\_DISCOUNT}
+and \linebreak {\tt LO\_QUANTITY}, and thus the number of possible combinations is the product of 
 the potential combinations for each field. 
-Also, there are two queries, and one partitioning scheme may be better for one query or the other. 
-As a result, the DBA will be faced with a daunting combinatorial search problem 
-and no clear basis to decide on which combination is the best. 
-This state of affairs begs for a {\em tool} to assist the DBA.
 
-In the sequel, we introduce an automated tool, called {\em MLPPI wizard}. 
-Indeed, the \hbox{wizard} is the first physical database design tool 
-developed at Teradata.
-The tool is based on a novel technique using a greedy algorithm for 
-search space enumeration. 
-This tool based on a general framework allowing general expressions, 
-ranges and case expressions for \hbox{partition} \hbox{definitions} 
-is particularly well-suited for an MLPPI definition. \linebreak
-The {\em predicate-driven} \hbox{technique} used by the tool can be applied 
-to any clustering or partitioning based on simple fields and expressions or complex SQL predicates. 
+Furthermore, given two queries one partitioning scheme may be favorable for one query but not for the other, or vice versa. 
+As a result, the DBA becomes faced with a daunting combinatorial search problem 
+and no clear basis to decide on which combination is the best. 
+This state of affairs begs for a {\em tool} for the DBA.
+
+%\subsection{Solution: An Automated Partitioning Tool}
+%\label{sec:solution}
+\paragraph{Solution:} 
+To ease a burden of partitioning decision, 
+we introduce a novel physical database design tool, called {\em MLPPI wizard}, 
+designed to recommend an effective partitioning solution for a given workload.
+%Indeed, the \hbox{wizard} is the first physical database design tool 
+%developed at Teradata.
+This tool uses a greedy algorithm for search space enumeration 
+and is based on a general framework allowing general expressions, 
+ranges and case expressions for partition definitions. 
+%is particularly well-suited for an MLPPI definition. 
+We emphasize that the \hbox{predicate-driven} algorithm used by the tool can be applied 
+to {\em any} clustering or partitioning scheme based on simple fields and expressions or complex SQL predicates 
+in an {\em arbitrary} DBMS. 
 The wizard also borrows the optimizer's cost model 
 to prune the search space and reach a final solution. 
 
 \begin{figure*}[htp!]
 \centering
-\includegraphics[scale=0.5]{architecture}
+\includegraphics[scale=0.48]{architecture}
 \vspace{-0.1in}
 \caption{The MLPPI wizard architecture\label{fig:arch}}
 \end{figure*}
@@ -323,47 +336,49 @@ the final MLPPI customized for a given workload consisting of
 a set of queries and corresponding weights. 
 The wizard passes through a series of phases: {\em Preprocessing}, 
 {\em Initial}, and {\em Optimized} Phases. 
-In the preprocessing phase the tool produces the most granular partitioning (MGP) based on the predicates collected from every query.
+In the pre-processing phase the tool produces the most granular partitioning (MGP) based on the predicates collected from every query.
 In the initial phase the wizard refines the passed MGP 
 by merging a pair of partitions with the least {\em scan cost} (as will be explained in \hbox{Section~\ref{sec:init_phase}}) 
 and then yields an initial (feasible) MLPPI based on the refined partitions.
 In the \hbox{optimization} phase, the tool makes a further attempt to optimize the initial MLPPI. 
-We provide in greater \hbox{detail} each phase, 
-using the query set $Q$ consisting of $q$1 and $q2$ in the rest of the article.
+We elaborate in greater detail on each phase, 
+using the running query set $Q$ consisting of $q$1 and $q2$ in the rest of the article.
 
-\shorten{
-An initial MLPPI is produced through the top two phases reflecting practical constraints by field or partition. 
-It is further optimized in the last phase.
-In the preprocessing phase, 
-for each query its predicate(s) is extracted via an API call (on {\tt explain}) made to the server. 
-Then, the wizard produces the most granular partitioning (MGP) based on the 
-predicates collected from every query. 
-If the MGP has too many fields over a field count limit, 
-then the wizard \hbox{incrementally} throws away a field from the MGP until the limit. 
+%\shorten{
+%An initial MLPPI is produced through the top two phases reflecting practical constraints by field or partition. 
+%It is further optimized in the last phase.
+%In the preprocessing phase, 
+%for each query its predicate(s) is extracted via an API call (on {\tt explain}) made to the server. 
+%Then, the wizard produces the most granular partitioning (MGP) based on the 
+%predicates collected from every query. 
+%If the MGP has too many fields over a field count limit, 
+%then the wizard \hbox{incrementally} throws away a field from the MGP until the limit. 
+%
+%In the initial phase, the passed MGP gets reduced if it includes more partitions than a partition count limit allowed by an MLPPI. 
+%The refinement can be \hbox{incrementally} done by merging a pair of partitions 
+%with the least {\em scan cost} (as will be explained in \hbox{Section~\ref{sec:init_phase}}), 
+%until the limit. 
+%After the phase, an initial (feasible) MLPPI is produced based on the refined partitions.
+%
+%In the optimization phase, the tool makes a further attempt to optimize the initial MLPPI. 
+%Similar to the initial phase, more partitions can be reduced by merging ones with the 
+%least {\em query cost} (as will be described in Section~\ref{sec:opt_phase}). 
+%If the ongoing solution cannot be further improved, the tool makes the final MLPPI recommendation. 
+%We will provide more details about each phase later, 
+%using the query set $Q$ consisting of $q$1 and $q2$ 
+%in the rest of the article.}
 
-In the initial phase, the passed MGP gets reduced if it includes more partitions than a partition count limit allowed by an MLPPI. 
-The refinement can be \hbox{incrementally} done by merging a pair of partitions 
-with the least {\em scan cost} (as will be explained in \hbox{Section~\ref{sec:init_phase}}), 
-until the limit. 
-After the phase, an initial (feasible) MLPPI is produced based on the refined partitions.
-
-In the optimization phase, the tool makes a further attempt to optimize the initial MLPPI. 
-Similar to the initial phase, more partitions can be reduced by merging ones with the 
-least {\em query cost} (as will be described in Section~\ref{sec:opt_phase}). 
-If the ongoing solution cannot be further improved, the tool makes the final MLPPI recommendation. 
-We will provide more details about each phase later, 
-using the query set $Q$ consisting of $q$1 and $q2$ 
-in the rest of the article.}
-
-To the best of our knowledge, there is no existing industrial tool 
-to solve the {\it {\bf multi-level partitioning}} problem except our wizard. 
-The wizard is contained completely on the client side, as opposed to 
-previous work~\cite{agrawal04:integrating,Lightstone04:db2auto,nehme2011automated} 
-requiring optimizer code extension. 
+To the best of our knowledge, there is few extant industrial tool 
+to addressing the {\it {\bf \hbox{multi-level} partitioning}} problem, except our wizard. 
+The wizard resides completely on the client side as opposed to 
+several previous tools~\cite{agrawal04:integrating,Lightstone04:db2auto,nehme2011automated} 
+that require optimizer code instrumentation. 
 Our tool simply uses existing APIs to simplify the queries, capture fact table 
 predicates and costs, and uses these items to make a recommendation. 
-This makes the wizard extensible and portable to different releases 
-of the Teradata DBMS server. 
+%This makes the wizard extensible and portable to different releases 
+%of the Teradata DBMS server. 
+This \hbox{loosely-coupled} approach makes the wizard extensible and portable to different releases 
+of the database server. 
 
 The article is a substantial extension of prior work~\cite{Suh12}. 
 The rest of this article is \hbox{organized} in the following way. 
