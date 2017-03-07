@@ -293,8 +293,8 @@ a between clause yielding the following:
 compared to the previous solution but still focuses sharply on the constraints 
 with still relatively small partitions. 
 
-(Another possibility would be to use the partitioning associated with {\tt LO\_DISCOUNT} shown 
-in the beginning of this section with only two partitions.)
+%(Another possibility would be to use the partitioning associated with {\tt LO\_DISCOUNT} shown 
+%in the beginning of this section with only two partitions.)
 
 Similar considerations apply to the partitioning associated with {\tt LO\_QUANTITY}. 
 The resulting partitioning definition for the table includes both {\tt LO\_DISCOUNT}
@@ -306,8 +306,6 @@ As a result, the DBA becomes faced with a daunting combinatorial search problem
 and no clear basis to decide on which combination is the best. 
 This state of affairs begs for a {\em tool} for the DBA.
 
-%\subsection{Solution: An Automated Partitioning Tool}
-%\label{sec:solution}
 \paragraph{Solution:} 
 To ease a burden of partitioning decision, 
 we introduce a novel physical database design tool, called {\em MLPPI wizard}, 
@@ -326,7 +324,7 @@ to prune the search space and reach a final solution.
 
 \begin{figure*}[htp!]
 \centering
-\includegraphics[scale=0.48]{architecture}
+\includegraphics[scale=0.45]{architecture}
 \vspace{-0.1in}
 \caption{The MLPPI wizard architecture\label{fig:arch}}
 \end{figure*}
@@ -334,51 +332,41 @@ to prune the search space and reach a final solution.
 Figure~\ref{fig:arch} illustrates how our tool recommends 
 the final MLPPI customized for a given workload consisting of 
 a set of queries and corresponding weights. 
-The wizard passes through a series of phases: {\em Preprocessing}, 
+Until yielding a final partitioning recommendation, 
+the wizard passes through a series of phases: {\em Preprocessing}, 
 {\em Initial}, and {\em Optimized} Phases. 
-In the pre-processing phase the tool produces the most granular partitioning (MGP) based on the predicates collected from every query.
-In the initial phase the wizard refines the passed MGP 
-by merging a pair of partitions with the least {\em scan cost} (as will be explained in \hbox{Section~\ref{sec:init_phase}}) 
-and then yields an initial (feasible) MLPPI based on the refined partitions.
-In the \hbox{optimization} phase, the tool makes a further attempt to optimize the initial MLPPI. 
-We elaborate in greater detail on each phase, 
-using the running query set $Q$ consisting of $q$1 and $q2$ in the rest of the article.
-
-%\shorten{
-%An initial MLPPI is produced through the top two phases reflecting practical constraints by field or partition. 
-%It is further optimized in the last phase.
-%In the preprocessing phase, 
-%for each query its predicate(s) is extracted via an API call (on {\tt explain}) made to the server. 
-%Then, the wizard produces the most granular partitioning (MGP) based on the 
-%predicates collected from every query. 
-%If the MGP has too many fields over a field count limit, 
-%then the wizard \hbox{incrementally} throws away a field from the MGP until the limit. 
-%
-%In the initial phase, the passed MGP gets reduced if it includes more partitions than a partition count limit allowed by an MLPPI. 
-%The refinement can be \hbox{incrementally} done by merging a pair of partitions 
-%with the least {\em scan cost} (as will be explained in \hbox{Section~\ref{sec:init_phase}}), 
-%until the limit. 
-%After the phase, an initial (feasible) MLPPI is produced based on the refined partitions.
-%
-%In the optimization phase, the tool makes a further attempt to optimize the initial MLPPI. 
-%Similar to the initial phase, more partitions can be reduced by merging ones with the 
-%least {\em query cost} (as will be described in Section~\ref{sec:opt_phase}). 
-%If the ongoing solution cannot be further improved, the tool makes the final MLPPI recommendation. 
-%We will provide more details about each phase later, 
-%using the query set $Q$ consisting of $q$1 and $q2$ 
-%in the rest of the article.}
-
-To the best of our knowledge, there is few extant industrial tool 
-to addressing the {\it {\bf \hbox{multi-level} partitioning}} problem, except our wizard. 
-The wizard resides completely on the client side as opposed to 
+%In the pre-processing phase the tool produces the most granular partitioning (MGP) based on the predicates collected from every query.
+%In the initial phase the wizard refines the passed MGP 
+%by merging a pair of partitions with the least (scan) cost 
+%and then yields an initial (feasible) MLPPI based on the refined partitions.
+%In the \hbox{optimization} phase, the tool makes a further attempt to optimize the initial MLPPI. 
+We elaborate in greater detail on each of the three phases, 
+using the running query set $Q$ consisting of $q$1 and $q2$ in the rest of the article. 
+As illustrated in Figure~\ref{fig:arch}, the wizard resides completely on the client side as opposed to 
 several previous tools~\cite{agrawal04:integrating,Lightstone04:db2auto,nehme2011automated} 
 that require optimizer code instrumentation. 
-Our tool simply uses existing APIs to simplify the queries, capture fact table 
-predicates and costs, and uses these items to make a recommendation. 
+Our tool simply invokes the server's existing APIs used to simplify the queries, capture fact table 
+predicates, and estimate processing costs. 
 %This makes the wizard extensible and portable to different releases 
 %of the Teradata DBMS server. 
-This \hbox{loosely-coupled} approach makes the wizard extensible and portable to different releases 
-of the database server. 
+%This \hbox{loosely-coupled} interaction 
+%between both sides makes the wizard extensible and portable to different releases 
+%of the database server. 
+To the best of our knowledge, our wizard  
+is the very first physical database design tool 
+to address such a {\em \hbox{multi-level} partitioning} problem. 
+
+\paragraph{Contribution:} This article provides 
+the following contributions. 
+
+\begin{itemize}
+\item We propose a physical database design tool, termed MLPPI wizard, to recommend a multi-level partitioning definition 
+for reducing the processing cost of a given query workload on a star schema benchmark. 
+\item This tool is totally outside the database server, thereby incurring no overhead of instrumenting query optimizer's code.
+\item We empirically show that a partitioning recommendation of our tool outperforms that of human expert 
+over increasing workload size and growing fact table.
+
+\end{itemize}
 
 The article is a substantial extension of prior work~\cite{Suh12}. 
 The rest of this article is \hbox{organized} in the following way. 
