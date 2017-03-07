@@ -1648,7 +1648,7 @@ INSERT INTO EH_Analysis_RowCount_Ver1 (dbmsName, exprName, stepName, stepResultS
 	       COALESCE(count(*),0) as stepResultSize
 	FROM EH_Analysis_S5_II_TSM_Ver1
 	GROUP BY dbms, experimentname;
-
+--select sum(stepResultSize) from EH_Analysis_RowCount_Ver1 where stepName = 'EH_Analysis_S5_II_TSM_Ver1'
 -- Print out all query executions violating strict monotonicity 
 -- EH_Analysis_S5_II_SMVP_Ver1 : Exhaustive_Analysis_S5_II_Strict_Monotonicity_Violation_Printout_Ver1
 DROP TABLE EH_Analysis_S5_II_SMVP_Ver1;

@@ -20,6 +20,7 @@
 \usepackage{balance}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{subfigure}
 
 \definecolor{grey}{RGB}{200,200,200}
 \newcommand{\hilite}[1]{\colorbox{grey}{#1}}
@@ -172,7 +173,7 @@ IIS-0415101, and EIA-0080123.
 \maketitle
 
 \section{Introduction}\label{sec:intro}
-DBMSes underlie all information systems and hence optimizing their performance is of
+DBMSes underlie information systems and hence optimizing their performance is of
 critical importance. The DBMS's query optimizer plays an important role. But
 what if the optimizer {\em doesn't}: what if it selects the wrong plan?
 
@@ -216,11 +217,13 @@ The key contributions of this paper are as follows.
 \item We propose a {\em predictive model} for \hbox{DBMSes} to better
   understand the factors causing suboptimality.
 
-\item We test the seven quite specific hypotheses that arise from that
+\item We test the six quite specific hypotheses that arise from that
   model across a wide range of DBMSes, queries, and data.
 
-\item We show that the hypothesized interactions are \todo{Rick:check after Sabah} supported,
-  lending credibility to our particular model.
+\item We show through correlational and regression analysis that four
+  hypothesized interactions are strongly supported, one is partially supported, and
+  an interaction hypothesized to go one direction went quite weakly the
+  other direction, lending credibility to our particular model.
 
 \item Through an innovative
   analysis, we track the net cumulative benefit of a succession of operators
@@ -231,8 +234,9 @@ The key contributions of this paper are as follows.
 \item The predictive model and these experimental results suggest several specific
   engineering directions.
 
-\item A subsequent analysis implies that a new approach, fundamentally
-  different from that utilized over the paper forty years, may be required
+\item The model and analyses presented here taken as a whole imply that a
+  new approach to query optimization, fundamentally
+  different from that utilized over the last forty years, may be required
   to get past a fundamental limitation uncovered in this research.
 \end{itemize}
 
@@ -263,15 +267,6 @@ understand how existing query optimizers can be further improved, and
 indeed, whether  fundamental limitation inherent in these optimizers exist
 and whether such limitations are indeed already being encountered.
 
-\begin{figure*}[t]
-\centering
-%originally 30pc
-%\epsfig{figure=figures/plan769.pdf,width=36pc}
-\includegraphics[width=30pc]{figures/subopt_flutter.pdf}
-%\includegraphics[scale=0.42]{figures/subopt_flutter.pdf}
-\caption{An Example of Suboptimality and Fluttering\label{fig:query769}}
-\end{figure*}
-
 We focus here on the effectiveness of query
 optimization. The query optimization phase within a \hbox{DBMS} ostensibly finds the fastest
 query execution plan from a potentially large set of enumerated plans, all of
@@ -292,7 +287,7 @@ articulation and empirical testing of a general scientific theory.
 In Section~\ref{sec:related} we briefly summarize the vast amount of related
 work in query optimization to establish the technical basis for our study.
 The following section introduces the methodology we will follow, that of
-{\em empirical generalization}~\cite{cohenbook}. We then present in
+{\em empirical generalization}~\cite{cohenbook}. We present in
 Sections~\ref{sec:model} and~\ref{sec:operationalization} a predictive,
 causal model of suboptimality and state seven specific hypotheses derived
 from that model. We then test these hypotheses across a number of queries,
@@ -340,6 +335,15 @@ cardinalities. So Plan~P0 was chosen for 2M tuples, switching to Plan~P1 at
 the plan
 sequence P0, P1, P0, P1, P2, P0, P2, and finally P3 at 40,000 tuples.
 
+\begin{figure*}[t]
+\centering
+%originally 30pc
+%\epsfig{figure=figures/plan769.pdf,width=36pc}
+\includegraphics[width=30pc]{figures/subopt_flutter.pdf}
+%\includegraphics[scale=0.42]{figures/subopt_flutter.pdf}
+\caption{An Example of Suboptimality and Fluttering\label{fig:query769}}
+\end{figure*}
+
 The lower graph in Figure~\ref{fig:query769} indicates the query times
 executed at adjacent cardinalities when the plan changed, termed the
 ``query-at-cardinality'' (Q@C) time. For some transitions, the Q@C time at
@@ -377,6 +381,8 @@ many changes to a plan that was in fact suboptimal, as indicated in
 Figure~\ref{fig:suboptplanchanges}, across all four \hbox{DBMSes} considered.
 
 \begin{figure}[h!]\centering
+%\todo{Young: were is the figure!}
+\includegraphics[width=0.60\textwidth]{figures/org_ncpq.pdf}
 \caption{Cumulative percentage of queries \hbox{exhibiting} the \hbox{indicated}
   number of plan changes\label{fig:planchanges}}
 \end{figure}
@@ -794,10 +800,6 @@ is sensitive to the input size in a rather complex way. Any inaccuracy in
 the estimation of plan statistics may lead the optimizer to select a suboptimal
 plan.
 
-\vspace{0.6em}\noindent
-{\bf Hypothesis 4}: Plan space complexity (CEPS) and (a)~Number of operators
-with discontinuity and (b) Number of repeats will be positively correlated.
-
 \vspace{0.6em}
 Similarly, a plan chosen by the optimizer once will be reconsidered at a
 later cardinality and perhaps chosen, following
@@ -810,7 +812,8 @@ Then the larger CEPS, the more times the optimizer repeats using the same plans.
 We thus hypothesize that the number of repeats has a positive correlation with CEPS. 
 
 \vspace{0.6em}\noindent
-{\bf Hypothesis 5}: The Number of repeats will positively correlate with CEPS. 
+{\bf Hypothesis 4}: Plan space complexity (CEPS) and (a)~Number of operators
+with discontinuity and (b) Number of repeats will be positively correlated.
 
 \vspace{0.6em}
 The schema complexity construct consists of the variable ``Presence of
@@ -822,16 +825,17 @@ process. We hypothesize that this factor has a more complex role in the
 model, serving as a {\em moderator} of two interactions previously
 introduced. We hypothesize that the overall effect of the secondary indexes
 is to increase the strength of the interaction between query
-complexity to plan space complexity.
+complexity to plan space complexity. (Note that as the presence of primary
+key is required for secondary indexes, we don't include that former
+independent variable here.)
 
 \vspace{0.6em}\noindent
-{\bf Hypothesis 6}: Presence of secondary indexes will strengthen
+{\bf Hypothesis 5}: Presence of secondary indexes will strengthen
 the correlations between the Query Complexity construct, specifically, the
 variables Number of
-correlation names, Presence of aggregate, Presence of primary key
-attribute, and Presence of subquery, and
+correlation names, Presence of aggregate, and Presence of subquery, and
 the Plan Space Complexity construct, specifically, variables Number of repeats, CEPS, and Number
-of operators with discontinuity (correlations a--l listed above in
+of operators with discontinuity (correlations a--f and j--l listed above in
 Hypothesis 2).
 
 \vspace{0.6em}
@@ -844,14 +848,14 @@ more opportunities for suboptimality at some cardinality, just because the
 number of repeats is an indication that the query optimizer is struggling.
 
 \vspace{0.6em}\noindent
-{\bf Hypothesis 7}: Suboptimality will be positively correlated with Plan
+{\bf Hypothesis 6}: Suboptimality will be positively correlated with Plan
 space complexity, that is, (a)~Number of repeats, (b)~CEPS, and (c)~Number
 of operators with discontinuity.
 
 \vspace{0.6em}
 We have just {\em described} how
 suboptimality might arise, through a theory and its elaborated causal model,
-which implies seven specific hypotheses.
+which implies six specific hypotheses (some with multiple components).
 We now need to move to {\em prediction}.
 How might we test such a model? 
 
@@ -873,9 +877,9 @@ the plan space (number of repeats, CEPS, and number of discontinuous
 operators). There is 
 one dependent variable of our model (suboptimality).
 
-It is important to note that all manipulation must be done {\em
-  outside} the \hbox{DBMS}. For proprietary systems we do not have access to the
-internal code. We do not know ({\em cannot} know) all the plans that were
+It is important to note that manipulation must be done {\em
+  outside} the \hbox{DBMS}, as we do not have access to the
+internal code of proprietary DBMSes. Hence, we do not know ({\em cannot} know) all the plans that were
 considered, nor the details of how the plans are selected. But such access
 is not needed; indeed, to be able to study a phenomenon across many \hbox{DBMSes},
 such access is not practical. But by designing the experiment to examine
@@ -901,10 +905,10 @@ operators available increases, the complexity of the optimizer increases
 because it has to choose between more operators.
 
 The {\tt EXPLAIN PLAN} facility specifies the operators(s) \hbox{employed} in that
-plan. For each \hbox{DBMS}, we collect all the unique operators from all the plans
+plan. For each \hbox{DBMS}, we collect the unique operators from the plans
 and count the number of these distinct operators, each used by for least one
 query at at least one cardinality by that \hbox{DBMS}. The number of operators used
-by a \hbox{DBMS} ranged from 8 to 53 across all the queries and data sets
+by a \hbox{DBMS} ranged from 8 to 53 across the queries and data sets
 used in the Exhaustive, Exhaustive with Keys, and Exploratory Experiments,
 to be discussed in Section~\ref{sec:experiments}.
 
@@ -951,7 +955,7 @@ and the presence of subqueries is false (0).
 \shorten{In {\tt generateWhereClause()}, in which all the joins will appear,
   we}We ensure that Cartesian products are
 eliminated\c2j{.}{\shorten{({\tt cartesianPossible="false"})}}  We do this by
-connecting all the correlation names that appear in the FROM statement via
+connecting the correlation names that appear in the FROM statement via
 equi-joins on random attributes. The comparisons are all
 equality operators. To ensure that the queries are as simple as possible, we
 do not include any additional predicates in the WHERE clause.  \c2j{}{This
@@ -1042,7 +1046,7 @@ At the end, 10K spans, each with a single value, remain.
 
 What about a skew factor of 0.1? 
 This skew factor translates to 10 distinct values. 
-So we generate 200K spans, each with 10 values. 
+So we generate 200K spans, each with ten values. 
 To shorten, we delete 1,000 spans, which is equivalent to removing 10K values. 
 As before, this does not change the skew.
 At the end, the table will have 1,000 spans with 10K values, retaining a
@@ -1067,7 +1071,7 @@ This explanatory construct includes three variables.
 As discussed in Section~\ref{sec:model}, the ``cardinality of the effective plan
 space'' (CEPS) is the number of plans selected as optimal for that query
 being evaluated on one of the 200 cardinalities for the variable table. It
-is ``effective'' because it was chosen, as opposed to all of the
+is ``effective'' because it was chosen, as opposed to of the
 plans that were considered but not chosen. (Recall that for proprietary
 \hbox{DBMSes}, we do not have access to such plans.) Note that we count only
 distinct plans. As we saw in Figure~\ref{fig:query769}, fluttering queries
@@ -1105,7 +1109,7 @@ from the Exhaustive Experiment. We
 used a small subset of queries to be used later in testing the model, to
 attempt to observe the same operators as encountered in that
 study. We
-collected all query plans at all possible cardinalities (200 in all) and
+collected the query plan at each possible cardinalities (200 in all) and
 looked for ``jumps,'' that is, when the cost model for an operator in the
 plan exhibited discontinuity. Jumps are determined from the estimated cost
 extracted from each plan operator. We provide an example of a jump below. If
@@ -1128,7 +1132,8 @@ to 2M in steps of 10K, or 200 points).  Figure~\ref{fig:discontinuity}
 presents for a single query\shorten{({\em query4}, exhaustive-10q-1,
   oracle)}, the {\em cost} of each of the hash-join operators utilized in
 each plan at a particular cardinality. Each distinct point type depicts an
-individual hash-join operator. Note that when two identical query plans
+individual hash-join operator. \todo{Young: I don't understand what this
+  sentence adds'' Rick: Yes, please delete the sentence.}Note that when two identical query plans
 appear at two different cardinalities, we consider all the plan operators
 found at the same position within these two plans to be identical. This
 figure shows only a small portion of the 200 cardinalities, and is typical
@@ -1180,7 +1185,7 @@ cardinality) between each pair of adjacent cardinalities as
 $S_{\hbox{\small\em card}} = (C_{\hbox{\small\em card} + 10K} -
 C_{\hbox{\small\em card}}) / 10K$~.
 This computes a series of slope values.
-We then compute the standard deviation of all the slope
+We then compute the standard deviation of the slope
 values.  For example, examining Figure~\ref{fig:discontinuity}, the slopes
 are small except at three places, one for the green operator and two for the
 red operator. By identifying the slope values that are greater than one
@@ -1190,7 +1195,7 @@ observed in that operator in one of the plans for at least one of the input
 queries.
 
 \subsection{Suboptimality}\label{sec:suboptimality}
-We now consider the one dependent variable.
+We now consider the one dependent variable at the core of this investigation.
 How might suboptimality be observed? We have developed a system, \azdb, that
 allows us to perform experiments to study this phenomenon of suboptimality.
 \hbox{\azdb} submits queries to the \hbox{DBMS}, while varying
@@ -1205,13 +1210,12 @@ situations when a suboptimal plan was chosen, when in fact there was a
 different plan that was semantically equivalent to the chosen plan (that is,
 yielded the identical result) but which ran faster.
 
-We modify the cardinality to produce multiple execution
-plans for a given query. For one of the \hbox{DBMSes}, we can modify the stored
-table statistics directly. For the other \hbox{DBMSes}, we had to do so indirectly,
-by varying the size of the table and running the optimizer on tables of
-different size. As we vary the cardinality, we
-collects all the plans that the optimizer felt were appropriate for that
-query. 
+We modify the cardinality to produce multiple execution plans for a given
+query. For one of the \hbox{DBMSes}, we can modify the stored table
+statistics directly. For the other \hbox{DBMSes}, we had to do so
+indirectly, by varying the size of the table and running the optimizer on
+tables of different size. As we vary the cardinality, we collect the plans
+that the optimizer felt were appropriate for that query at the various cardinalities.
 
 Our definition of suboptimality assumes that
 actual execution time for any query plan is {\em monotonic non-decreasing}, that is,
@@ -1275,7 +1279,7 @@ cardinality C as $\sigma$, $Q$ is non-strict monotonic if $\forall p \in
 
 \vspace{1em}
 As we will see in Section~\ref{sec:experiments}, we observed only 3,347
-violations (0.73\%) of non-strict monotonicity, for the largest experiment
+violations (0.74\%) of non-strict monotonicity, for the largest experiment
 (Experiment 7: Confirmatory) across all
 the \hbox{DBMSes} we studied, justifying our conclusion that the \hbox{DBMSes} under
 study are indeed monotonic.
@@ -1306,7 +1310,7 @@ $\hbox{\em time}_{n-1} - 0.5 \cdot \hbox{\em stddev}_{n-1} \geq \hbox{\em
 time}_n + 0.5 \cdot \hbox{\em stddev}_n$~.\\
 At each Q@C pair, Suboptimality is coded as four levels (0--3), based on the distance in 
 standard deviations, up to three standard deviations (we chose this cutoff
-because 99.7\% of all Q@C pairs are less than or equal to three standard
+because 99.7\% of Q@C pairs are less than or equal to three standard
 deviations). 
 \shorten{\begin{itemize}
 \item Not suboptimal, i.e., 0, when
@@ -1331,7 +1335,7 @@ $$\hbox{\em time}_{n-1} - 1.5
 \end{itemize}
 
 \noindent}
-We then sum this value over all Q@C pairs with different plans
+We then sum this value over the Q@C pairs with different plans
 (the change points) to arrive at a single integer for the query instance.
 
 Note that while \azdb\ examines the plan at every cardinality, it only has
@@ -1382,16 +1386,16 @@ experiment, the Confirmatory experiment 7 discussed below, approximately
 10.5\% of the query executions and 5.1\%
 of the queries-at-cardinality (Q@Cs) were dropped due to query execution
 and Q@C sanity checks. As a result, excessive variation in calculated query
-time was observed in only 0.003\% of the Q@Cs. A total of 0.35\% of Q@C adjacent
-pairs violated relaxed monotonicity and 0.68\% of the Q@Cs violated strict
+time was observed in only 0.003\% of the Q@Cs. A total of 0.43\% of Q@C adjacent
+pairs violated relaxed monotonicity and 0.74\% of the Q@Cs violated strict
 monotonicity, which is acceptable.
 
 \doubleblind{In fact, over the course of the research described here, we
-  found that currently available techniques did not offer sufficient query time
+  found that currently available techniques for measuring query time did not offer sufficient query time
   precision, and so we developed TTPv1~\cite{TTPv1} to provide that needed
   precision. As our research in suboptimality proceeded, we realized that
-  to get a actually recognized suboptimality for two adjacent cardinalities
-  separated by only 10,000 rows (just a few pages), or even in the case of
+  to detect suboptimality for two adjacent cardinalities
+  separated by only 10,000 rows (just a few database pages), or even in the case of
   MySQL, 300 rows, we needed even finer resolution. This provided the
   impetus for the massive effort to develop TTPv2~\cite{TTPv2}, which did
   indeed provide the needed precision.}{We
@@ -1405,8 +1409,7 @@ executions that appear to be the result of query result caching. We also
 ensured within-run plan repeatability.
 
 In the following, we describe in detail the data used by our experiments and
-the experimental scenarios we defined. More details on the data sets and
-experiment scenarios used
+the experimental scenarios we defined. More details on both
 can be found in Appendix~\ref{sec:app}.
 
 \subsection{Data sets}\label{sec:datasets}
@@ -1442,13 +1445,13 @@ size of the tables and varied the cardinality from 60K (maximum) to 300
 Utilizing JDBC to manipulate independent variables from outside the
   \hbox{DBMS} allows us to empirically generalize by moving up the $y$ axis of
   Figure~\ref{fig:empirical}, from one system to several systems and then to
-  a general theory. We don't reveal the identity of the \hbox{DBMS} we studied, for two reasons. First, commercial \hbox{DBMSes}
+  a general theory. We don't reveal the identity of the \hbox{DBMSes} we studied, for two reasons. First, commercial \hbox{DBMSes}
 include in their user agreements requirements not to release 
 performance data. This is detrimental to science, but we have no choice but
 to live with that restriction. However, in some sense the specific \hbox{DBMS}
 doesn't matter, as we are studying phenomena about cost-based optimizers
-{\em in general}, and so are interested in making statements that apply to
-all the experimental subjects in our study.
+{\em in general}, and so are interested in making statements that apply across
+the experimental subjects in our study.
 
 \begin{table}[t]
 \tbl{Experiments 1--7: Detailed Run Statistics\label{tab:run_stat}}
@@ -1461,7 +1464,7 @@ all the experimental subjects in our study.
 & & & {\em Hours} & {\em Query Instances}&{\em of Q@Cs} &{\em of QEs}&{\em Retained QEs}\\
 \hline
 1 & Monotonicity 		& --- & 38 & 60 & 12,000 & 12,000 & 12,000\\
-2 & Initial Exhaustive 		& TTPv1 & 1,672 & 160 & 32,000 & 320,000 & 244,787\\
+2 & Refined Monotonicity 		& TTPv1 & 1,672 & 160 & 32,000 & 320,000 & 244,787\\
 3 & Exhaustive 			& TTPv2 & 1,544 & 160 & 32,000 & 320,000 & 319,980\\
 4 & Exhaustive with Keys 	& --- & 28 & 200 & 40,000 & --- & ---\\
 5 & Initial Exploratory 	& TTPv1 & 560 & 780 & 8,842 & 88,420 & 68,891\\%40512+26367+2012
@@ -1498,36 +1501,41 @@ to be much more sophisticated in our approach to timing queries.
 
 \doubleblind{After we developed our six-step TTPv1 protocol,}{When TTPv1
     became available,} we performed our
-second experiment, termed ``Initial Exhaustive,'' which more accurately tested the
-monotonicity assumption, as also described in Section~\ref{sec:suboptimality}.
+second experiment, termed ``Refined Monotonicity,'' which more accurately tested the
+(strict) monotonicity assumption, as also described in
+Section~\ref{sec:suboptimality}.\todo{Young: I don't see any such discussion
+  in that section..., Rick: Please take a look at the definition of the strict monotonicity assumption. We discuss this there.}
 This experiment involved 160 query instances, 32,000 \QatC s, and thus
-320,000 QEs, requiring 1,672 cumulative hours.  The (very small) percentage
+320,000 QEs, requiring 1,672 cumulative hours.  The (very small\todo{Young:
+  how much?, Rick: 1.55\%}) percentage % (16312+8215)/(995321+587546) = 1.55%
 of strict monotonicity violations observed was consistent with the remaining
 variance of the query time measurement, concluding that none of
 the \hbox{DBMSes} violated monotonicity. This also provides a validation of
 our definition of suboptimality, which requires monotonicity.
-
-We used the plans generated from Initial Exhaustive to classify operators as
-continuous or discontinuous, as discussed in detail in
-Section~\ref{sec:discontinuity}. Again we note that this experiment used a subset of
-the set of {\em queries} (but {\em not} query executions) from the query pool,
-to ensure that we see the same operators as encountered in that
-study.
 
 We later reran this experiment using TTPv2 (we term this simply
 ``Exhaustive''). Note that the number of retained QEs went up a lot (that is
 the main benefit of TTPv2), while the number of hours required actually
 went down (another benefit).
 
-We also ran an experiment (number 3 in the table) on the Exhaustive query set but using the data
-set with primary keys, termed ``Exhaustive with Keys.'' However, in this
+We then used the plans generated from the Exhaustive Experiment to classify operators as
+continuous or discontinuous, as discussed in detail in
+Section~\ref{sec:discontinuity}. Again we note that this experiment used a subset of
+the set of {\em queries} (but {\em not} query executions) from the query pool,
+to ensure that we see the same operators as encountered in that
+study.
+
+We also ran an experiment (termed ``Exhaustive with Keys'') on the Exhaustive query set but using the data
+set with primary keys,  However, in this
 case we did not actually execute 
 the queries, but rather just examined the plans that were returned from the
 \hbox{DBMS} to identify additional discontinuous operators. \comment{Thus this third
-experiment was very fast.}
+experiment was very fast.}\todo{Sabah:were any additional discontinous
+  operators found? Rick: I don't know about this. I redirect this question to Sabah.}
 
-The fourth experiment was for initial exploratory analysis of a prior
-version of the causal model. (This fourth experiment used
+\todo{Rick: Shouldn't this experiment  be before Experiment 3 (Exhaustive),
+  because it used TTPv1?}The fifth experiment was for initial exploratory analysis of a prior
+version of the causal model. (Note that this experiment used
 the first version of the Tucson Timing Protocol (TTPv1)~\cite{TTPv1}.)
 The earlier model had fewer independent
 variables yet also had more complex interactions. Specifically, the model
@@ -1583,10 +1591,11 @@ Again, we ran the \hbox{DBMSes} at the 99,558 {\QatC}s that were observed,
 roughly 13 per query. The protocol accurately timed
 both sides of adjacent {\QatC}s (53,547 change points in all).
 
-In this Confirmatory Experiment, we observed 3,347 strict monotonicity
+\todo{Young: these percentages  are different from those in Section 6.1. Why? Rick: A good catch. Those numbers are out-of-date: ones from the TODS metrology paper. I replaced them with the current numbers mentioned in this para. Now consistent.}In this Confirmatory Experiment, we observed 3,347 strict monotonicity
 violations (0.74\%), and 1,966 relaxed monotonicity violations (0.43\%) (out
 of a total of 452,684 pairs
-of two Q@Cs having identical plans and query instance), which provides
+of two Q@Cs having identical plans and query instance), \todo{Rick:merge
+  somehow with Section 6.1:}which provides
 further confidence that monotonicity also applies to operators found in
 queries over data in various contexts (as described above) and that our
 operationalization of suboptimality is a valid one.
@@ -1602,16 +1611,19 @@ experimental runs, summarized in Table~\ref{tab:run_stat}.
 
 Let illustrate the descriptive statistics with the Confirmatory
 experiment. In that experiment, we started with 7,640 query instances. These
-resulted in 99,558 Q@Cs, with 10 each query executions (QEs). There were 890,631
-retained QEs, which resulted in 6,983 retained query
-instances (equivalently, 657 query instances were dropped by the
-protocol). Additionally, 16 query instances were dropped {\em after} the
+resulted in 99,558 Q@Cs, each with ten query executions (QEs). Some of these
+QEs violated one or more of the (many) sanity checks specified within the
+TPPv1 and TTPv2 protocols, leaving a remaining 890,631
+retained QEs. Some of the query instances then voliated one or more of the
+Q@C sanity checks in the protocols (657 in all), leaving a remaining 6,983 retained query
+instances. Additionally, 16 query instances were dropped {\em after} the
 protocol because they were missing data for the only change point in the
-query. Therefore, we were left with 6,967 queries.
+query.
+
+Therefore, we were left with 6,967 queries, of which we make three general observations.
 
 First, perhaps surprisingly, 
-more than half (3,933 queries out of the 6,967
-query instances that emerged from the measurement protocol) exhibited suboptimality
+more than half (3,933 queries out of those that emerged) exhibited suboptimality
 somewhere in the range of cardinality of the varying table. 
 {\em Every} \hbox{DBMS} exhibits suboptimality.
 
@@ -1625,9 +1637,10 @@ querynum from CF_Analysis_SuboptDefn_Ver1 where subopt>=3);
 query used 7_10: select count(*) FROM (select distinct experimentid, experimentname, dbms, runid,
 querynum from Cnfm_Analysis_SuboptDefn where subopt_sd>=3);}
 
-This phenomenon (query suboptimality) is likely to be a fundamental aspect
-of either the algorithm (cost-based optimization) or the creator of the
-algorithm (human information processing). Our model includes both effects.
+The phenomenon of query suboptimality that we observed is likely to be a
+fundamental aspect of either the algorithm (cost-based optimization) or the
+creator of the algorithm (human information processing). Our model includes
+both effects.
 
 Third, concerning the causal factors of suboptimality in our model,
 \begin{itemize}
@@ -1639,50 +1652,23 @@ averaged 9.4, with 85 being the maximum, and
 \end{itemize}
  
 \subsection{Correlational Analysis}\label{sec:corr}
-We tested Hypotheses 1--7 using the strength and significance of correlations
-of variables involved. These hypotheses 
-predicts eleven positive relationships. Table~\ref{tab:hyptest} lists the hypotheses followed by the
-correlation observed when testing each hypothesis.  (``NS'' denotes not
-significant at the 0.05 level, the accepted standard for
-significance. ``---'' denotes no prediction arising from the model.)
-\todo{Sabah: update after filling out Table II:}As can
-be seen, most of the predictions (nine) arising from the causal model are
-supported and significant.  The two
-exceptions are Hypotheses 1 and 2. Hypothesis 1 was not supported because
-the correlation between number of operators available and suboptimality was negative,
-while we predicted positive correlation.  \hbox{Hypothesis}~2 was not significant.
-
-\subsection{Regression Analysis}\label{sec:regression}
-\todo{Sabah: revisit this entire section, with confirmatory analysis numbers}
-We ran a regression over the independent variables of the
-model that predict suboptimality over the data from the Confirmatory experiment. 
-Our model explained \% of the variance of the suboptimality dependent
-variable.
-
-We also did regressions on the causal variables for CEPS, number of repeats and for number of
-operators with discontinuity. Our model explained \% of the
-variance for CEPS, \% of the variance for number of repeats, and \% of the variance for
-discontinuity. \shorten{need path analysis} 
-
-Hypothesis 6 predicts that the presence of secondary indexes will be a moderator,
-strengthen the interactions between query complexity with plan space
-complexity. It thus provides
-predictions that the strength of such interactions will increase in the
-presence of secondary keys. When
-secondary indexes were not specified, our model explains 
-\shorten{\% of the variance
-of suboptimality,} \% of the variance of CEPS, and \% of the variance
-of discontinuity, with all of the independent variables. When
-secondary indexes were defined on the underlying tables, our model explains
-\% of the variance of suboptimality, \% of the variance of CEPS, and
-\% of the variance of discontinuity. These findings are all consistent with our
-hypothesis predicting a positive moderation effect of primary keys.
-
-Table~\ref{tab:hyptest8} shows that the strength of all interactions goes
-up as predicted, except for ones involving aggregates. Recall
-that the predictive model indicates weaker effects generally for aggregates,
-as they are evaluated late in the query, and the primary key attributes are
-not necessarily included in the grouping attributes.
+We tested Hypotheses 1--6 using the strength and significance of
+correlations of variables involved. These hypotheses predict 21 main effects
+and 12 moderating effects. Table~\ref{tab:hyptest} lists the hypotheses
+followed by the correlation observed when testing each hypothesis.  (``NS''
+denotes not significant at the $p < 0.05$ level, the accepted standard for
+significance. For each dependent variable, we used the Bonferroni correction
+to control the familywise error rate. ``---'' denotes no prediction arising
+from the model.)  As can be seen, most of the main effects (18) arising from
+the causal model are supported and significant.  The four exceptions are
+Hypotheses 1c, 2g, 2j, and 3. Hypothesis 1c was not supported because the
+correlation between Number of operators available and Number of operators
+with discontinuity was negative, while we predicted positive
+correlation. Similarly Hypothesis 3 was not supported because the
+correlation between Percentage of skewed data and Suboptimality was
+negative, while we predicted positive correlation. (In both cases, the
+strength of the negative correlation was small: -0.09 and -0.05, respectively.) \hbox{Hypotheses}~2g and
+2j, both involving Number of repeats, were not significant.
 
 \begin{table}[t]
 \tbl{Testing Hypotheses 1--7: Correlations on the Confirmatory Study\label{tab:hyptest}}{%
@@ -1691,15 +1677,15 @@ not necessarily included in the grouping attributes.
 \begin{tabular}{c|c|c|c|c}
 {\em Variable}& {\em Suboptimality}&{\em Repeats}&{\em CEPS} & {\em Discontinuity}\\
 \hline
-Operators in \hbox{DBMS} & ---&  {\bf H1a:}$-$0.16 & {\bf H1b:} & {\bf H1c:} \\
-Correlation names & {\bf }  & {\bf H2a:} 0.54 & {\bf H2b:}  &{\bf H2c:} 0.49\\
-Skew & {\bf H3:}  & --- & ---  & ---\\
-Presence of aggregate & & {\bf H2d:}  & {\bf H2e:}  & {\bf H2f:} \\
-Presence of primary key & & {\bf H2g:}  & {\bf H2h:}  & {\bf H2i:} \\
-Presence of subquery & & {\bf H2j:}  & {\bf H2k:}  & {\bf H2l:} \\
-Repeats& {\bf H7a:}  & --- & {\bf H5:}  & ---\\
-CEPS &  {\bf H7b:} 0. & {\bf H4b:} &  --- &{\bf H4a:}  \\
-Discontinuity & {\bf H7c:} 0.31 & --- & --- & ---\\
+Operators in \hbox{DBMS} & ---&  {\bf H1a:} 0.35 & {\bf H1b:} 0.27& {\bf H1c:} -0.09\\
+Correlation names & --- & {\bf H2a:} 0.17 & {\bf H2b:} 0.46 &{\bf H2c:} 0.34\\
+Presence of aggregate & -- & {\bf H2d:} 0.04 & {\bf H2e:} 0.10 & {\bf H2f:} 0.29\\
+Presence of primary key & -- & {\bf H2g:} NS & {\bf H2h:} 0.15 & {\bf H2i:} 0.14\\
+Presence of subquery & -- & {\bf H2j:} NS & {\bf H2k:} 0.26 & {\bf H2l:} 0.20\\
+Skew & {\bf H3:} -0.05 & --- & ---  & ---\\
+Repeats& {\bf H6a:} 0.62 & --- & --  & ---\\
+CEPS &  {\bf H6b:} 0.61 & {\bf H4b:} 0.45 &  --- &{\bf H4a:} 0.72 \\
+Discontinuity & {\bf H6c:} 0.47 & --- & --- & ---\\
 \end{tabular}
 }
 %\end{center}
@@ -1707,7 +1693,7 @@ Discontinuity & {\bf H7c:} 0.31 & --- & --- & ---\\
 \end{table}
 
 \begin{table}[t]
-\tbl{Testing Hypothesis 6: Interaction Strength on the Confirmatory Study\label{tab:hyptest8}}{%
+\tbl{Testing Hypothesis 5: Interaction Strength on the Confirmatory Study\label{tab:hyptest5}}{%
 %\begin{center}
 \resizebox{85mm}{!}{
 \begin{tabular}{c|c|c|c|c|c|c}
@@ -1716,15 +1702,72 @@ Discontinuity & {\bf H7c:} 0.31 & --- & --- & ---\\
 {\em }&{Not SI\em }&{SI\em }&{Not SI\em }&{SI\em }&{Not SI\em }&{SI\em }\\
 %&{\em }&{\em }&{\em }&{\em }\\
 \hline
-Correlation names &  & 0. &0. &0.  & 0. & 0. \\
-Presence of aggregate  & 0. & 0. & 0. & 0. & 0. & 0. \\
-Presence of primary key  &  & 0. & --- & --- & --- & --- \\
-Presence of subquery  &  & 0. & --- & ---  & --- & --- 
+Correlation names & 0.17 & 0.15 &0.49 &0.39  & 0.36 & 0.27 \\
+Presence of aggregate  & 0.04 & NS & 0.12 & NS & 0.31 & 0.22 \\
+Presence of primary key  & -0.03 & NA & 0.06 & NA & 0.09 & NA \\
+Presence of subquery  & 0.03 & NS & 0.18 & 0.17  & 0.14 & 0.13 
 \end{tabular}
 }
 %\end{center}
 }
 \end{table}
+
+\subsection{Regression Analysis}\label{sec:regression}
+Regression analysis is required to test Hypothesis 5, which predicts a positive
+moderation in the presence of query complexity, specifically the Number of
+correlation names, Presence of aggregate, and Presence of subquery
+independent variables. Thus our causal model predicts that the interaction
+strength should increase when secondary indexes appear in the realtional schema.
+In Table~\ref{tab:hyptest5}, we examine the interaction strength both when
+the secondary indexes are absent (``Not SI'') and when they are present
+(``SI''). As before, ``NS'' denotes no significant at the $p < 0.05$ level (three
+of these interactions beome not significant when secondary indexes are
+added). ``NA'' denotes inapplicable: as the Presence of primary key is
+required for secondary indexes, it is not possible to compute the
+interaction strength in the presence of secondary indexes.
+
+This table shows that the strength of all six applicable and significant
+interactions goes {\em down} just a little (on average by 0.05), which is
+opposite to our prediction. Hence, this negative moderation seems small but
+robust. One possibility is that rather than adding
+complexity, secondary indexes may have {\em reduced} the complexity of query
+optimization, since the role of secondary indexes within query optimization
+is well-understood.
+
+A second use of regression is to compute the amount of variance explained,
+as another way of testing the moderation effect.
+Hypothesis 5 thus predicts that the strength of the interactions between
+query complexity with plan space complexity will increase in the
+presence of secondary keys. When
+secondary indexes were not specified, our model explains 
+7.23\% of the variance of number of repeats, 40.9\% of the variance of CEPS, and 35.7\% of the variance
+of discontinuity\todo{Sabah: don't understand this ending phrase:}, with all of the independent variables. When
+secondary indexes were defined on the underlying tables, our model explains
+7.23\% of the variance of number of repeats, 41.1\% of the variance of CEPS, and
+38.9\% of the variance of discontinuity. These findings are all consistent with our
+hypothesis predicting a positive moderation effect of secondary
+indexes. Hence, the jury is still out on that hypothesis.
+
+A third use of regression is to compute the amount of variance explained
+for the intervening and dependent variables, to indicate how much of the
+underlying phenomena are explained holistically by the model.
+
+We did regressions on the causal variables for CEPS, number of repeats and for number of
+operators with discontinuity. Our model explained 41.1\% of the
+variance for CEPS, 7.23\% of the variance for number of repeats, and 38.9\% of the variance for
+discontinuity. \shorten{need path analysis} 
+
+We also ran a regression over the independent variables of the model that
+predict suboptimality over the data from the Confirmatory experiment. Our
+model explained 53.6\% of the variance of the suboptimality dependent
+variable. That means that over half of the variance of suboptimality is
+explained by the independent and intevening variables in our model, the ten
+variables within our five constructs of Optimizer Complexity, Schema
+Complexity, Query Complexity, Data Complexity, and Plan Space Complexity.
+
+To state this a different way, all other possible causes for suboptimality
+will in concert have less predictive power than the constructs and specific
+variables included in the causal model introduced here.
 
 \shorten{
 In our experiments, we noticed that some of the \hbox{DBMSes} might at
@@ -1742,16 +1785,16 @@ some variance in the cardinality dependent variable.
 To test this, we ran regressions on just the \hbox{DBMS} that was demonstrably {\em
   not} heuristic, for the common case of primary keys. Interestingly, only
 the presence of an aggregate and CEPS were significant at the 0.05 level, yet
-our model explains fully 53\% of the suboptimality variance (and 56\% of the
-CEPS variance and \todo{Sabah:??} of the discontinuity variance). This might imply
+our model explains fully \% of the suboptimality variance (and \% of the
+CEPS variance and \% of the discontinuity variance). This might imply
 that heuristic optimization itself introduces perhaps 10--20% of the variance.
 
 The size of the regression coefficients also provides useful
-information. From the regressions run on all of the data, for the
+information. From the regressions run on the data, for the
 statistically significant causal factors, the highest coefficients, all in
-predicting the suboptimality dependent variable, were CEPS at 0.42, number
-of tables involved at 0.23, number of discontinuous variables at 0.16,
-number of operators available in \hbox{DBMS} at 0.06. Note though that number of correlation
+predicting the suboptimality dependent variable, were CEPS at , number
+of tables involved at , number of discontinuous variables at ,
+number of operators available in \hbox{DBMS} at . Note though that number of correlation
 variables is highly correlated with CEPS; the regression will apportion the variance of the dependent
 variable among these factors.
 }
@@ -1759,7 +1802,7 @@ variable among these factors.
 \subsection{Summary of Model Testing}
 In our experimental design, we started with a structural causal model that
 encapsulates our theory for how cost-based query optimizers might select a
-suboptimal plan for a query at a cardinality. This model implies the seven
+suboptimal plan for a query at a cardinality. This model implies the six
 specific hypotheses listed in Section~\ref{sec:model}. We then performed
 six experiments,
 \begin{itemize}
@@ -1786,17 +1829,6 @@ utilize cost-based query optimization, to test
 our refined model. Statistical inference is only possible in confirmatory
 analysis, where the model and hypotheses are selected a priori.
 
-\todo{Sabah: update with final results:}
-Correlational analysis provides significant support for the model, except
-for Hypotheses 1 and 2, with the implication that the influence of the
-number of operators available remains largely unexplored. Via regression
-analysis, the model explains 34\% of the variance of suboptimality (overall:
-with primary keys a little lower and without primary keys a little higher
-due to that moderating effect), 31\% of CEPS, and 35\% of discontinuity. In
-all but one case, the causal influence of independent and latent variables is significant
-($p<0.05$). The direction of the regression coefficients, again in all but one
-case as predicted, also provides strong support for the model.
-
 Now that the causal model has been found to be supported by the confirmatory
 \hbox{analysis}, we turn to possible implications of this model.
 
@@ -1810,27 +1842,16 @@ improve \hbox{DBMSes} through engineering \hbox{efforts} that benefit from the f
 understanding that the scientific perspective can provide.
 
 \todo{Sabah: update with final numbers:}
-Our model includes three causal factors of suboptimality: \hbox{DBMS} optimizer
-complexity, query complexity, and plan space complexity. Of these factors,
-the regression \hbox{coefficient} that was highest was for CEPS
-(cf.~Table~\ref{tab:hyptest}: 0.51--0.54, normalized) The next \hbox{highest}
-regression factor was number of tables involved, which is highly correlated
-with CEPS (cf.~Table~\ref{tab:hyptest}: 0.54). These two observations imply that the
+Our model includes two causal factors of suboptimality: \hbox{DBMS} data complexity, and plan space complexity. Of these factors,
+the regression \hbox{coefficient} that was highest was for number of repeats (0.46, normalized). The next \hbox{highest}
+regression factor was CEPS (0.27, normalized). These two observations imply that the
 number of plans being considered is a major determinate of
 suboptimality, indicating that choosing among many plans is hard, despite
-many decades of research and development.
+many decades of research and development. \todo{Rick: Please confirm this paragraph is still valid}
 
 The next most influential factor is the number of discontinuous operators
-(cf.~Table~\ref{tab:hyptest8}: 0.40--0.41, normalized),
+(0.176, normalized),
 \hbox{implicating} the cost model.
-
-\shorten{Sabah, how does the following sound?}The one following that is the number of operators provided by the \hbox{DBMS}.
-This factor is totally correlated with the \hbox{DBMS}, and so
-is confounded with other specificities of the coding of each \hbox{DBMS}. That said,
-it is still the case that as the number of operators goes up, across
-all the \hbox{DBMSes} studied, the amount of suboptimality increases. This
-\hbox{factor} also strongly impacts CEPS, and so indirectly impacts suboptimality
-through that path.
 
 These factors implicate two broad root causes of suboptimality across \hbox{DBMSes}:
 (i)~the cost model and (ii)~the plan search process.
@@ -1890,7 +1911,7 @@ Let's then refine our Gedanken experiment. Let's assume each subsequent
 generation adds a single operator. Starting with a fixed set of queries,
 for each DBMS, we run each generation on each Q@C and then sum up the query
 times to compute a {\em per-generation (total) time} for that DBMS. We can
-also sum over all four DBMSes, to see how this  {\em overall per-generation
+also sum over the four DBMSes, to see how this  {\em overall per-generation
   time} (a single number for each generation number) varies with generation.
 
 The underlying question then becomes, does an additional operator made
@@ -1923,7 +1944,7 @@ start to level off as suboptimality becomes more prevalent (specifically,
 the prediction is that the second derivative is either. Eventually, the
 per-generation time will either asymptotically approach a horizontal line
 (with the first derivative approaching 0 from below), or worse: the first
-derivative changing to positive, with the per-generation time over the
+derivative will change to positive, with the per-generation time over the
 queries we are studying actually {\em increasing} with \hbox{DBMS}
 generation. In either case, the causal model predicts a point where {\em the
 \hbox{increase} in execution time due to suboptimality obviates the decrease
@@ -2038,7 +2059,6 @@ subsequent generation adds that operator that maximizes the number of plans
 that operator will eventual enable. So Generation 3 adds the Eq\_Ref operator,
 as that operator enables 633 plans eventually. Generation 4 adds the Ref
 operator and Generation 5 adds the Index operator. 
-involve all five operators.
 
 The generations of MySQL thus can be characterized from the Q@Cs we encountered: five distinct combinations of two
 operators, covering 1086 Q@Cs, six combinations of three operators (1126 Q@Cs),
@@ -2107,7 +2127,7 @@ for more plans (as some fraction of the previously generated plans will
 still be quite good or even optimal), and so less opportunity for flutter
 which will show up as a large maximum CPQ. And indeed, at generation 8,
 there is a query that has an astonishingly high number of change points,
-172, all within that generation.
+172, all waffling between plans within that generation.
 
 This analysis indicates that there is something concerning that seems to get
 critical around generation 8.  And indeed, for this data set, we'll see in
@@ -2378,9 +2398,9 @@ While the numbers jump around quite a bit, especially for the first few
 generations. The thing to focus on is the last column, where the cumulative
 relative delta starting off at a low of
 -0.28 (recall that low negative value is good, as it indicates the
-additional operator was effective at lowering the execution time) and slowly decreasing to -0.23:
+additional operator was effective at lowering the execution time) and slowly decreasing to -0.225:
 larger negative numbers trending to lower negative
-numbers.
+numbers, indicating decreasing benefits of optimization.
 
 This general behavior matches our prediction arising from the structural causal model that it
 gets harder to squeeze out performance gains as operators are added to the
@@ -2394,14 +2414,14 @@ points: those for which the
   relative deltas are positive, indicating a poor decision, as the query
   time increased. While there are
   still only a small number of change points, there are a greater number of
-  {\em suboptimal} change points, with more relatively showing up at more
+  {\em suboptimal} change points, with a relatively greater number showing up at more
   recent generations. But more strikingly, the cumulative relative delta has
   the opposite behavior to the non-suboptimal change points: it {\em
-    increases} over the generations, starting at 0.08 and ending at 0.25, a
+    increases} over the generations (indicating greater suboptimality), starting at 0.08 and ending at 0.25, a
   value {\em higher} than that of the non-suboptimal change points.
 
-The last column brings the non-suboptimal and suboptimal together, stating
-the {\em net cumulative relative delta}, gathering all of the change points
+The next-to-last column brings the non-suboptimal and suboptimal together, stating
+the {\em net cumulative relative delta}, gathering the change points
 with plans that would have been generated by that DBMS generation
 together. We see that the net starts out \hbox{at -0.24}, indicating that the new
 operators are {\em decreasing} the query time for the
@@ -2410,6 +2430,11 @@ each successive generation, the improvement is less. This is as predicted:
 the optimizer is struggling with both more options (plans over the available
 operators) to select from and a diminished opportunity to make a significant
 improvement.
+
+We also see that at Generation 10, the net actually becomes very slightly positive: meaning that the performance
+curve has hit a minimum and is now on its way up, towards slower
+performance. This trend increases in later generations.
+
 
 \begin{table}[t]
 \tbl{Non-Suboptimal Change Points\label{tab:non-subopt}}{%
@@ -2437,58 +2462,103 @@ improvement.
 }
 \end{table}
 
-\begin{table}
-[t]
+\begin{table}[t]
 \tbl{Suboptimal Change Points\label{tab:subopt}}{%
 %\begin{center}
-\begin{tabular}{c|c|c|c|c}
-{\em Generation}&{\em Number of} &{\em Average}&{\em Cumulative}&{\em Net Cumulative}\\
-& {\em Change Points} & {\em Relative Delta} & {\em Relative Delta}& {\em Relative Delta}\\
+\begin{tabular}{c|c|c|c|c|c}
+{\em Generation}&{\em Number of} &{\em Average}&{\em Cumulative}&{\em Net
+  Cumulative}&{\em Relative}\\
+& {\em Change Points} & {\em Relative Delta} & {\em Relative Delta}& {\em
+  Relative Delta}&{\em ``Performance''}\\
 \hline
-1 & --- & --- & 0.00&---\\
-2 & --- & --- & 0.00&---\\
-3 & --- & --- & 0.00&---\\
-4 & 2 & 0.2 & 0.2&-0.24\\
-5 & 211 & 0.076 & 0.077&-0.045\\
-6 & 86 & 0.16 & 0.102&-0.103\\
-7 & 263 & 0.303 & 0.196&-0.0800\\
-8 & 273 & 0.303 & 0.231&-0.0256\\
-9 & 3 & 0.04 & 0.230&-0.0257\\
-10 & 168 & 0.319 & 0.245&0.008\\
-11 & 639 & 0.237 & 0.242&0.0296\\
-12 & 53 & 0.35 & 0.245&0.0346\\
-13 & 12 & 0.40 & 0.246&0.0360\\
-{\em Cumulative} & 1710 & --- & 0.246&0.0360\\
+1 & --- & ---   & 0.00  &---   &---\\
+2 & --- & ---   & 0.00  &---   &--\\
+3 & --- & ---   & 0.00  &---   &0\\
+4 & 2   & 0.2   & 0.2   &-0.24 &-0.24\\
+5 & 211 & 0.076 & 0.077 &-0.045&-0.285\\
+6 & 86  & 0.16  & 0.102 &-0.103&-0.308\\
+7 & 263 & 0.303 & 0.196 &-0.0800&-0.388\\
+8 & 273 & 0.303 & 0.231 &-0.0256&-0.401\\
+9  & 3  & 0.04  & 0.230 &-0.0257&-0.426\\
+10 & 168& 0.319 & 0.245 &0.008&-0.426\\
+11 & 639& 0.237 & 0.242 &0.0296&-0.396\\
+12 & 53 & 0.35  & 0.245 &0.0346&-0.361\\
+13 & 12 & 0.40  & 0.246 &0.0360&-0.325\\
+{\em Cumulative}& 1710& ---  & 0.246 &0.0360&---\\
 \end{tabular}
 %\end{center}
 }
 \end{table}
 
-\begin{figure*}[t]
-%\centering
-%originally 30pc
-\includegraphics[width=30pc]{figures/gen_benefit.pdf}
-\caption{Cumulative Average Relative Delta over Generations\label{fig:benefit}}
-\end{figure*}
+The final column integrates the average relative delta to produce a unit-less
+{\em relative performance}, a simulation of how the four DBMSes together
+would have performed (say, total time) on the workload of the Confirmatory
+Experiment, or rather the 1378 change points selected by the criteria in
+Section~\ref{sec:usingCP}. (We emphasize that our experiment estimates just
+the first derivative of the performance graph, which is the net cumulative
+relative delta, and then only for a small
+number of Q@Cs, and then only as a relative measure, between -1 and 1. It is
+thus only very roughly indicative of the {\em shape} of the performance graph.)
+The relative performance gets better (faster, indicated by a falling
+value), but that trend again stops at generation 10, after which the
+relative performance actually gets worse (slower, indicated by a rising value).
 
-At Generation 10, the
-net actually becomes very slightly positive: meaning that the performance
-curve has hit a minimum and is now on its way up, towards slower
-performance. This trend increases in later generations.
+\begin{figure}
+    \subfigure[Cumulative Average Relative Delta over Generations]{
+        %\includegraphics[width=20pc]{figures/gen_benefit.pdf}
+        %\includegraphics[scale=0.56]{figures/gen_benefit.pdf}
+        %\includegraphics[width=19pc, height=5.5cm]{figures/gen_benefit.pdf}
+        \includegraphics[scale=0.735]{figures/gen_benefit.pdf}
+        \label{fig:benefit}
+    }
+    \hspace{-0.17in}
+    \subfigure[Performance over Generations]{
+        %\includegraphics[scale=0.6]{overall/machine_pt_re.eps}
+        %\includegraphics[width=12pc]{figures/perf_gen.pdf}
+        %\includegraphics[scale=0.56]{figures/perf_gen.pdf}
+        %\includegraphics[width=14.5pc, height=5.5cm]{figures/perf_gen.pdf}
+        \includegraphics[scale=0.735]{figures/perf_gen.pdf}
+        \label{fig:performance}
+    }
+    \caption{Trend of Performance Improvement over Generations}
+    \label{fig:machine_comp}
+\end{figure}
 
-Figure~\ref{fig:benefit} tells this story graphically, with the net benefit
-in the center, having a least squares slope of -0.024, which is consistent with the
-transition from a generation being net beneficial to actually being slightly
-suboptimal around generation 10 and more so at later generations.
+Figure~\ref{fig:benefit} and \ref{fig:performance} tell the story
+graphically. Figure~\ref{fig:benefit} plots the last column of
+Table~\ref{tab:non-subopt} as the top line (non-suboptimal cumulative
+relative data), the fourth column of Table~\ref{tab:subopt} as the bottom
+line (suboptimal cumulative relative delta), and the fifth column of
+Table~\ref{tab:subopt} as the middle line (net cumulative relative delta)
+in the center. This middle line has a least squares slope of -0.024, which
+is consistent with the transition from a generation being net beneficial to
+actually being slightly suboptimal around generation 10 and more so at later
+generations. Figure~\ref{fig:performance} plots the last column of
+Table~\ref{tab:subopt}, the relative performance across generation. This
+illustrates visually that the performance time falls (gets better) until
+around generation 10, after which adding an operator might have an overall
+detrimental impact, actually slowing down the query.
+
+In summary, the engineering perspective in Section~\ref{sec:gedanken}
+predicts that the overall per-generation time would ``monotonically decrease
+as the generations add query evaluation operators.'' The scientific
+perspective reaches the opposite conclusion: ``the
+per-generation time will either asymptotically approach a horizontal line
+(with the first derivative approaching 0 from below), or worse: the first
+derivative will change to positive, with the per-generation time over the
+queries we are studying actually increasing with \hbox{DBMS}
+generation. In either case, the causal model predicts a point where the
+\hbox{increase} in execution time due to suboptimality obviates the decrease
+enabled by the new operator.'' The results of this study clearly support
+the latter (cf.~Figure~\ref{fig:performance}).
 
 This highly aggregated result, extracting 3000-odd change-point pairs having
 the specified properties of interest stated in Section~\ref{sec:trends} and
-drawn from almost \hbox{100-thousand} Q@Cs implies that these four particular
-\hbox{DBMSes}, taken together, might be close to or have already hit the wall, where
-adding an operator actually slows down the average query.
-
-And we recall the analysis in Section~\ref{sec:CPQ} in which a related
-problem cropped up around generation 8.
+drawn from almost \hbox{100-thousand} Q@Cs implies that these four
+particular \hbox{DBMSes}, taken together, might be close to or have already
+hit the wall, where adding an operator actually slows down the average
+query. And recall the analysis in Section~\ref{sec:CPQ} in which a
+related problem cropped up around generation 8.
 
 It is important to emphasize that we can't say whether any of these DBMSes have actually
 transitioned to where, for this class of queries, the errors of the
@@ -2501,17 +2571,19 @@ strongly point to a decreasing benefit and an increasing cost. as predicted
 by the simple arguments made above, and (b)~if current DBMSes haven't yet
 reached the point of diminishing returns, that possibility exists.
 
-We should also reiterate all the provisos mentioned earlier. In all of these
-experiments, we are looking at
-quite simple queries, over a quite limited range of data, with only a small
-percentage (3\%) of change points identified in our experimental
-protocol. On the other hand, simpler queries are thought to be easier to
-generate good plans than more complex queries (as Hypothesis 2 in
-Section~\ref{sec:interactions} states), relational data is generally much less uniform
-in its structure (e.g., we used only integer data), values (the values in our
-tables are quite evenly distributed), schema (the schemas of our tables
-are identical and extremely simple), and range of sizes (the smallest table is 1/200-th of the
-largest table); all of these factors should independently, and certainly in concert, minimize the suboptimality.
+We reiterate the provisos mentioned earlier. In all of these
+experiments, we are looking at quite simple queries, over a quite limited
+range of data, with only a small percentage (3\%) of change points
+identified in our experimental protocol. On the other hand, simpler queries
+are thought to be easier to generate good plans than more complex queries
+(as Hypothesis 2 in Section~\ref{sec:interactions} states). Also, relational
+data is generally much less uniform in its (i)~data types (we used only
+integer data), (ii)~values (the values in our tables are quite evenly
+distributed), (ii)~schemas (the schemas of our tables are identical and
+extremely simple), and (iii)~range of table cardinalities (the smallest
+table is 1/200-th of the largest table). The simpliciy of queries, schemas,
+and tables should independently, and certainly in concert, minimize the
+suboptimality.
 
 \section{Engineering Implications}\label{sec:engineering}
 We studied a particular
@@ -2633,7 +2705,7 @@ The generational study in Section~\ref{sec:diminishing} though implies that
 the challenge in daunting. That study validates the implications of the
 causal model in Figure~\ref{fig:model}, which correctly predict  the almost
 inexorable rise in net cumulative relative delta, which implies that the
-suboptimizer will eventually hit the wall where it is no longer improving.
+optimizer will eventually hit the wall where it is no longer improving.
 
 We emphasize that this section of this paper, considering engineering
 implications of the underlying causal model, contrasts with the rest of the
@@ -2647,6 +2719,12 @@ This paper studies an important
 component of a \hbox{DBMS}, the query optimizer. This component is an amazingly
 sophisticated piece of code, but is still not well understood after decades
 of research and development.
+
+While there has been a wealth of research over the last forty years on
+engineering approaches and refinements to improve the performance of query
+optimization, this is the first paper to the authors' knowledge that focuses
+on {\em suboptimality} and the first to take a scientific approach (in the
+sense of {\em empirical generalization} towards this important aspect.
 
 This paper makes the following contributions in
 an \hbox{attempt} to gain new understanding of this
@@ -2669,7 +2747,7 @@ perspective} that treats \hbox{DBMSes} as experimental subjects within {\em empi
 \doubleblind{\item Utilizes a novel {\em research infrastructure}, \azdb, to express, run, and
   analyze experiments.}{}
 
-\item Tests {\em seven hypotheses} deductively derived from the predictive causal model. A
+\item Tests {\em six hypotheses} deductively derived from the predictive causal model. A
 correlational analysis and a regression analysis
 provided {\em strong support} for our model, across \hbox{DBMSes}, thus
 qualitatively confirming what was informally known.
@@ -2721,7 +2799,7 @@ directed engineering efforts.
 \section{Future Work}\label{sec:future}
 There are several directions this work could be take. \todo{RICK IS HERE}With the model refinements
 we propose here, additional directed pointers to engineering efforts should
-emerge.\todo{Rick:DOn't say ``we'', but just say the research needs to be done}
+emerge.\todo{Rick:Don't say ``we'', but just say the research needs to be done}
 
 \todo{Rick: keep following shorten?}\shorten{restate: Again, the purpose of our work is to present
   a methodological perspective that can be further improved to study more
@@ -2765,7 +2843,10 @@ be rewritten into joins with the outer level).
 It would also be interesting to study how a suboptimal subquery can affect
 the suboptimality of the containing query.  For instance, is it true that if
 many subqueries are themselves suboptimal, does that causally impact whether
-the overall query is suboptimal? Finally, we may be able to determine
+the overall query is suboptimal? It would also be useful to look at the
+moderation effect for Presence of secondary indexes: why precisely do these seem to
+actually decrease plan space complexity, and does this moderation continue
+as queries get more complex? Finally, we may be able to determine
 whether certain query rewrite techniques are employed within each \hbox{DBMS},
 introducing another ``\hbox{DBMS} complexity'' factor into our model.
 
@@ -3021,14 +3102,12 @@ M.~Winslett, ``David DeWitt Speaks Out,'' {\em ACM SIGMOD
 \newpage
 \appendix
 \section{Details on the Experiments}\label{sec:app}
-Table~\ref{tab:run_stat} lists the run statistics of the seven experiments
-  used in this paper. In this appendix we provide more detailed information
-  on the experiments.
+Table~\ref{tab:run_stat} in Section~\ref{sec:experiments} lists the run statistics of the seven experiments
+  used in this \hbox{paper}. In this appendix we provide more detailed information
+  on the experiments, walking through the columns in succession of
+Table~\ref{tab:run_stat2}, given below.
 
-Table~\ref{tab:run_stat2} gives some of those details. We'll walk through
-the columns in succession.
-
-The third column states the data set used in each experiment, that is, the
+The third column identifies the data set(s) used in each experiment, that is, the
 specific tables being queried. There are four data sets, named A, B, C, and
 D.
 
@@ -3036,9 +3115,9 @@ We first discuss the features shared between the four data sets. As
 introduced in Section~\ref{sec:motivation}, the queries referenced tables
 {\tt ft\_HT1}, {\tt ft\_HT2}, {\tt ft\_HT3}, and {\tt ft\_HT4}. All four
 tables contain four columns, each of type integer. The specific values of
-the rows \todo{Young: is this correct?:}for all but the first column depend
+the rows for all but the first column depend
 on the percentage of skewed data. Section~\ref{sec:datacomplexity} provides
-the algorithm for generated the values for different values of skew; this
+the algorithm for generating the values for different values of skew; this
 algorithm is used in columns two--four, which for any row will have
 identical values. The first column holds a unique integer starting from 1
 and going to 60K or 2M, for use in an optional primary key.
@@ -3075,12 +3154,14 @@ TTPv1.  Version 6.0 also implemented TTPv1, but collected more query
 measures that were not relevant for this paper. Version 7.1 implemented
 TTPv2.
 
-The \hbox{\azdb\ system also includes support} for {\em experiment scenarios}, which
-are Java code that actually performs the experiment, such as varying the
+The \hbox{\azdb\ system also includes support} for {\em experiment
+  scenarios}, each of which
+is a small amount~ (a few hundred lines) of Java code that actually performs the experiment, such as varying the
 cardinality and running different queries on the data. The only difference
 in the scenario code across these experiments was in accommodating the
 details of the data set (that is, creating secondary indexes and data skew)
-and adding robustness features, such as using exponential backoff when the
+\todo{Young:was this in the scenario code? It seems that this should be
+  outside of that: Rick: Yes, this is part of the scenario code. Specifically, if the presence of secondary indexes is true, or the presence of data skew is false, then in the scenario code an experiment subject creates the indexes or makes no skew when populating tables. After table population is done, the code studies each query, or detects a change point and makes query executions at that change point.}and adding robustness features, such as using exponential backoff when the
 network connection to the DBMS was temporarily lost.
 
 The bottom line is that while the lab shelf and experiment scenario varied
@@ -3105,12 +3186,12 @@ Table~\ref{tab:run_stat} dropped query executions and Q@Cs via its many
 \resizebox{140mm}{!}
 {
 \begin{tabular}{c|c|c|c|c|c|c}
-& {\em Experiment}& {\em Data Sets} & {\em Lab Shelves} & {\em What was} &{\em Was query}&{\em Number of}\\
+& {\em Experiment}& {\em Data Sets} & {\em Lab Shelves} & {\em What was} &{\em Was Query}&{\em Number of}\\
 &                 & {\em Used}      &                   & {\em Examined?}&{\em Timed?}   &{\em Retained (Raw)}\\
 &&&&&& {\em Q@Cs}\\
 \hline
 1 & Monotonicity 	& A & 6.0     &all cardinalities&yes& 12,000 (12,000)\\
-2 & Initial Exhaustive 	& A & 5.19 + 6.0&all cardinalities&yes& 27,948 (32,000)\\
+2 & Refined Monotonicity& A & 5.19 + 6.0&all cardinalities&yes& 27,948 (32,000)\\
 3 & Exhaustive 		& A & 7.1     &all cardinalities&no & 29,515 (32,000)\\
 4 & Exhaustive with Keys & B& 6.0     &change points   &no& --- \\
 5 & Initial Exploratory & A + B&5.19 + 5.2 + 6.0&change points&yes& 8,171 (8,842)\\
@@ -3124,60 +3205,61 @@ Table~\ref{tab:run_stat} dropped query executions and Q@Cs via its many
 
 The following sets of queries were used in the seven experiments.
 
-\todo{Young: how does the following look? Any changes needed?}
 \begin{description}
-\item[QSa] 100 queries over the four tables, generated as described in Section~\ref{sec:querycomplexity}
-\item[QSb] 100 queries, generated the same way
-\item[QSc] 100 queries
-\item[QSd] 100 queries
-\item[QSe] 100 queries
-\item[QSf] 100 queries
-\item[QSg] 100 queries
-\item[QSh] 100 queries
-\item[QSi] 100 queries
-\item[QSj] 100 queries
-\item[QSl] A primary key query set consisting of 230 queries from {\em
-  QSa}--{\em QSf}
-\item[QSm] A primary key query set consisting of 160 queries: 40 queries
-  drawn from each of {\em QSg}--{\em QSj}
-%\item[QSlm] A primary key query set consisting of 390 queries from QSl and QSm
-\item[QSn] A primary key query set consisting of 110 new queries
-\item[QSo] A no-skew query set consisting of 100 queries without aggregates
-  for no skew\todo{Young: skew is an aspect of the {\bf data}, not the queries...}
-\item[QSp] A subquery query set consisting of 100 queries, each with a subquery
-\item[QSq] A subquery query set consisting of 100 queries, each with a subquery
-\item[QSr] A \todo{Young: isn't this redundant?:}primary key query set consisting of 100 queries drawn from {\em
-  QSl} and {\em QSm}
-\item[QSab'] 100 queries drawn from {\em QSa} and {\em QSb} for which the where
-     selection involved a primary key column
-\todo{Young what does this mean (from your notes): ``This query set was revised to QSI and
-  QSm.''? Also, it doesn't seem like this set is used anywhere...}
+\item[QSa] 100 queries over the four tables, generated as described in Section~\ref{sec:querycomplexity} (on Data Set A)
+\item[QSb] 100 queries (on Data Set A)
+\item[QSc] 100 queries (on Data Set A)
+\item[QSd] 100 queries (on Data Set A)
+\item[QSe] 100 queries (on Data Set A)
+\item[QSf] 100 queries (on Data Set A)
+\item[QSg] 100 queries (on Data Set A)
+\item[QSh] 100 queries (on Data Set A)
+\item[QSi] 100 queries (on Data Set A)
+\item[QSj] 100 queries (on Data Set A)
+\item[QSl] A query set consisting of 230 queries drawn from \hbox{\em
+  QSa}--{\em QSf} (on Data Set B)
+\item[QSm] A query set consisting of 160 queries: 40 queries
+  drawn from each of {\em QSg}--{\em QSj} (on Data Set B)
+\item[QSn] A query set consisting of 110 new queries (on Data Set B)
+\item[QSo] A query set consisting of 100 queries without aggregates (on Data
+  Set C)\todo{Young: are these new queries, or drawn from prior query sets? Rick: New queries.}
+\item[QSp] A subquery query set consisting of 100 queries, each with a subquery (on Data Sets A, B, and D)
+\item[QSq] A subquery query set consisting of 100 queries, each with a subquery (on Data Set D)
+\item[QSr] A query set consisting of the 390 queries in {\em QSl} + {\em QSm} (on Data Set B)
+%\item[QSs] A primary key query set consisting of 100 queries drawn from {\em QSr}
+\item[QSs] A query set consisting of 100 queries drawn from {\em QSr} (on Data Set D)
 \end{description}
 
 Experiment 1 (Monotonicity) used the first 50 queries from QSa
 for one DBMS plus the first six queries from QSa and two queries each from
 {\em QSd} and {\em QSe} for MySQL, for a total of 60 query instances.
 
-Experiment 2 (Initial Exhaustive) used the first 50 queries from {\em QSa}
+Experiment 2 (Refinded Monotonicity) used the first 50 queries from {\em QSa}
 for the three other DBMSes plus the ten queries for MySQL from Experiment 1, for
 a total of 160 query instances. Experiment 3 (Exhaustive) used the same 160 queries.
 
 Experiment 4 (Exhaustive with Keys) used the first 50 queries from {\em QSa}
-for all four DBMSes, for a total of 200  query instances.
+for the four DBMSes, for a total of 200  query instances.
 
 Experiment 5 (Initial Exploratory) used the (100) queries from {\em
   QSa}--{\em QSf} (for
 one DBMS), the first 20 queries from {\em QSa}--{\em QSf} (for another DBMS), the first
-10 (primary key) queries from {\em QSa} (for all four DBMSes), and the first 10
+10 (primary key) queries from {\em QSa} (for the four DBMSes), and the first 10
 (non-primary key) queries from {\em QSa} (for the other two DBMSes), for a total of 780 query instances.
 
 Experiment 6 (Exploratory) used {\em QSa} and {\em QSb}, plus the first 100 (primary
-key) queries from {\em QSl} and {\em QSm}, for all four DBMSes, for a total of 1200 query
-instances. 
+key) queries from {\em QSr}, for the four DBMSes, for a total of 1200 query
+instances.
 
-Experiment 7 (Confirmatory) used {\em QSc}--{\em QSr}, along with {\em QSp} for primary key and
-subquery, {\em QSp} for subquery, {\em QSp} and {\em QSq} for primary key and secondary index and
-subquery), all across all four DBMSes, for a total of 7,640 query instances.
+Experiment 7 (Confirmatory) used {\em QSc}--{\em QSj},
+along with {\em QSr} except the (first 100) queries included in Experiment 6,
+{\em QSn} for primary key (for two runs, or 220 queries),
+{\em QSo} for no data skew,
+{\em QSp} for primary key and subquery,
+{\em QSp} for subquery,
+{\em QSp} and {\em QSq} for primary key and secondary index and subquery,
+{\em QSs} for primary key and secondary index,
+all across the four DBMSes, for a total of 7,640 query instances.
 
 \shorten{
 \newpage
