@@ -380,14 +380,18 @@ Finally, we conclude this article by summarizing our discussion.
 \section{The MLPPI wizard}
 \label{sec:algorithms}
 
-In this section we describe in detail each phase of the wizard using the query set $Q$ \hbox{provided} in Section~\ref{sec:intro}. 
+As illustrated in Figure~\ref{fig:arch}, 
+the MLPPI wizard has the three phases for a final partitioning recommendation. 
+In this section we delve into each phase. For better exposition we use the running 
+query set $Q$ \hbox{provided} in Section~\ref{sec:intro}.
 
 \subsection{The Preprocessing Phase}
 \label{sec:pre_phase}
 
-Algorithm~\ref{algo:pre_phase} sketches 
-the steps in the preprocessing phase. 
-This phase consists of a total of six steps. 
+The first phase is called {\em Preprocessing} 
+to extract query predicates and check any constraint in partitioning. 
+This phase consists of a total of six steps, as shown in Algorithm~\ref{algo:pre_phase}. 
+%We elaborate on each step in the subsequent section.
 
 \vspace{-.1in}
 
@@ -414,22 +418,22 @@ This phase consists of a total of six steps.
 
 \subsubsection{Query Simplification}
 
-The first step of this phase is to simplify the predicate(s) of each query 
-by removing redundant conditions. 
+The first step is to simplify the predicates of queries in a given workload.
+In other words, we remove redundant conditions among the queries. 
 For instance, if a query predicate has the condition of 
 ``{\tt LO\_DISCOUNT IN (1, 4, 5) AND LO\_DISCOUNT IN (2, 3, 4, 5)}'', 
-then the predicate can be simplified as ``{\tt LO\_DISCOUNT IN (4, 5)}.'' 
-This can be done via an API call to the DBMS server. 
-In the running example this simplification is not required. 
+then the predicate can be simplified as \linebreak ``\hbox{{\tt LO\_DISCOUNT}} {\tt IN (4, 5)}.'' 
+This can be done via an API call to the database server. 
+This simplification is not required for the running example.
 
 %\vspace{-.3in}
 
 \subsubsection{Range Extraction}
 
-The following step is to gather the simplified predicates and 
-then obtain ranges from the collected predicates. 
-This can also be done through an API call to the server. 
-The query predicate is of the form  
+In the subsequent step we gather the simplified predicates and 
+then extract ranges from the collected predicates. 
+This task can also be conducted through an API call to the server. 
+The query predicate is of the form 
 \begin{center}
 \begin{tabular}{l} 
 \form{\tt variable} \form{\tt op} \form{\tt constant},
