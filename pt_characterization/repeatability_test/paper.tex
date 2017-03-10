@@ -1,0 +1,66 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+ \usepackage{auto-pst-pdf}
+\usepackage{graphicx}
+%\usepackage{arydshln}
+\usepackage{ifpdf}
+\ifpdf
+  \usepackage{epstopdf}
+\fi
+\usepackage{multirow}
+\usepackage{epsfig}
+\usepackage{float}
+\usepackage{url}
+\usepackage{color}
+\usepackage{subfigure}
+
+%\newcommand\solidrule[1][1cm]{\rule[0.5ex]{#1}{.4pt}}
+%\newcommand\dashedrule{\mbox{%
+%  \solidrule[2mm]\hspace{2mm}\solidrule[2mm]\hspace{2mm}\solidrule[2mm]}}
+  
+%\usepackage{hyperref}
+
+\begin{document}
+\title{A Study of Experiment Repeatability}
+
+\author{
+Young-Kyoon Suh\\
+}
+\maketitle
+
+\section{Description}
+This document presents histograms rendered based on empirical data 
+of a program under test, called {\em INC}. 
+Our experiment increases a task length of {\em INC} 
+from one second to 4096 seconds by a factor of two.
+We already ran this experiment last month (February 2017), 
+but we reran the experiment this month (March 2017) 
+to check if experiment repeatability holds true.
+
+\section{Experiment Notes}
+Table~\ref{tab:exp_notes} provides a short description of our experimental runs, 
+on which the following histograms are based.
+
+%% done
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|p{2cm}|p{3cm}|p{6cm}|p{4cm}|} \hline
+Machine & Task Length (sec) & Description & Experiment Period\\ \hline
+{\tt sodb9} &  INC1$\sim$INC512 & Each run with 1000 samples & 2017-03-02 $\sim$ 2017-03-07\\ \hline
+%{\tt sodb10} & INC2048 & A run of 300 samples & 2017-02-12 $\sim$ 2017-02-20\\ \hline
+%{\tt sodb12} & INC4096 & A run of 300 samples & 2017-02-12 $\sim$ 2017-02-27\\ \hline
+%{\tt sodb12} & INC8192 & Two runs, each with 40 samples & 2017-01-16 $\sim$ 2017-01-20 / 2017-01-25 $\sim$ 2017-01-29\\ \hline
+%{\tt sodb12} & INC16384 & Two runs, each with 40 samples & 2017-01-05 $\sim$ 2017-01-13 / 2017-01-29 $\sim$ 2017-02-06\\ \hline 
+\end{tabular}
+\end{center}
+\vspace{-.2in}
+\caption{Notes on experiment runs used for histograms\label{tab:exp_notes}}
+\end{table}
+
+Now we show histograms of elapsed time (ET) and process time (PT) of INC. 
+
+\newpage
+
+\input{sodb9/res.tex}
+
+\end{document}

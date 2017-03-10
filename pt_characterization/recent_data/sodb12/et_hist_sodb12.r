@@ -8,7 +8,7 @@ x <- subset(x, x$ITERNUM > 40)
 x <- subset(x, x$ITERNUM != 84 & x$ITERNUM != 95 & x$ITERNUM != 105 & x$ITERNUM != 116 & x$ITERNUM != 45 & x$ITERNUM != 56 & x$ITERNUM != 66 & x$ITERNUM != 77)
 x_up = mean(x$METIME) + 2*sd(x$METIME)
 x_dn = mean(x$METIME) - 2*sd(x$METIME)
-binsize=10
+binsize=20
 x = subset(x, x$METIME >= x_dn & x$METIME <= x_up)
 nbins <- ceiling((max(x$METIME)-min(x$METIME)) / binsize)
 h = hist(x$METIME, right=F, breaks=nbins,plot=F)
@@ -17,7 +17,7 @@ xmax <-max(x$METIME)
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
 ymax <- max(h$counts)
-ymax <- 10
+ymax <- 20
 plot(h, freq=TRUE,ylim=c(0,ymax), xlim=c(xmin-50,xmax+50),col="blue", main='ET frequency on INC8192', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
 xlab='ET (ms)', ylab=expression('Frequency'))

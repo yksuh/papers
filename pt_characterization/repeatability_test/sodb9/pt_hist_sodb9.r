@@ -1,5 +1,5 @@
 ### sodb9
-numSamples <- 300
+numSamples <- 1000
 x = read.csv(file="1_sec.dat",head=TRUE,sep="\t")
 x <- subset(x, x$ITERNUM <= numSamples)
 setEPS()
@@ -33,7 +33,7 @@ nbins <- ceiling((max(x$PRTIME)-min(x$PRTIME)) / binsize)
 h = hist(x$PRTIME, right=F, breaks=nbins,plot=F)
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
-ymax <- 250
+ymax <- 700
 xmin <-min(x$PRTIME)
 xmax <-max(x$PRTIME)
 plot(h, axes = TRUE,freq=TRUE,ylim=c(0,ymax), xlim=c(xmin-1,xmax+1),col="green", main='PT frequency on INC2', 
@@ -53,7 +53,7 @@ x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
 h = hist(x$PRTIME, right=F,breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
-ymax <- 200
+ymax <- 400
 binsize=1
 plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-2,max(x$PRTIME)+4),col="green", main='PT frequency on INC4', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
@@ -64,14 +64,13 @@ x = read.csv(file="8_sec.dat",head=TRUE,sep="\t")
 x <- subset(x, x$ITERNUM <= numSamples)
 setEPS()
 postscript("8_sec_pt_hist_v5.eps")
-x <- subset(x, x$ITERNUM != 27)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
 x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
 x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
 h = hist(x$PRTIME, right=F,breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
-ymax <- 100
+ymax <- 400
 binsize=1
 plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-4,max(x$PRTIME)+4),col="green", main='PT frequency on INC8', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
@@ -82,7 +81,6 @@ x = read.csv(file="16_sec.dat",head=TRUE,sep="\t")
 x <- subset(x, x$ITERNUM <= numSamples)
 setEPS()
 postscript("16_sec_pt_hist_v5.eps")
-#x <- subset(x, x$ITERNUM != 686 & x$ITERNUM != 700)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
 x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
 x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
@@ -90,7 +88,7 @@ h = hist(x$PRTIME, right=F,breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
 binsize=1
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
-ymax <- 100
+ymax <- 400
 plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-8,max(x$PRTIME)+8),col="green", main='PT frequency on INC16', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
 xlab='PT (ms)', ylab=expression('Frequency'))
@@ -100,7 +98,7 @@ x = read.csv(file="32_sec.dat",head=TRUE,sep="\t")
 x <- subset(x, x$ITERNUM <= numSamples)
 setEPS()
 postscript("32_sec_pt_hist_v5.eps")
-#x <- subset(x, x$ITERNUM != 284 & x$ITERNUM != 291 & x$ITERNUM != 727 & x$ITERNUM != 732 & x$ITERNUM != 734)
+x <- subset(x, x$ITERNUM != 433)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
 x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
 x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
@@ -108,7 +106,7 @@ h = hist(x$PRTIME, right=F,breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
 binsize=1
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
-ymax <- 100
+ymax <- 300
 plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-15,max(x$PRTIME)+9),col="green", main='PT frequency on INC32', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
 xlab='PT (ms)', ylab=expression('Frequency'))
@@ -118,7 +116,6 @@ x = read.csv(file="64_sec.dat",head=TRUE,sep="\t")
 x <- subset(x, x$ITERNUM <= numSamples)
 setEPS()
 postscript("64_sec_pt_hist_v5.eps")
-#x <- subset(x, x$ITERNUM != 85 & x$ITERNUM != 89 & x$ITERNUM != 308 & x$ITERNUM != 312 & x$ITERNUM != 437 & x$ITERNUM != 437 & x$ITERNUM != 531 & x$ITERNUM != 535 & x$ITERNUM != 754 & x$ITERNUM != 758 & x$ITERNUM != 977 & x$ITERNUM != 981)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
 x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
 x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
@@ -126,7 +123,7 @@ h = hist(x$PRTIME, right=F,breaks=max(x$PRTIME)-min(x$PRTIME)+1,plot=F)
 binsize=1
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
-ymax <- 100
+ymax <- 250
 plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-9,max(x$PRTIME)+8),col="green", main='PT frequency on INC64', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
 xlab='PT (ms)', ylab=expression('Frequency'))
@@ -136,7 +133,7 @@ x = read.csv(file="128_sec.dat",head=TRUE,sep="\t")
 x <- subset(x, x$ITERNUM <= numSamples)
 setEPS()
 postscript("128_sec_pt_hist_v5.eps")
-#x <- subset(x, x$ITERNUM != 90 & x$ITERNUM != 202)
+x <- subset(x, x$ITERNUM != 26)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
 x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
 x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
@@ -147,7 +144,7 @@ h = hist(x$PRTIME, right=F, breaks=nbins,plot=F)
 binsize=1
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
-ymax <- 60
+ymax <- 50
 plot(h, ylim=c(0,ymax), axes = TRUE,freq=TRUE,xlim=c(min(x$PRTIME)-4,max(x$PRTIME)+5),col="green", main='PT frequency on INC128', 
 sub=paste("(n=",nrow(x),", bin_size=",binsize,"ms)",sep=""), 
 xlab='PT (ms)', ylab=expression('Frequency'))
@@ -156,7 +153,7 @@ dev.off()
 x = read.csv(file="256_sec.dat",head=TRUE,sep="\t")
 setEPS()
 postscript("256_sec_pt_hist_v5.eps")
-x <- subset(x, x$ITERNUM != 188)
+x <- subset(x, x$ITERNUM != 199)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
 x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
 x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
@@ -176,15 +173,15 @@ dev.off()
 x = read.csv(file="512_sec.dat",head=TRUE,sep="\t")
 setEPS()
 postscript("512_sec_pt_hist_v5.eps")
-x <- subset(x, x$ITERNUM != 111 & x$ITERNUM != 279)
+x <- subset(x, x$ITERNUM != 114 & x$ITERNUM != 186 & x$ITERNUM != 285)
 x_up = mean(x$PRTIME) + 2*sd(x$PRTIME)
 x_dn = mean(x$PRTIME) - 2*sd(x$PRTIME)
 x = subset(x, x$PRTIME >= x_dn & x$PRTIME <= x_up)
 xmax <- max(x$PRTIME)
 xmin <- min(x$PRTIME)
+binsize=2
 nbins <- ceiling((xmax-xmin) / binsize)
 h = hist(x$PRTIME, right=F, breaks=nbins,plot=F)
-binsize=2
 ymax <- max(h$counts)
 ymax <- ceiling(ymax/100)*100
 ymax <- 80
