@@ -432,14 +432,14 @@ This simplification is not required for the running example.
 
 In the subsequent step we gather the simplified predicates and 
 then extract ranges from the collected predicates. 
-This task can also be conducted through an API call to the server. 
+This task can also be performed through an API call to the server. 
 The query predicate is of the form 
 \begin{center}
 \begin{tabular}{l} 
 \form{\tt variable} \form{\tt op} \form{\tt constant},
 \end{tabular}
 \end{center}
-where \form{\tt variable} is a field from {\tt LINEORDER}, 
+where \form{\tt variable} is a field (column) from {\tt LINEORDER}, 
 \form{\tt op} is in 
 \begin{center}
 \begin{tabular}{l} 
@@ -466,11 +466,11 @@ $p$4: {\tt l.LO\_QUANTITY >= 25} {\tt AND} {\tt l.LO\_QUANTITY <= 35}. \\
 
 %\vspace{-.15in}
 
-In turn, the wizard constructs a bi-directional {\em map} between a query and 
-associated predicates, so that for each query the corresponding predicate(s) can be 
-found directly in the map, and vice versa. 
-In the example, a map, called $M$1, is built 
-between $Q$ and $P$, and $M$1 is filled with the following entries:
+Next, we construct a bi-directional {\em map} between a query and 
+associated predicates, so that for each query the corresponding predicate(s) 
+can be found directly in the map, and vice versa. 
+In the example, we get a map, called $M$1, built between $Q$ and $P$. 
+$M$1 gets filled with the following entries:
 
 $M$1:
 \begin{center}
@@ -480,16 +480,14 @@ $M$1:
 \end{tabular}
 \end{center}
 
-Next, we gather fields referenced by predicates in $P$, extract 
-ranges from the predicates, and group the ranges on each of the fields. 
+For each field referenced by the predicates, 
+we then build a set of distinct ranges on that field. 
+Specifically, we gather fields referenced by predicates in $P$, extract 
+ranges from the predicates, and group the ranges of each of the referenced fields. 
 Assume $I$ to be the list of fact table fields referenced by $P$. 
-In the workload $Q$, we can see that there are two fields used by $P$: 
-{\tt LO\_DISCOUNT}, {\tt LO\_QUANTITY}. 
-These are added to $I$. 
-
-After that, we construct a set of distinct ranges on each field in $I$, using the predicates in $P$. 
-Then, the whole range set becomes a kind of two-dimensional array, called $R$. 
-The array $R$ captures the range representation of the predicates. 
+In the workload $Q$ we add to $I$ two fields, {\tt LO\_DISCOUNT} and {\tt LO\_QUANTITY}, used by $P$. 
+The whole range set then becomes a kind of two-dimensional array, called $R$, capturing 
+the range representation of the gathered predicates. 
 Each entry under a field in $R$ represents a pair of (start and end) values forming the range. 
 In the range representation, infinity ($\infty$) or -infinity (-$\infty$) can 
 be used for unbounded ranges. 
@@ -498,7 +496,7 @@ In particular, {\tt IN} predicate is represented by multiple ranges.
 For instance, the above $p$1 can be represented by the following three ranges 
 \range{1, 1}, \range{4, 4}, \range{5, 5}; however, the last two consecutive 
 ranges can be consolidated as \range{4, 5}. 
-In the continuing example the range set $R$ is formed by the entries below.
+In the continuing example the field-wise distinct range set ($R$) is formed by the entries below.
 
 $R$:
 \begin{center}
@@ -510,8 +508,8 @@ $R$:
 \end{tabular}
 \end{center}
 
-Then, each predicate can be mapped to its associated ranges in $R$. That is, 
-we can have another map, called $M$2, between $P$ and $R$. 
+We then build another map, called $M$2, between $P$ and $R$. 
+That is, we associate each predicate in $P$ with a corresponding range in $R$. 
 Let $R$[$i$, $j$] denote the interval value for the $i$-th field and $j$-th range in $R$. 
 $R$[1, 3], for instance, indicates range \ropenrange{7, \infty} under {\tt LO\_DISCOUNT}. 
 In the running example, $M$2 is constructed as follows:
