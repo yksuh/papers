@@ -196,10 +196,10 @@ the entire range, so that a row will belong to exactly one and one partition.
 The Teradata optimizer then applies \hbox{partition} elimination for queries 
 that specify conditions on {\tt LO\_DISCOUNT} and/or {\tt LO\_QUANTITY}. 
 For \hbox{example}, only partitions~1 and~2 are needed for the query 
-``{\tt SELECT * FROM LINEORDER WHERE LO\_DISCOUNT >= 7 AND} {\tt LO\_QUANTITY <= 30}.'' 
+``{\tt SELECT * FROM LINEORDER WHERE} \linebreak {\tt LO\_DISCOUNT >= 7 AND} {\tt LO\_QUANTITY <= 30}.'' 
 Similarly, partitions~1 and~5 are sufficient to answer the query 
-``{\tt SELECT * FROM LINEORDER WHERE LO\_QUANTITY < 25}.'' 
-\linebreak The respective sizes of the partitions are a factor of the data distribution. 
+``{\tt SELECT * FROM LINEORDER WHERE} \linebreak {\tt LO\_QUANTITY < 25}.'' 
+The respective sizes of the partitions are a factor of the data distribution. 
 To see MLPPI in greater detail, check our references~\cite{klindt09mlppi,sinclair:ppi}. 
 
 %\vspace{-.1in}
@@ -207,7 +207,7 @@ To see MLPPI in greater detail, check our references~\cite{klindt09mlppi,sinclai
 %Next, using {\tt LINEORDER} defined in the SSB we provide examples of partitioning options that 
 %a DBA may define based on a small query set. 
 \paragraph{Challenge:}
-Consider a query set $Q$ having two queries $q$1 and $q$2 on the SSB, as shown below.
+Consider the below query set $Q$ having two queries $q$1 and $q$2 on the SSB.
 \vspace{-.05in}
 \begin{center}
 {\small
@@ -232,7 +232,7 @@ $q$2:	& {\tt SELECT c.C\_NATION, SUM(l.LO\_REVENUE)} \\
 \end{center}
 
 A DBA may focus on the {\tt LINEORDER} fact table and 
-the predicates involving {\tt LINEORDER} fields only. 
+the predicates involving \linebreak {\tt LINEORDER} fields only. 
 He can figure out the following five constraints, identified by the query number 
 and the sequence number of predicates in each query: 
 \vspace{-.05in}
@@ -270,7 +270,7 @@ for {\tt LO\_DISCOUNT}:
 \end{tabular}
 }
 \end{center}
-The above expression minimizes the size of the partitions 
+This expression minimizes the size of the partitions 
 by focusing exactly on the values required to satisfy the constraints 
 but creates a large number of small partitions. 
 
@@ -393,7 +393,7 @@ to extract query predicates and check any constraint in partitioning.
 This phase consists of a total of six steps, as shown in Algorithm~\ref{algo:pre_phase}. 
 %We elaborate on each step in the subsequent section.
 
-\vspace{-.1in}
+%\vspace{-.1in}
 
 \begin{algorithm}	
 \caption{The Preprocessing Phase}
@@ -413,8 +413,6 @@ This phase consists of a total of six steps, as shown in Algorithm~\ref{algo:pre
 \hspace{.05in} Partition Count Limit Check (on $R$) \\
 }
 \end{algorithm}
-
-%\vspace{-.3in}
 
 \subsubsection{Query Simplification}
 
@@ -480,18 +478,17 @@ $M$1:
 \end{tabular}
 \end{center}
 
-For each field referenced by the predicates, 
-we then build a set of distinct ranges on that field. 
+Now we build a set of distinct ranges for each field referenced by the predicates. 
 Specifically, we gather fields referenced by predicates in $P$, extract 
 ranges from the predicates, and group the ranges of each of the referenced fields. 
-Assume $I$ to be the list of fact table fields referenced by $P$. 
+Suppose $I$ to be a list of fact table fields referenced by $P$. 
 In the workload $Q$ we add to $I$ two fields, {\tt LO\_DISCOUNT} and {\tt LO\_QUANTITY}, used by $P$. 
-The whole range set then becomes a kind of two-dimensional array, called $R$, capturing 
-the range representation of the gathered predicates. 
+The whole range of the gathered predicates can be represented by a kind of two-dimensional array, called $R$. 
+
 Each entry under a field in $R$ represents a pair of (start and end) values forming the range. 
-In the range representation, infinity ($\infty$) or -infinity (-$\infty$) can 
-be used for unbounded ranges. 
-``['' or ``]'' are used for closed ranges, and ``('' or ``)'' for open ranges. 
+When it comes to range representation for an entry, 
+``['' and ``]'' are used for closed ranges while ``('' and ``)'' for open ranges. 
+Also, infinity ($\infty$) and -infinity (-$\infty$) can be used for unbounded ranges. 
 In particular, {\tt IN} predicate is represented by multiple ranges. 
 For instance, the above $p$1 can be represented by the following three ranges 
 \range{1, 1}, \range{4, 4}, \range{5, 5}; however, the last two consecutive 
@@ -508,7 +505,7 @@ $R$:
 \end{tabular}
 \end{center}
 
-We then build another map, called $M$2, between $P$ and $R$. 
+In turn, we build another map, called $M$2, between $P$ and $R$. 
 That is, we associate each predicate in $P$ with a corresponding range in $R$. 
 Let $R$[$i$, $j$] denote the interval value for the $i$-th field and $j$-th range in $R$. 
 $R$[1, 3], for instance, indicates range \ropenrange{7, \infty} under {\tt LO\_DISCOUNT}. 
@@ -526,18 +523,14 @@ $\langle${$p$4}, \{$R$[2, 2]\}$\rangle$. \\
 
 \subsubsection{Non-Overlapping Range Construction}
 
-Since there could be multiple predicates on the same field across queries, 
-extracted ranges may overlap each other. 
-The overlapping ranges must be broken without any common portion, so that 
-a pair of consecutive, \hbox{non-overlapping} ranges can be 
-considered for a merge in further phases. 
+Since there may be multiple predicates on the same field across queries, 
+extracted ranges for the field may overlap each other. 
+The overlapping ranges must be broken without any common portion, in order 
+that we can consider a pair of consecutive, \hbox{non-overlapping} ranges for 
+a merge in subsequent phases. 
 
-Algorithm~\ref{algo:split_overlap} describes the way of breaking 
-the \hbox{overlap} of ranges. 
 
-%\vspace{-.1in}
-
-\begin{algorithm}[h]
+\begin{algorithm}[t]
 \caption{Splitting Overlapping Ranges}
 \label{algo:split_overlap}
 \SetKwInOut{Input}{input}
@@ -563,19 +556,18 @@ the \hbox{overlap} of ranges.
 }
 \end{algorithm}
 
-\vspace{-.1in}
-
-\noindent For each field, the tool gets its associated ranges and sorts them 
-by start value. 
-It then checks whether or not adjacent ranges overlap each other.
-If that is the case, then we make a split between the ranges. 
+Algorithm~\ref{algo:split_overlap} describes the way of breaking 
+the \hbox{overlap} of ranges. 
+For each field, the algorithm 
+gets associated ranges of each field and sorts them by start value. 
+We then check whether or not adjacent ranges overlap each other.
+If that is the case, we make a split between the ranges. 
 In the example, the split is applied on the 
-overlapping ranges, \lopenrange{\infty, 30} and \range{25, 35}, under {\tt LO\_QUANTITY}. 
-Subsequently, a common, intermediate range (\range{25, 30}) is newly created and inserted into the range set 
+overlapping ranges, \lopenrange{\infty, 30} and \range{25, 35} in {\tt LO\_QUANTITY}. 
+Subsequently, a common (or intermediate) range (\range{25, 30}) is created and inserted into the range set 
 belonging to the {\tt LO\_QUANTITY} field, in order to fill the gap. 
-Then, $R$ in the example is shown as follows.
+$R$ is shown in the following.
 
-\
 {\it $R$}:
 \begin{center}
 \begin{tabular}{c|c} 
@@ -589,9 +581,10 @@ Then, $R$ in the example is shown as follows.
 The update of $R$ affects the existing map $M$2. 
 In the running example, $p$3 and $p$4 influenced by the split get mapped to 
 new range sets, \{$R$[2, 1], $R$[2, 2]\} and \{$R$[2, 2], $R$[2, 3]\}, respectively. 
-Of course, the range sets mapped to $p$1 and $p$2 referencing {\tt LO\_DISCOUNT} remain unchanged. 
-As a result, in the example we obtain the updated $M$2 as follows:
+Of course, the range sets corresponding to $p$1 and $p$2 referencing {\tt LO\_DISCOUNT} remain unchanged. 
+As a result, in the running example we obtain the updated $M$2 in the following.
 
+\pagebreak
 $M$2:
 \begin{center}
 \begin{tabular}{l}
@@ -602,40 +595,40 @@ $\langle${$p$4}, \{$R$[2, 2], $R$[2, 3]\}$\rangle$. \\
 \end{tabular}
 \end{center} 
 
-%\vspace{.1in}
-
 \subsubsection{Field Count Limit Check}
 
-%The DBMS or user may impose a limit on the number of fields in the final 
-%MLPPI recommendation. 
-At present, the Teradata DBMS has a limit (64) of the fields 
-that can be used in an MLPPI definition.
+One question that occurs is what if a DBMS has 
+a limit of fields that can be used for a partitioning definition. 
+(In the case of Teradata DBMS, up to 64 fields can be allowed for 
+an MLPPI definition.)
 If the number of fields present in $R$ exceeds the field count limit, 
 we determine which field(s) should be thrown away to satisfy the limit. 
 (The star schema fact table we use has much fewer fields than the limit, 
 and thus, this step will not be executed.)
-To choose victim fields, the tool computes the weighted sum of 
-{\em query cost} of queries regarding each field. 
+To choose victim fields, our tool computes the weighted sum of 
+{\em query cost}, to be discussed in Section~\ref{sec:opt_phase}, 
+of queries regarding each field. 
 The sum can be obtained by adding up every query cost on an MLPPI using 
 only the ranges under the field. 
-(We will cover how to measure the query cost in Section~\ref{sec:opt_phase}.) 
-We incrementally discard a field with the highest query cost sum 
+We incrementally discard a field with the largest sum of query cost 
 until the limit is reached. 
-Accordingly, we can update the existing $M$2. 
-One might say that the MLPPI may not be exploited if too many ranges, 
-exceeding a partition count limit (or 65,536 as of now) are found in one field. 
+Correspondingly, we can update the existing $M$2. 
+One might say that such an MLPPI may not be exploited if too many ranges 
+over a partition count limit (65,536 in Teradata DBMS) are found in one field.
 But we assume that such an extreme case is not expected. Even if 
-it happens, we can utilize the merges of consecutive ranges to make 
-the MLPPI feasible. 
+such a case happens, the merges of consecutive ranges can make the MLPPI feasible. 
 
 \subsubsection{Query-to-Range-Set Map Construction}
 
-Now, the tool can create a bi-directional {\em query-to-range-set} map, called $M$, 
-between $Q$ and $R$, using the existing maps $M$1 and $M$2. 
-It leverages a transitive property from $M$1 to $M$2.
-Once $M$ is constructed, 
-the intermediate maps ($M$1 and $M$2) are not used in the rest of phases. 
-$M$ is shown as below:
+Using the existing maps $M$1 and $M$2, 
+the tool can create the final bi-directional {\em query-to-range-set} map, say $M$, 
+between $Q$ and $R$. 
+To construct $M$, we leverage a transitive property from $M$1 to $M$2.
+Once we compute $M$, there is no need to keep 
+the intermediate maps ($M$1 and $M$2) for the subsequent phases. 
+In the running example, we can build $M$ in the following. 
+
+\pagebreak
 
 {\it $M$}:
 \begin{center}
@@ -645,27 +638,27 @@ $\langle${$q$2}, \{$R$[1, 3], $R$[2, 2], $R$[2, 3]\}$\rangle$.
 \end{tabular}
 \end{center} 
 
-In the subsequent phases $M$ gets used for computing costs and updated 
+\noindent In the subsequent phases $M$ gets used for computing costs and updated 
 along with a merge of ranges, and $R$ is refined for an MLPPI recommendation. 
 
 \subsubsection{Partition Count Limit Check}
 
-In this regard, the range set $R$ can be used to define an MLPPI using each field as one level. 
+The range set $R$ can be used to define an MLPPI using each field as one level. 
 However, if the current number of partitions by $R$ is greater than 
-the partition count limit, 
-then it is not possible to make a feasible MLPPI based on ranges in $R$. 
+the aforementioned partition count limit, 
+then it is not possible to make a feasible MLPPI based on the ranges in $R$. 
 
 The actual partition count limit is ample enough to pass the running example, 
 but to continue our discussion, assume that in our discussion the limit is {\it 15}.
-From $R$ in the running example, we can obtain a total of (number of ranges in {\tt LO\_DISCOUNT}) 
+From $R$ in the running example, we obtain a total of (number of ranges in {\tt LO\_DISCOUNT}) 
 $\cdot$(number of ranges in {\tt LO\_QUANTITY}) = (3+1) $\cdot$ (3+1) = {\it 16}
-partitions. 
-Because the total partitions surpass the limit, 
-the tool should pass through the initial phase in which 
-fewer partitions than the limit are made. 
-(Otherwise, the wizard will proceed to the optimized phase immediately.) 
-Note that one more range is counted per field in the calculation. 
-The added range is equivalent to the ``{\tt NO CASE OR UNKNOWN)}'' case in Figure~\ref{fig:exam}. 
+partitions. Note here that one reserved range covering the rest but the identified 
+is added by default to each field in the calculation, 
+and the default range is equivalent to the ``{\tt NO CASE OR UNKNOWN)}'' case in Figure~\ref{fig:exam}. 
+Since the total partitions surpass the limit, 
+the tool should go through the initial phase in which 
+we make fewer partitions than the limit. 
+(Otherwise, the wizard can bypass the initial phase and then immediately proceed to the optimized phase.) 
 
 The tool is now ready to proceed to the next phases, 
 with $R$ (input range set, or MGP) and the prepared $M$ (query-to-range-set map). 
@@ -675,37 +668,32 @@ with $R$ (input range set, or MGP) and the prepared $M$ (query-to-range-set map)
 \subsection{The Initial Phase}
 \label{sec:init_phase}
 
-In this phase, we incrementally merge a range pair in $R$ to reduce partitions. 
+This phase incrementally merges a range pair in $R$ to reduce partitions. 
 The merge continues until the number of ongoing partitions 
-drop below the partition count limit. 
-Once reaching the limit, we can have a feasible MLPPI with 
-the remaining partitions. 
+drops below the partition count limit. 
+After finishing the merge, the tool can derive a feasible MLPPI with the remaining partitions. 
 
-By and large, overall I/O cost may be increased by the merge. 
-Since every row is hash-sorted in each AMP of the Teradata DBMS server, 
-typically the full scan on a partition is done to retrieve 
-all the rows matching a given query. 
+By and large, overall I/O cost may be increased by the merge, 
+in that the full scan on a partition is performed to retrieve all the rows potentially matching a given query. 
 In the case of a merged partition, we may read the non-qualifying rows 
 that would not be seen before the merge, thereby paying more I/O to answer 
-the query.  
-To minimize the merge overhead, we pick up the range pair incurring 
-the least I/O increase in a heuristic fashion.
-
+the query. To minimize the merge overhead, we pick up the range pair incurring 
+the least I/O increase in a heuristic fashion. 
 To choose the desirable range pair for a merge, 
-the tool leverages the scan cost of a query on a range pair.
+the tool leverages the {\em scan cost} of a query on a range pair.
+
 Algorithm~\ref{algo:comp_scan_cost} represents how 
-the scan cost can be computed on the range pair that \hbox{influences} a query. 
-The scan cost represents the I/O cost to answer the query when the range pair is merged. It is 
-modeled as the {\em number of blocks} that are to be read 
-for the target query. To compute the scan cost of a query $q$, we use 
-a corresponding scan cost query ($s$), and 
-it can be constructed as follows: 
+the scan cost can be computed on the range pair that \hbox{influences} a given query. 
+The scan cost represents the I/O cost to answer the query when the range pair is merged. 
+It is defined as the {\em number of blocks} that are to be read 
+for the given query. To compute the scan cost of a query $q$, we write 
+a corresponding scan cost query ($s$), which can be constructed as follows: 
 \begin{center}
 $s$: {\tt SELECT * FROM $F$ WHERE} {\it CP},
 \end{center} 
 where $F$ is a fact table, and 
-{\it CP} indicates the predicates  
-restored from the ranges mapped to $q$ from $M$.
+{\it CP} indicates a predicate(s) reconstructed from 
+a range(s) mapped to $q$ in $M$.
 
 \begin{algorithm}[t]
 \caption{Scan Cost Computation}
@@ -735,13 +723,11 @@ restored from the ranges mapped to $q$ from $M$.
 
 If $q$ turns out to be affected by the merge of a range pair, 
 then the range set associated with $q$ in $M$ is temporarily updated 
-by removing the parent ranges and adding the merged one. 
+by removing the parent ranges and adding the merged range. 
 The altered range set is remapped to $q$ in $M$ and then 
-translated to the equivalent predicates, 
-so that {\it CP} for $s$ based on the predicates can be built.
-Unless the merge range pair influences $q$, then 
-{\it CP} can be simply built based on the 
-predicates restored from the existing ranges mapped to $q$.
+translated to the equivalent predicates. Then {\it CP} for $s$ can be built based on the predicates.
+Unless the merge range pair influences $q$, 
+we can simply derive {\it CP} from the existing ranges mapped to $q$.
 
 To help understand the scan cost construction, let us 
 consider a range pair ($rp$) of \hbox{$R$[2, 2]} and $R$[2, 3] in the running example. 
@@ -959,7 +945,13 @@ In turn, the tool merges the range pair that produces $T$ and updates $M$ and $R
 The wizard repeats the process until 1) no ranges in $R$ remain, or 2) pre-defined iterations are reached. 
 The optimized phase is finished if $T$ $\geq$ $T_{p}$.  
 
-\begin{figure}[t]
+In the running example, suppose that in the first round, ranges $R$[1, 1] and $R$[1, 2] are chosen for a merge. 
+Then, the wizard produces a merged range \range{1, 5} \hbox{under} {\tt LO\_DISCOUNT} and proceeds to the next round. 
+If a range pair selected for the subsequent merge fails to improve $T_{p}$, 
+then, the tool exits the optimized phase and \hbox{produces} the final MLPPI recommendation for the given workload $Q$ 
+as shown in Figure~\ref{fig:mlppi}. 
+
+\begin{figure}[h]
 \begin{center}
 \begin{tabular}{|l|} \hline
 {\tt ALTER TABLE LINEORDER} \\
@@ -980,11 +972,6 @@ The optimized phase is finished if $T$ $\geq$ $T_{p}$.
 \end{figure}
 
 
-In the running example, suppose that in the first round, ranges $R$[1, 1] and $R$[1, 2] are chosen for a merge. 
-Then, the wizard produces a merged range \range{1, 5} \hbox{under} {\tt LO\_DISCOUNT} and proceeds to the next round. 
-If a range pair selected for the subsequent merge fails to improve $T_{p}$, 
-then, the tool exits the optimized phase and \hbox{produces} the final MLPPI recommendation for the given workload $Q$ 
-as shown in Figure~\ref{fig:mlppi}. 
 
 Algorithm~\ref{algo:opt_phase} exhibits the proposed optimized phase, 
 which also applies the same heuristic to favor a range pair 
@@ -1447,156 +1434,10 @@ done by a human expert.
 \section*{Acknowledgments} 
 This work was carried out while the first author visited Teradata. 
 The first author is now at Korea Institute of Science and Technology Information (yksuh@kisti.re.kr).
-%\clearpage
-%\vspace\fill
-
-%1. Agrawal, R., Srikant, R.: Fast algorithms for mining association rules. In: Proceedings of the 20th International Conference on Very Large Databases. pp. 487–499. Morgan Kaufmann, San- tiago, Chile (1994)
-%2. Bruce,K.B.,Cardelli,L.,Pierce,B.C.:Comparingobjectencodings.In:Abadi,M.,Ito,T.(eds.) Theoretical Aspects of Computer Software, Lecture Notes in Computer Science, vol. 1281, pp. 415–438. Springer-Verlag, Berlin Heidelberg New York (1997)
-%3. Garcia-Molina, H., Ullman, D.J., Widom, J.: Database Systems: The Complete Book. Prentice Hall, New Jersey, USA (2002)
-%4. van Leeuwen, J. (ed.): Computer Science Today. Recent Trends and Developments, Lecture Notes in Computer Science, vol. 1000. Springer-Verlag, Berlin Heidelberg New York (1995)
-%5. Ribicˇre,M.,Charlton,P.:Ontologyoverview.MotorolaLabs,Paris(2002),[Online].Available:
-%http://www.fipa.org/docs/input/f-in-00045/f-in-00045.pdf (current October 2003)
-%6. Wang,X.,Bettini,C.,Brodsky,A.,Jajoida,S.:Logicaldesignfortemporaldatabaseswithmul-
-%tiple granularities. ACM Transactions on Database Systems 22(2), 115–170 (1997)
-
-%\begin{thebibliography}{99}
-%\expandafter\ifx\csname url\endcsname\relax
-%  \def\url#1{\texttt{#1}}\fi
-%\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
-%\expandafter\ifx\csname href\endcsname\relax
-%  \def\href#1#2{#2} \def\path#1{#1}\fi
-%
-%{
-%\bibitem{Suh12}
-%{Y.-K.~Suh, A.~Ghazal, A.~Crolotte, and P.~Kostamaa}, {A New Tool for Multi-level Partitioning in Teradata}, 
-%in: CIKM'12, pp. 2214--2218.
-%  
-%\bibitem{sinclair:ppi}
-%P.~Sinclair, {Using PPIs to Improve Performance},
-%  \url{http://www.teradata.com/tdmo/v08n03/pdf/AR5731.pdf}
-%  (accessed August 27, 2015).
-%
-%\bibitem{klindt09mlppi}
-%J.~Klindt, {Single-level and Multilevel Partitioned Primary \linebreak Indexes},
-%  \url{http://www.teradata.com/white-papers/Single-level-and-}\linebreak\url{Multilevel-Partitioned-Primary-Indexes-eb1889/}
-%  (accessed July 27 2015).
-%
-%\bibitem{oneil:ssb}
-%{P.~O’Neil, B.~O'Neil, and X.~Chen}, {The Star Schema Benchmark (SSB)},
-%  \url{http://www.cs.umb.edu/~poneil/StarSchemaB.PDF} 
-%  (accessed February 28, 2017).
-%
-%\bibitem{agrawal04:integrating}
-%{S.~Agrawal, V.~Narasayya, and B.~Yang}, {Integrating Vertical and Horizontal Partitioning into Automated Physical Database Design}, 
-%in: \hbox{SIGMOD} '04, pp. 359--370.
-%
-%\bibitem{Lightstone04:db2auto}
-%{S.~Lightstone and B.~Bhattacharjee}, {Automated Design of
-%  Multi-dimensional Clustering Tables for Relational Databases}, in:
-%  VLDB '04, pp. 1170--1181.
-%
-%\bibitem{nehme2011automated}
-%{R.~Nehme and N.~Bruno}, {Automated Partitioning Design in Parallel
-%  Database Systems}, in: SIGMOD '11, pp. 1137--1148.
-%
-%\bibitem{chaudhuri1998autoadmin}
-%{S.~Chaudhuri and V.~Narasayya}, {AutoAdmin `What-If' Index Analysis Utility}, ACM SIGMOD Rec. 27~(2) (1998) 367--378.
-%
-%\bibitem{finkelstein1988physical}
-%{S.~Finkelstein, M. Schkolnick, and P. Tiberio}, {Physical Database Design for Relational Databases}, ACM Trans. on Datab. Syst. (TODS), 13~(1) (1988) 91--128.
-%
-%\bibitem{labio1997physical}
-%{W.~Labio, D.~Quass, and B.~Adelberg}, {Physical Database Design for Data Warehouses}, in: ICDE '97, pp. 277--288.
-%
-%\bibitem{rozen1991framework}
-%{S.~Rozen and D.~Shasha}, {A Framework for Automating Physical Database Design}, in: VLDB '91, pp. 401--411.
-%
-%\bibitem{Zilio1998}
-%{C.~Zilio}, {Physical Database Design Decision Algorithms and Concurrent
-%  \hbox{Reorganization} for Parallel Database Systems}, Ph.D. thesis,
-%  Dept. of CS, Univ. of Toronto (1998).
-%
-%\bibitem{sheet2009oracle}
-%{Oracle}, {Oracle White Paper---Partitioning with \hbox{Oracle} Database 11g
-%  \hbox{Release 2}},
-%  \url{http://www.oracle.com/technetwork/database/options/partitioning/twp-partitioning-11gr2-2009-09-130569.pdf}
-%  (accessed June 23, 2014).
-%
-%\bibitem{saa2007oracle}
-%{Oracle}, {SQL Access Advisor},
-%  \url{http://docs.oracle.com/cd/B19306_01/server.102/b14211/advisor.htm}
-%  (accessed March 30, 2012).
-%
-%\bibitem{rao2002automating}
-%{Jun Rao, Chun Zhang, Nimrod Megiddo, and Guy Lohman}, {Automating
-%  Physical Database Design in A Parallel Database}, in: SIGMOD '02, pp. 558--569.
-%
-%\bibitem{agrawal2000automated}
-%{S.~Agrawal et. al.}, {Automated Selection of Materialized Views and Indexes in SQL Databases}, in:
-%  {VLDB '00}, pp. 496--505.
-%
-%\bibitem{Agrawal04:sqlserver}
-%{S.~Agrawal et. al.}, {Database Tuning Advisor for Microsoft
-%  SQL Server 2005: Demo}, in: \hbox{SIGMOD} '05, pp. 930--932.
-%
-%\bibitem{dash2011cophy}
-%{D.~Dash}, {CoPhy: A
-%  Scalable, Portable, and Interactive Index Advisor for Large Workloads},
-%  in: PVLDB, 4~(6) (2011) 362--372.
-%
-%\bibitem{Kimura11}
-%{H.~Kimura et. al.}, {Compression Aware
-%  \hbox{Physical} Database Design}, in: PVLDB, 4~(10) (2011) 657--668.
-%
-%\bibitem{itwsqlserver}
-%{Microsoft SQL Server 2000}, {Index Tuning Wizard SQL Server 2000},
-%  \url{http://technet.microsoft.com/en-us/library/cc966541.aspx} 
-%  (accessed on March 21, 2014).
-%
-%\bibitem{valentin2000db2}
-%{G.~Valentin}, {DB2 Advisor: An Optimizer Smart Enough to Recommend Its Own
-%  Indexes}, in: {ICDE '00}, pp. 101--110.
-%
-%\bibitem{zilio2004recommending}
-%{D.~Zilio et. al.},
-%  {Recommending Materialized Views and Indexes with the IBM DB2 Design
-%  Advisor}, in: ICAC '04, pp. 180--188.
-%
-%\bibitem{Zilio04:db2design}
-%{D.~Zilio et. al.}, {DB2 Design Advisor:
-%  Integrated Automatic Physical Database}, in: VLDB '04, pp. 1087--1097.
-%
-%\bibitem{tatarowicz2012lookup}
-%{A.~Tatarowicz et. al.}, {Lookup Tables: Fine-grained Partitioning for Distributed Databases},
-%  in: ICDE'12, pp. 102--113.
-%
-%\bibitem{idreoskm07}
-%{S.~Idreos et. al.}, {Database Cracking}, in: CIDR'07, pp. 68--78.
-%}
-%
-%\end{thebibliography}
 
 {\footnotesize
 \bibliographystyle{splncs03}
 \bibliography{paper}
 }
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% For the final version of the paper: %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% Author information
-%\vspace{4ex}\noindent
-%\textbf{Author One} is\dots
-%
-%\bigskip\noindent
-%\textbf{Author Two} is\dots
-%
-%\bigskip\noindent
-%\textbf{Author Three} is\dots
-
-%% Reception and acceptance information
-%\bigskip
-%\paragraph{Received: Month DD, 20YY; Accepted: Month DD, 20YY.}
 
 \end{document}
