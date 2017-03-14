@@ -31,14 +31,12 @@
 %% Use this the list of authors is too long for the running heads
 %\authorrunning{Correspondence to Young-Kyoon Suh, now at Korea Institute of Science and Technology Information}
 
-\institute{Department of Computer Science, The University of Arizona, Tucson, AZ 85721, USA\\ 
+\institute{Department of Computer Science, The University of Arizona, AZ 85721, USA\footnote{Currently, he is at Korea Institute of Science and Technology Information (KISTI). This work was conducted while he interned at Teradata during his PhD in the University of Arizona.}\\ 
+  %\email{yksuh@cs.arizona.edu}
   \email{yksuh@cs.arizona.edu}
   \and
   Teradata Corporation, El Segundo, CA 90245, USA\\
   \email{\{alain.crolotte,pekka.kostamaa\}@teradata.com}
-%  \and
-%  Korea Institute of Science and Technology Information, Daejeon 34141 Republic of Korea\\ 
-%  \email{yksuh@kisti.re.kr}
 }
 
 \def\form#1{$\langle{#1}\rangle$}
@@ -673,14 +671,14 @@ The merge continues until the number of ongoing partitions
 drops below the partition count limit. 
 After finishing the merge, the tool can derive a feasible MLPPI with the remaining partitions. 
 
-By and large, overall I/O cost may be increased by the merge, 
+Overall, I/O cost may be increased by the merge, 
 in that the full scan on a partition is performed to retrieve all the rows potentially matching a given query. 
 In the case of a merged partition, we may read the non-qualifying rows 
 that would not be seen before the merge, thereby paying more I/O to answer 
 the query. To minimize the merge overhead, we pick up the range pair incurring 
 the least I/O increase in a heuristic fashion. 
-To choose the desirable range pair for a merge, 
-the tool leverages the {\em scan cost} of a query on a range pair.
+To choose a range pair for a merge, 
+we calculate the {\em scan cost} of a query on the merged range pair.
 
 Algorithm~\ref{algo:comp_scan_cost} represents how 
 the scan cost can be computed on the range pair that \hbox{influences} a given query. 
@@ -710,7 +708,7 @@ a range(s) mapped to $q$ in $M$.
 	Delete ranges in $rp$ from and insert $r_{m}$ into $L$. \\
 	$s$ $\leftarrow$ ``{\tt SELECT * FROM FACT$\_$TABLE WHERE }'' \;
 	\ForEach{range $r$ $\in$ $L$}{	
-		Restore a predicate $p$ from $r$. \\
+		Reconstruct a predicate $p$ from $r$. \\
 		Add $p$ to {\tt WHERE} clause of $s$.
 	}
 	Make an API call with $s$ to the server. \\
@@ -721,7 +719,7 @@ a range(s) mapped to $q$ in $M$.
 }
 \end{algorithm}
 
-If $q$ turns out to be affected by the merge of a range pair, 
+If $q$ turns out being affected by the merge of a range pair, 
 then the range set associated with $q$ in $M$ is temporarily updated 
 by removing the parent ranges and adding the merged range. 
 The altered range set is remapped to $q$ in $M$ and then 
@@ -729,17 +727,17 @@ translated to the equivalent predicates. Then {\it CP} for $s$ can be built base
 Unless the merge range pair influences $q$, 
 we can simply derive {\it CP} from the existing ranges mapped to $q$.
 
-To help understand the scan cost construction, let us 
+To see in the Algorithm~\ref{algo:comp_scan_cost} how a scan cost query is built, 
 consider a range pair ($rp$) of \hbox{$R$[2, 2]} and $R$[2, 3] in the running example. 
 $rp$ produces the merged range, \range{25, 35}, \hbox{under} {\tt LO\_QUANTITY}. 
-The merge by $rp$ affects both $q$1 and $q$2 in the workload.  
-
+The merge by $rp$ affects both $q$1 and $q$2 in the workload. 
 Thus, the range sets of $q$1 and $q$2 on {\tt LO\_QUANTITY} are 
-altered to \{\openrange{\infty, 25}, \range{25, 35}\} and \{\range{25, 35}\}, 
+correspondingly altered to \{\openrange{\infty, 25}, \range{25, 35}\} and \{\range{25, 35}\}, 
 respectively. Of course, no change is made to the existing range sets 
 of the queries on {\tt LO\_DISCOUNT}. 
 Therefore, the corresponding scan cost queries for $q$1 and $q$2 
-can be built as below:
+can be built as shown below:
+\vspace{-.08in}
 \begin{center}
 \begin{tabular}{rl}
 $\Sone$:	& {\tt SELECT * FROM LINEORDER l} \\
@@ -752,22 +750,20 @@ $\Stwo$:	& {\tt SELECT * FROM LINEORDER l} \\
         & {\tt AND (l.LO\_QUANTITY >= 25 AND} \\ 
         & {\tt l.LO\_QUANTITY <= 35)}.
 \end{tabular}
-\end{center}
+\end{center} 
+\vspace{-.08in}
+\noindent Since the altered ranges (\openrange{\infty, 25} and \range{25, 35}) of $q$1 
+are consecutive, we can simply build the merged, single predicate ({\tt l.LO\_QUANTITY <= 35}) for $\Sone$. 
 
-It is possible to combine all the (consecutive) ranges in the (temporarily) altered set of $q$1, 
-and hence, a single predicate ({\tt l.LO\_QUANTITY <= 35}) can be built. 
-
-The wizard sends such a scan cost query to the server via an API call, 
-and it extracts from the server's response the {\em spool size} (in bytes), or the size of scan query result. 
-Then, the tool computes as scan cost the {\em block counts} using the spool size. 
+In turn, the wizard sends each scan cost query to the server through an API call. 
+The tool extracts from the server's response the {\em spool size} (in bytes), which is 
+the result size of the sent scan cost query, and then 
+calculates as scan cost the {\em block counts} ($blc$) using the spool size. 
 If the merge of a range pair does not impact on any query in the workload, 
-the existing (previously computed) scan cost of queries 
-will be reused for the range pair. 
-That is, the wizard will only recompute 
-the scan cost of a query {\em iff} the query is affected by 
-the merge of two consecutive ranges. 
-
-In this way, the weighted sum of scan cost of queries, $T_{s}$ can be computed 
+the existing (previously computed) scan cost of queries is reused for the range pair. 
+In other words, the wizard only recomputes the scan cost of a query {\em only if} 
+the query is affected by the merge of two consecutive ranges. 
+The weighted sum of scan cost of queries, $T_{s}$ can be computed 
 for each range pair. 
 $T_{s}$ can be defined as follows:
 \begin{center}
@@ -813,11 +809,11 @@ to retrieve all the qualifying
 rows for $q$2; thus, the other partitions can be simply eliminated. 
 In the meantime, to answer $q$1, we need to read the four partitions formed by 
 the top two ranges of each field. 
-Unfortunately, because the partitions formed by (({$R$[1, 1]{$\cup$}$R$[1, 2]})$\cap$($R$[2, 2]) 
-contain the non-qualifying rows for $q$1, $R$ cannot provide $q$1 with as much benefit as $q$2. 
-However, $R$ can be a good compromise to satisfy both queries, in that 
-the MLPPI derived by $R$ can potentially minimize the total execution cost 
-of $Q$. 
+As the partitions formed by (({$R$[1, 1]{$\cup$}$R$[1, 2]})$\cap$($R$[2, 2]) 
+contain the non-qualifying rows for $q$1, unfortunately, 
+$R$ cannot provide $q$1 with as much benefit as $q$2. 
+$R$, however, can be a good compromise to satisfy both queries, in that 
+the MLPPI derived by $R$ can potentially minimize the total execution cost of $Q$. 
 
 \begin{algorithm}[t]
 \caption{The Initial Phase}
@@ -855,27 +851,29 @@ of $Q$.
 }
 \end{algorithm}
 
-
 Algorithm~\ref{algo:init_phase} represents the initial phase 
-that has been proposed so far. 
-The algorithm starts with a query-to-range set map ($M$) and an input range set ($R$). 
-Until the number of the partitions in $R$ falls below the partition limit threshold, 
-the algorithm determines the range pair yielding the least total execution cost ($T_{s}$) 
-and updates $M$ and $R$. At the end, the algorithm produces a final recommendation based on $R$.
-%\vspace{-.1in}
+that has been described so far. 
+Given a \linebreak \hbox{query-to-range} set map ($M$) and an input range set ($R$), 
+the algorithm determines which range pair to yield the least total execution cost ($T_{s}$) 
+and updates $M$ and $R$ using the chosen range pair, 
+until the number of the partitions by $R$ falls below a pre-defined partition limit count.
+Finally, the algorithm produces the final recommendation based on $R$.
 
-Now that the total partition counts ($4${$\times$}$3$=$12$) by $R$ falls  
-below the assumed limit ($15$), the wizard 
-proceeds to the optimized phase with $R$ without repeating the initial phase. 
+In the running example the total partition counts ($4${$\times$}$3$=$12$) by $R$ is under 
+the assumed limit ($15$), which meets the partitioning limit. 
+Hence, the wizard can enter the optimized phase with $R$, 
+without repeating the initial phase. 
 
 \subsection{The Optimized Phase}
 \label{sec:opt_phase}
 
 %We verified the effectiveness of the tool by running it on a workload based
-In this regard, using $R$ we have an initial MLPPI recommendation for the {\tt LINEORDER} fact table.
-The recommendation can be used sufficiently, but 
-having fewer partitions, induced by further merges, 
-can enhance the overall workload performance for the following reasons. 
+After passing the initial phase, 
+we now have an initial MLPPI recommendation based on $R$, for the {\tt LINEORDER} fact table.
+The initial recommendation can be used sufficiently. 
+
+But via additional merges we may further make fewer partitions, 
+which actually can enhance the overall workload performance for the following reasons. 
 First, multiple file contexts by many partitions can incur 
 huge overhead that impacts on the query optimizer. 
 There also exists an operational threshold 
@@ -950,7 +948,7 @@ Then, the wizard produces a merged range \range{1, 5} \hbox{under} {\tt LO\_DISC
 If a range pair selected for the subsequent merge fails to improve $T_{p}$, 
 then, the tool exits the optimized phase and \hbox{produces} the final MLPPI recommendation for the given workload $Q$ 
 as shown in Figure~\ref{fig:mlppi}. 
-
+\vspace{-.25in}
 \begin{figure}[h]
 \begin{center}
 \begin{tabular}{|l|} \hline
@@ -968,10 +966,10 @@ as shown in Figure~\ref{fig:mlppi}.
 {\tt );} \\ \hline
 \end{tabular}
 \end{center}
-\caption{An MLPPI Recommendation for Workload $Q$\label{fig:mlppi}}
+\vspace{-.2in}
+\caption{The Final MLPPI Recommendation for the Given Workload $Q$\label{fig:mlppi}}
+\vspace{-.2in}
 \end{figure}
-
-
 
 Algorithm~\ref{algo:opt_phase} exhibits the proposed optimized phase, 
 which also applies the same heuristic to favor a range pair 
@@ -1062,8 +1060,8 @@ A range consisting of only a single value per field can be mapped to each query.
 Thus, the running time complexity for the map construction 
 is $\BigO$($N${$\cdot$}$C${$\cdot$}$V$). \qed
 
-{\bf Comment:} In practice, our experiments showed that the bound 
-$\BigO$($N${$\cdot$}$C${$\cdot$}$V$) is overly pessimistic. 
+But we empirically observed that the bound of $\BigO$($N${$\cdot$}$C${$\cdot$}$V$) 
+was overly pessimistic. 
 
 \subsection{The Initial and Optimized Phases}
 
@@ -1071,8 +1069,7 @@ $\BigO$($N${$\cdot$}$C${$\cdot$}$V$) is overly pessimistic.
 \label{lemma:init_phase}  
 The running time complexity for the initial or optimized phases is 
 $\BigO$($M^{2}${$\cdot$}$N$), 
-where $M$ is the number of range pairs, and $N$ is the number of queries in 
-a given workload. 
+where $M$ is the number of range pairs, and $N$ is the number of queries in a workload. 
 \end{lemma}
 
 {\bf Proof}. Suppose that the merge of every range pair influences all the queries. 
@@ -1092,12 +1089,13 @@ $M${$\cdot$}$N$+($M$-1){$\cdot$}$N$+$\cdots$+$N$ = ($\sum_{i=1}^M i$){$\cdot$}$N
 
 %\vspace{0.1in}
 
-Our experiments showed that $\BigO$($M^{2}${$\cdot$}$N$), the running time complexity, 
-is overly pessimistic. 
-In \hbox{practice}, the number of calls made was much fewer than the \hbox{theoretic} bound, 
-since it was very rare for a range pair to be associated with all queries in a workload. 
-In \hbox{Section}~\ref{sec:stat} we will show how many API calls take place on the workloads 
-used for evaluation. 
+Again, our experiments showed that $\BigO$($M^{2}${$\cdot$}$N$), the running time complexity, 
+was overly pessimistic. Specifically, 
+the number of calls made in our experiments was much fewer than that bound, as 
+it was almost rare for a range pair to involve all queries in a workload 
+(as seen in Table~\ref{tab:workload_stat}).
+
+In the following, we evaluate the proposed algorithm. 
 
 \section{Experiment}
 \label{sec:experiment}
@@ -1180,7 +1178,7 @@ The total number of iterations in the initial phases
 tended to be proportional to the input \hbox{partitions} 
 \hbox{generated} from the workloads. 
 Note that there \hbox{happened} only one iteration in the optimized phase. 
-The reason was that since the partitions produced by the \hbox{initial} phase were customized enough, 
+The reason was that as the partitions produced by the \hbox{initial} phase were customized enough, 
 no more \hbox{iterations} were \hbox{necessary} for further optimization. 
 
 As mentioned in Section~\ref{sec:analysis}, the total calls made to 
@@ -1431,9 +1429,9 @@ the wizard could reduce the total elapsed time by more than a factor of two,
 compared with those of no partitioning approach and partitioning 
 done by a human expert. 
 
-\section*{Acknowledgments} 
-This work was carried out while the first author visited Teradata. 
-The first author is now at Korea Institute of Science and Technology Information (yksuh@kisti.re.kr).
+%\section*{Acknowledgments} 
+%This work was carried out while the first author visited Teradata. 
+%The first author is now at Korea Institute of Science and Technology Information (yksuh@kisti.re.kr).
 
 {\footnotesize
 \bibliographystyle{splncs03}
