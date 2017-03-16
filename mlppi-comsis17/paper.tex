@@ -1039,9 +1039,9 @@ as shown in Figure~\ref{fig:mlppi}.
 \label{sec:analysis}
 
 In this section we analyze the time complexity of 
-the proposed preprocessing, initial, and optimized phases.
-For the time complexity we compute the logical running time of the wizard, using the {\em number of API calls} 
-made to the server during the phases. 
+the proposed algorithms: preprocessing, initial, and optimized phases. 
+The metric of this complexity analysis on each phase is the logical running time of the wizard, 
+equivalent to the number of API calls made to the database server during that phase. 
 
 \subsection{The Preprocessing Phase}
 
@@ -1053,34 +1053,33 @@ in a workload, $C$ is the total number of fields in the fact table,
 and $V$ is the max number of values in a field. 
 \end{lemma}
 
-{\bf Proof}. Let us consider a worst case such that given a workload of 
+{\bf Proof}. Consider the worst case such that given a workload of 
 $N$ queries, each query references all the fields of the fact table, and 
 each field is associated with at most $V$ values by the predicates of the queries. 
 Each query may have a single-value range. 
-A range consisting of only a single value per field can be mapped to each query. 
+A range consisting of only one value per field can be mapped to each query. 
 Thus, the running time complexity for the map construction 
 is $\BigO$($N${$\cdot$}$C${$\cdot$}$V$). \qed
 
-But we empirically observed that the bound of $\BigO$($N${$\cdot$}$C${$\cdot$}$V$) 
+But note that in our experiments the bound of $\BigO$($N${$\cdot$}$C${$\cdot$}$V$) 
 was overly pessimistic. 
 
 \subsection{The Initial and Optimized Phases}
 
 \begin{lemma}
 \label{lemma:init_phase}  
-The running time complexity for the initial or optimized phases is 
+The running time complexity for the initial (or optimized) phase is 
 $\BigO$($M^{2}${$\cdot$}$N$), 
 where $M$ is the number of range pairs, and $N$ is the number of queries in a workload. 
 \end{lemma}
 
 {\bf Proof}. Suppose that the merge of every range pair influences all the queries. 
-Every iteration, either the scan or query costs need to be recomputed 
-for each query. 
-In the first round the \hbox{re-computation} cost is paid as many times as $M${$\cdot$}$N$, 
-and a chosen range pair is merged. In the subsequent round 
-$M$-1 range pairs remains, and the following cost amounts to ($M$-1){$\cdot$}$N$. 
-In the worst case we may end up consolidating all range pairs, thus having no partition on 
-a target table. The total calls to the server can be increased up to 
+Every iteration, either the scan or query costs need to be recomputed for each query. 
+In the first round we pay the \hbox{re-computation} cost of $M${$\cdot$}$N$ 
+and merge a victim range pair. In the subsequent round, $M$-1 range pairs remain, 
+so the cost amounts to ($M$-1){$\cdot$}$N$. 
+In the worst case we end up consolidating all range pairs, thus having no partition on 
+the target table. The total calls made to the server can be added up to 
 
 \begin{center}
 $M${$\cdot$}$N$+($M$-1){$\cdot$}$N$+$\cdots$+$N$ = ($\sum_{i=1}^M i$){$\cdot$}$N$ = $\frac{M(M-1)}{2}${$\cdot$}$N$. 
@@ -1092,48 +1091,51 @@ $M${$\cdot$}$N$+($M$-1){$\cdot$}$N$+$\cdots$+$N$ = ($\sum_{i=1}^M i$){$\cdot$}$N
 
 Again, our experiments showed that $\BigO$($M^{2}${$\cdot$}$N$), the running time complexity, 
 was overly pessimistic. Specifically, 
-the number of calls made in our experiments was much fewer than that bound, as 
-it was almost rare for a range pair to involve all queries in a workload 
+the number of calls made in our experiments was by far fewer than that bound. 
+That was because it was very rare for a range pair to involve all queries in a given workload 
 (as seen in Table~\ref{tab:workload_stat}).
 
-In the following, we evaluate the proposed algorithm. 
+%In the following we evaluate the performance of our wizard using the proposed algorithms.
 
 \section{Experiment}
 \label{sec:experiment}
 
-In this section, we describe our environment settings, 
-report the statistics measured in our experiments, and 
-demonstrate the performance of the MLPPI wizard (WIZARD), compared with 
-that of no partitioning and the partitioning by a human expert (EXP). 
+In this section we evaluate the performance of our wizard using the proposed algorithms.
+We first describe our environment settings. 
+We then report the statistics measured during our experiments. 
+Finally, we compare the performance of the recommendation 
+by the MLPPI wizard with (1)~that of no partitioning 
+and (2)~the partitioning of a human expert (EXP) under different setups.
 
 \subsection{Environment Settings}
 \label{sec:env_set}
 
-The MLPPI wizard was implemented as a prototype 
-on top of the Teradata DBMS server. 
-It was written in Java. 
-The performance of the wizard was evaluated 
+\paragraph{Development:} 
+We implemented our MLPPI wizard as a prototype on top of the \hbox{Teradata} DBMS server. 
+The wizard was written in Java. 
+We evaluated the performance of the \hbox{wizard} 
 on the Teradata DBMS server machine running Unix. 
 
-When it comes to workload generation, we took advantage of 
+\paragraph{Workload:} When it comes to workload generation, we took advantage of 
 our simple star schema query \hbox{generator}. 
-The generator assumes that 1) available operators, 2) fields, 
-and 3) the minimum and \hbox{maximum} values of the fields are already known. 
+The generator assumes that (i)~available operators, (ii)~fields, 
+and (iii)~the minimum and \hbox{maximum} values of the fields are already known. 
 For each query, the generator first randomly selects the number of single-table 
 predicates to create. 
-Then, it arbitrarily chooses a field and a specific operator 
+The generator then arbitrarily chooses a field and a specific operator 
 for each predicate. 
 If {\tt IN} operator on a chosen field is picked up, the query generator 
 determines the number of values to add to the {\tt IN} list and then chooses random values within the min-max value 
 range of the field. 
-In this way the generator builds a query involving the generated predicates.
+In this way the generator makes a query involving the generated predicates.
 
-A generated query is based on a template that joins {\tt LINEORDER} and {\tt DDATE} with constraints defined by the predicates. 
+A generated query is based on a template that joins {\tt LINEORDER} and 
+{\tt DDATE} with constraints defined by the predicates. 
 This template is common in customer cases like reports and form 
 templates. 
-Using the query generator we generated two workloads consisting of 10 queries (10Q) and 20 queries (20Q). 
+Using the query generator we generated two workloads consisting of 10 queries~(10Q) and 20 queries~(20Q). 
 
-For the query workloads we populated the fact table with a scale of 1TByte (1TB) and 3TBytes (3TB).
+For the query workloads we populated the fact table with a scale factor of 1TByte~(1TB) and 3TBytes~(3TB).
 
 \begin{table*}[t]
 \caption{The statistics obtained on the used workloads\label{tab:workload_stat}}
