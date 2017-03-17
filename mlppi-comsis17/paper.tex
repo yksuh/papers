@@ -1104,7 +1104,7 @@ In this section we evaluate the performance of our wizard using the proposed alg
 We first describe our environment settings. 
 We then report the statistics measured during our experiments. 
 Finally, we compare the performance of the recommendation 
-by the MLPPI wizard with (1)~that of no partitioning 
+by the MLPPI wizard (WIZARD) with (1)~that of no partitioning (NO PPI)
 and (2)~the partitioning of a human expert (EXP) under different setups.
 
 \subsection{Environment Settings}
@@ -1140,23 +1140,23 @@ For the query workloads we populated the fact table with a scale factor of 1TByt
 \begin{table*}[t]
 \caption{The statistics obtained on the used workloads\label{tab:workload_stat}}
 \begin{center}
-{\scriptsize
-\begin{tabular}{|l|l|l|l|l|} \hline
-		   			   							   & \multicolumn{2}{|c|}{Init. Phase} & \multicolumn{2}{|c|}{Opt. Phase} \\ \cline{2-5}
-		   			   							   & 10Q & 20Q & 10Q & 20Q \\ \hline
-{\# Input Partitions}  							   & 1,008,000 & 110,739,200 & 51,840 & 59,520 \\ \hline
-{\# Input Range Pairs} 							   & 441 & 4,180 & 24 & 48\\ \hline
-{\# Total Iterations}  							   & 14 & 55 & 1 & 1 \\ \hline
-{\# Total API Calls (Worst Calls by Lemma~\ref{lemma:init_phase}})   & 1,305 (1,944,810) & 31,915 (349,448,000) & 78 (5,760) & 388 (46,080) \\ \hline
-{\# Average API calls per Range Pair} 		  	   & 2.96 & 7.63 & 3.25 & 8.08 \\ \hline
-{\# Average number of range pairs compared per iteration} 	   & 31.5 & 76.0 & 24 & 48 \\ \hline
-{\# Maximum number of range pairs compared per an iteration} & 38 & 103 & 24 & 48 \\ \hline
-{\# Minimum number of range pairs compared per an iteration} & 25 & 49 & N/A & N/A\\ \hline
+{\scriptsize %
+\begin{tabular}{|c|l|l|l|l|l|} \hline
+\multicolumn{2}{|c|}{\multirow{2}{*}{Item}} & \multicolumn{2}{|c|}{The Initial Phase} & \multicolumn{2}{|c|}{The Optimized Phase} \\ \cline{3-6}
+ \multicolumn{2}{|c|}{} & 10Q & 20Q & 10Q & 20Q \\ \hline
+1 & {\# of input partitions}  	 & 1,008,000 & 110,739,200 & 51,840 & 59,520 \\ \hline
+2 & {\# of input range pairs} 	 & 441 & 4,180 & 24 & 48\\ \hline
+ % {\# of total iterations}   & 14 & 55 & 1 & 1 \\ \hline
+3 & {\# of total API calls (\# of worst calls by Lemma~\ref{lemma:init_phase}})   & 1,305 (1,944,810) & 31,915 (349,448,000) & 78 (5,760) & 388 (46,080) \\ \hline
+4 & {\# of average API calls per range pair} 	& 3 & 8 & 3 & 8 \\ \hline
+5 & {\# of average range pairs compared per iteration} 	   & 32 & 76 & 24 & 48 \\ \hline
+6 & {The maximum \# of range pairs compared per an iteration} & 38 & 103 & 24 & 48 \\ \hline
+7 &{The minimum \# of range pairs compared per an iteration} & 25 & 49 & 24 & 48\\ \hline
 %{\# max. API Calls made per range pair} 		   & 4.92 & 16.14 & & \\ \hline
 %{\# min. API Calls made per range pair} 		   & 1.92 & & & \\ \hline
-{\# Average API calls made per iteration}		   & 93.21 & 580 & 78 & 388 \\ \hline
-{\# Maximum number of API calls made per an iteration} 	   & 123 & 791 & 78 & 388 \\ \hline
-{\# Minimum number of API calls made per an iteration} 	   & 73 & 381 & N/A & N/A \\ \hline
+8 & {\# of average API calls made per iteration}		   & 93 & 580 & 78 & 388 \\ \hline
+9 & {The maximum \# of API calls made per an iteration} 	   & 123 & 791 & 78 & 388 \\ \hline
+10 & {The minimum \# of API calls made per an iteration} 	   & 73 & 381 & 78 & 388 \\ \hline
 \end{tabular}
 }
 \end{center}
@@ -1166,28 +1166,28 @@ For the query workloads we populated the fact table with a scale factor of 1TByt
 \subsection{Statistics Report}
 \label{sec:stat}
 
-Table~\ref{tab:workload_stat} summarizes the WIZARD's execution statistics, 
+Table~\ref{tab:workload_stat} summarizes the execution statistics of 
 which were obtained while the recommendations for the \hbox{workloads} were produced. 
 The statistics includes input partitions, 
 range pairs, number of API calls made, and total iterations 
 observed in each phase. 
 
-About 1 million partitions were initially derived for 10Q whereas roughly 0.11 billion partitions for 20Q. 
-Although the workload size doubled, the total number of partitions was increased exponentially. 
-Much more predicates with different bindings produced two orders of magnitude more ranges in 20Q than those of 10Q. 
-While the huge input partitions were made, the number of collected range pairs per field was relatively small. 
+About 1 million partitions were initially derived for 10Q, and roughly 110 million partitions for 20Q. 
+Although the workload size doubled from 10Q to 20Q, the total number of partitions increased exponentially. 
+Much more predicates with different bindings produced about 110x more ranges in 20Q than those of 10Q. 
+While a huge number of input partitions were made, the number of range pairs collected per field was relatively small. 
 
-The total number of iterations in the initial phases 
-tended to be proportional to the input \hbox{partitions} 
-\hbox{generated} from the workloads. 
-Note that there \hbox{happened} only one iteration in the optimized phase. 
-The reason was that as the partitions produced by the \hbox{initial} phase were customized enough, 
-no more \hbox{iterations} were \hbox{necessary} for further optimization. 
+The total number of iterations in the initial phase 
+tended to be proportional to the input partitions 
+generated from the 10Q and 20Q workloads. 
+Note that the optimized phase ran only once for those two workloads.
+Since the partitions produced by the initial phase were customized enough,
+no more iterations were necessary for further optimization. 
 
-As mentioned in Section~\ref{sec:analysis}, the total calls made to 
-the server per workload were by far fewer than the theoretical bound shown in parentheses. 
+As mentioned in Section~\ref{sec:analysis}, for each workload the number of the total calls made to 
+the database server were extremely small, compared to that of the theoretical worst calls shown in the parentheses. 
 The worst call counts were calculated regarding the number of queries and range pairs observed in each phase. 
-The average number of calls per range pair was limited within 10. %across workloads and phases. 
+Furthermore, the average number of calls per range pair (was limited within 10 across the workloads and phases. 
 
 \begin{figure*}[t]
 \vspace{-.2in}
